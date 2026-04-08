@@ -1,16 +1,11 @@
 import { motion } from "framer-motion";
-import { Dumbbell, Users, Apple, Video } from "lucide-react";
+import { Dumbbell, Apple, Video, Heart } from "lucide-react";
 
 const services = [
   {
     icon: Dumbbell,
     title: "Coaching Individuel",
     description: "Séances personnalisées adaptées à tes objectifs et ton niveau. Suivi complet de ta progression.",
-  },
-  {
-    icon: Users,
-    title: "Cours Collectifs",
-    description: "Entraînements en groupe dynamiques et motivants. HIIT, renforcement, cardio et plus encore.",
   },
   {
     icon: Apple,
@@ -21,6 +16,11 @@ const services = [
     icon: Video,
     title: "Coaching en Ligne",
     description: "Programmes d'entraînement à distance avec suivi vidéo et ajustements en temps réel.",
+  },
+  {
+    icon: Heart,
+    title: "Suivi & Motivation",
+    description: "Accompagnement continu pour rester motivée et progresser à ton rythme. Bilan régulier.",
   },
 ];
 
