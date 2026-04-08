@@ -1,7 +1,4 @@
 import { motion } from "framer-motion";
-import { Dumbbell, Users, Apple, Video } from "lucide-react";
-
-import { motion } from "framer-motion";
 import { Dumbbell, Apple, Video, Heart } from "lucide-react";
 
 const services = [
