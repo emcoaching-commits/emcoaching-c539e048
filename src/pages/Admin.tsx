@@ -247,17 +247,51 @@ const Admin = () => {
 
   const addSlot = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Auto-calculate end_time from type duration if a type is selected
+    let endTime = slotEnd;
+    if (slotTypeId && slotStart) {
+      const selectedType = appointmentTypes?.find((t: any) => t.id === slotTypeId);
+      if (selectedType) {
+        const [h, m] = slotStart.split(":").map(Number);
+        const totalMin = h * 60 + m + selectedType.duration_minutes;
+        const endH = Math.floor(totalMin / 60).toString().padStart(2, "0");
+        const endM = (totalMin % 60).toString().padStart(2, "0");
+        endTime = `${endH}:${endM}`;
+      }
+    }
     const { error } = await supabase.from("time_slots").insert({
       date: slotDate,
       start_time: slotStart,
-      end_time: slotEnd,
+      end_time: endTime,
+      appointment_type_id: slotTypeId || null,
     });
     if (error) toast.error("Erreur");
     else {
       toast.success("Créneau ajouté");
-      setSlotDate(""); setSlotStart(""); setSlotEnd("");
+      setSlotDate(""); setSlotStart(""); setSlotEnd(""); setSlotTypeId("");
       queryClient.invalidateQueries({ queryKey: ["admin_slots"] });
     }
+  };
+
+  const addAppointmentType = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTypeName.trim()) return;
+    const { error } = await supabase.from("appointment_types").insert({
+      name: newTypeName.trim(),
+      duration_minutes: parseInt(newTypeDuration) || 30,
+    });
+    if (error) toast.error("Erreur");
+    else {
+      toast.success("Type de RDV créé");
+      setNewTypeName(""); setNewTypeDuration("30");
+      queryClient.invalidateQueries({ queryKey: ["admin_appointment_types"] });
+    }
+  };
+
+  const deleteAppointmentType = async (id: string) => {
+    await supabase.from("appointment_types").delete().eq("id", id);
+    queryClient.invalidateQueries({ queryKey: ["admin_appointment_types"] });
+    toast.success("Type supprimé");
   };
 
   const deleteSlot = async (id: string) => {
