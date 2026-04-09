@@ -42,6 +42,11 @@ const MonProfil = () => {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { navigate("/auth"); return; }
+
+      // If admin, redirect to admin dashboard
+      const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin");
+      if (roleData && roleData.length > 0) { navigate("/admin"); return; }
+
       setUserEmail(user.email || "");
       setUserId(user.id);
 
