@@ -321,6 +321,9 @@ const Admin = () => {
               )}
             </TabsTrigger>
             <TabsTrigger value="reviews">Avis ({reviews?.length || 0})</TabsTrigger>
+            <TabsTrigger value="types">
+              <Tag size={14} className="mr-1" /> Types RDV
+            </TabsTrigger>
             <TabsTrigger value="slots">Créneaux ({slots?.length || 0})</TabsTrigger>
             <TabsTrigger value="bookings">Réservations ({bookings?.length || 0})</TabsTrigger>
             <TabsTrigger value="clients">Clients ({clients?.length || 0})</TabsTrigger>
