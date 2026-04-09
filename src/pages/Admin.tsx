@@ -140,9 +140,6 @@ const Admin = () => {
     },
     enabled: isAdmin === true,
   });
-    },
-    enabled: isAdmin === true,
-  });
 
   // Notifications
   const { data: notifications } = useQuery({
