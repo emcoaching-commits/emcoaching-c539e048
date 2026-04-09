@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Instagram, Mail, Phone } from "lucide-react";
+import { Instagram, Mail, Phone, MessageCircle } from "lucide-react";
 
 const ContactSection = () => {
   return (
@@ -52,7 +52,7 @@ const ContactSection = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Email</p>
-                <p className="text-foreground font-medium">emma@coaching.fr</p>
+                <a href="mailto:emma.berlin@hotmail.com" className="text-foreground font-medium hover:text-primary transition-colors">emma.berlin@hotmail.com</a>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -62,6 +62,15 @@ const ContactSection = () => {
               <div>
                 <p className="text-sm text-muted-foreground">Téléphone</p>
                 <p className="text-foreground font-medium">06 70 61 96 28</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                <MessageCircle className="text-primary" size={22} />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">WhatsApp</p>
+                <a href="https://wa.me/33670619628" target="_blank" rel="noopener noreferrer" className="text-foreground font-medium hover:text-primary transition-colors">06 70 61 96 28</a>
               </div>
             </div>
             <div className="flex items-center gap-4">
