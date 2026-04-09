@@ -44,8 +44,8 @@ const Auth = () => {
     const ext = avatarFile.name.split(".").pop();
     const path = `${userId}/avatar.${ext}`;
     await supabase.storage.from("avatars").upload(path, avatarFile, { upsert: true });
-    const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
-    await supabase.from("profiles").update({ avatar_url: `${urlData.publicUrl}?t=${Date.now()}` }).eq("user_id", userId);
+    // Store path only (bucket is private, signed URLs used for display)
+    await supabase.from("profiles").update({ avatar_url: path }).eq("user_id", userId);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
