@@ -34,6 +34,7 @@ const MonProfil = () => {
   const [sendingMsg, setSendingMsg] = useState(false);
   const [adminId, setAdminId] = useState<string | null>(null);
   const msgBottomRef = useRef<HTMLDivElement>(null);
+  const messagerieRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const load = async () => {
