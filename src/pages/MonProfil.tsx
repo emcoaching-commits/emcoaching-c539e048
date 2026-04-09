@@ -198,10 +198,29 @@ const MonProfil = () => {
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="relative"
+              className="relative group cursor-pointer"
+              onClick={() => fileInputRef.current?.click()}
             >
-              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/25">
-                <span className="font-display text-3xl text-primary-foreground">{initials}</span>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarUpload}
+              />
+              {profile?.avatar_url ? (
+                <img
+                  src={profile.avatar_url}
+                  alt="Photo de profil"
+                  className="w-24 h-24 rounded-2xl object-cover shadow-lg shadow-primary/25"
+                />
+              ) : (
+                <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/25">
+                  <span className="font-display text-3xl text-primary-foreground">{initials}</span>
+                </div>
+              )}
+              <div className="absolute inset-0 rounded-2xl bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <Camera size={24} className="text-foreground" />
               </div>
               {profile?.has_active_subscription && (
                 <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-green-500 border-2 border-background flex items-center justify-center">
