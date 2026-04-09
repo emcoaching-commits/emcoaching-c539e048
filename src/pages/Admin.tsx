@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search, Users, Settings, CalendarClock } from "lucide-react";
+import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search, Users, Settings, CalendarClock, Tag, Clock } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -21,6 +21,11 @@ const Admin = () => {
   const [slotDate, setSlotDate] = useState("");
   const [slotStart, setSlotStart] = useState("");
   const [slotEnd, setSlotEnd] = useState("");
+  const [slotTypeId, setSlotTypeId] = useState("");
+
+  // New appointment type form
+  const [newTypeName, setNewTypeName] = useState("");
+  const [newTypeDuration, setNewTypeDuration] = useState("30");
 
   // Messaging
   const [selectedClient, setSelectedClient] = useState<string | null>(null);
@@ -60,7 +65,18 @@ const Admin = () => {
   const { data: slots } = useQuery({
     queryKey: ["admin_slots"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("time_slots").select("*").order("date").order("start_time");
+      const { data, error } = await supabase.from("time_slots").select("*, appointment_types(name, duration_minutes)").order("date").order("start_time");
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin === true,
+  });
+
+  // Appointment types
+  const { data: appointmentTypes } = useQuery({
+    queryKey: ["admin_appointment_types"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("appointment_types").select("*").order("created_at");
       if (error) throw error;
       return data;
     },
@@ -231,17 +247,51 @@ const Admin = () => {
 
   const addSlot = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Auto-calculate end_time from type duration if a type is selected
+    let endTime = slotEnd;
+    if (slotTypeId && slotStart) {
+      const selectedType = appointmentTypes?.find((t: any) => t.id === slotTypeId);
+      if (selectedType) {
+        const [h, m] = slotStart.split(":").map(Number);
+        const totalMin = h * 60 + m + selectedType.duration_minutes;
+        const endH = Math.floor(totalMin / 60).toString().padStart(2, "0");
+        const endM = (totalMin % 60).toString().padStart(2, "0");
+        endTime = `${endH}:${endM}`;
+      }
+    }
     const { error } = await supabase.from("time_slots").insert({
       date: slotDate,
       start_time: slotStart,
-      end_time: slotEnd,
+      end_time: endTime,
+      appointment_type_id: slotTypeId || null,
     });
     if (error) toast.error("Erreur");
     else {
       toast.success("Créneau ajouté");
-      setSlotDate(""); setSlotStart(""); setSlotEnd("");
+      setSlotDate(""); setSlotStart(""); setSlotEnd(""); setSlotTypeId("");
       queryClient.invalidateQueries({ queryKey: ["admin_slots"] });
     }
+  };
+
+  const addAppointmentType = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTypeName.trim()) return;
+    const { error } = await supabase.from("appointment_types").insert({
+      name: newTypeName.trim(),
+      duration_minutes: parseInt(newTypeDuration) || 30,
+    });
+    if (error) toast.error("Erreur");
+    else {
+      toast.success("Type de RDV créé");
+      setNewTypeName(""); setNewTypeDuration("30");
+      queryClient.invalidateQueries({ queryKey: ["admin_appointment_types"] });
+    }
+  };
+
+  const deleteAppointmentType = async (id: string) => {
+    await supabase.from("appointment_types").delete().eq("id", id);
+    queryClient.invalidateQueries({ queryKey: ["admin_appointment_types"] });
+    toast.success("Type supprimé");
   };
 
   const deleteSlot = async (id: string) => {
@@ -271,6 +321,9 @@ const Admin = () => {
               )}
             </TabsTrigger>
             <TabsTrigger value="reviews">Avis ({reviews?.length || 0})</TabsTrigger>
+            <TabsTrigger value="types">
+              <Tag size={14} className="mr-1" /> Types RDV
+            </TabsTrigger>
             <TabsTrigger value="slots">Créneaux ({slots?.length || 0})</TabsTrigger>
             <TabsTrigger value="bookings">Réservations ({bookings?.length || 0})</TabsTrigger>
             <TabsTrigger value="clients">Clients ({clients?.length || 0})</TabsTrigger>
@@ -342,31 +395,107 @@ const Admin = () => {
             ))}
           </TabsContent>
 
+          <TabsContent value="types" className="space-y-4">
+            <form onSubmit={addAppointmentType} className="bg-card border border-border rounded-lg p-4 flex flex-wrap gap-3 items-end">
+              <div>
+                <label className="text-muted-foreground text-xs block mb-1">Nom du type</label>
+                <Input value={newTypeName} onChange={(e) => setNewTypeName(e.target.value)} placeholder="Ex: RDV téléphonique" className="bg-background border-border" required />
+              </div>
+              <div>
+                <label className="text-muted-foreground text-xs block mb-1">Durée (min)</label>
+                <Input type="number" min="5" value={newTypeDuration} onChange={(e) => setNewTypeDuration(e.target.value)} className="bg-background border-border w-24" required />
+              </div>
+              <Button variant="hero" size="sm" type="submit">
+                <Plus size={14} className="mr-1" /> Créer
+              </Button>
+            </form>
+
+            {appointmentTypes?.map((t: any) => (
+              <div key={t.id} className="bg-card border border-border rounded-lg p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Tag size={16} className="text-primary" />
+                  <span className="text-foreground text-sm font-medium">{t.name}</span>
+                  <span className="text-muted-foreground text-xs flex items-center gap-1">
+                    <Clock size={12} /> {t.duration_minutes} min
+                  </span>
+                </div>
+                <Button size="sm" variant="heroOutline" onClick={() => deleteAppointmentType(t.id)}>
+                  <Trash2 size={14} />
+                </Button>
+              </div>
+            ))}
+            {(!appointmentTypes || appointmentTypes.length === 0) && (
+              <p className="text-muted-foreground text-center py-4">Aucun type de RDV créé</p>
+            )}
+          </TabsContent>
+
           <TabsContent value="slots" className="space-y-4">
             <form onSubmit={addSlot} className="bg-card border border-border rounded-lg p-4 flex flex-wrap gap-3 items-end">
+              <div>
+                <label className="text-muted-foreground text-xs block mb-1">Type de RDV</label>
+                <select
+                  value={slotTypeId}
+                  onChange={(e) => {
+                    setSlotTypeId(e.target.value);
+                    // Auto-fill end time if start time is set
+                    if (e.target.value && slotStart) {
+                      const type = appointmentTypes?.find((t: any) => t.id === e.target.value);
+                      if (type) {
+                        const [h, m] = slotStart.split(":").map(Number);
+                        const totalMin = h * 60 + m + type.duration_minutes;
+                        setSlotEnd(`${Math.floor(totalMin / 60).toString().padStart(2, "0")}:${(totalMin % 60).toString().padStart(2, "0")}`);
+                      }
+                    }
+                  }}
+                  className="h-9 rounded-md border border-border bg-background px-3 text-sm text-foreground"
+                >
+                  <option value="">— Sans type —</option>
+                  {appointmentTypes?.filter((t: any) => t.is_active).map((t: any) => (
+                    <option key={t.id} value={t.id}>{t.name} ({t.duration_minutes} min)</option>
+                  ))}
+                </select>
+              </div>
               <div>
                 <label className="text-muted-foreground text-xs block mb-1">Date</label>
                 <Input type="date" value={slotDate} onChange={(e) => setSlotDate(e.target.value)} className="bg-background border-border" required />
               </div>
               <div>
                 <label className="text-muted-foreground text-xs block mb-1">Début</label>
-                <Input type="time" value={slotStart} onChange={(e) => setSlotStart(e.target.value)} className="bg-background border-border" required />
+                <Input type="time" value={slotStart} onChange={(e) => {
+                  setSlotStart(e.target.value);
+                  // Auto-calculate end if type selected
+                  if (slotTypeId && e.target.value) {
+                    const type = appointmentTypes?.find((t: any) => t.id === slotTypeId);
+                    if (type) {
+                      const [h, m] = e.target.value.split(":").map(Number);
+                      const totalMin = h * 60 + m + type.duration_minutes;
+                      setSlotEnd(`${Math.floor(totalMin / 60).toString().padStart(2, "0")}:${(totalMin % 60).toString().padStart(2, "0")}`);
+                    }
+                  }
+                }} className="bg-background border-border" required />
               </div>
               <div>
-                <label className="text-muted-foreground text-xs block mb-1">Fin</label>
-                <Input type="time" value={slotEnd} onChange={(e) => setSlotEnd(e.target.value)} className="bg-background border-border" required />
+                <label className="text-muted-foreground text-xs block mb-1">Fin {slotTypeId ? "(auto)" : ""}</label>
+                <Input type="time" value={slotEnd} onChange={(e) => setSlotEnd(e.target.value)} className="bg-background border-border" required readOnly={!!slotTypeId} />
               </div>
               <Button variant="hero" size="sm" type="submit">
                 <Plus size={14} className="mr-1" /> Ajouter
               </Button>
             </form>
 
-            {slots?.map((s) => (
+            {slots?.map((s: any) => (
               <div key={s.id} className="bg-card border border-border rounded-lg p-4 flex items-center justify-between">
-                <span className="text-foreground text-sm">
-                  {s.date} — {s.start_time?.toString().slice(0, 5)} à {s.end_time?.toString().slice(0, 5)}
-                  {s.is_available ? " ✅" : " ❌ Réservé"}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-foreground text-sm">
+                    {s.date} — {s.start_time?.toString().slice(0, 5)} à {s.end_time?.toString().slice(0, 5)}
+                    {s.is_available ? " ✅" : " ❌ Réservé"}
+                  </span>
+                  {s.appointment_types && (
+                    <span className="text-xs bg-primary/15 text-primary px-2 py-0.5 rounded-full">
+                      {(s.appointment_types as any).name}
+                    </span>
+                  )}
+                </div>
                 <Button size="sm" variant="heroOutline" onClick={() => deleteSlot(s.id)}>
                   <Trash2 size={14} />
                 </Button>
