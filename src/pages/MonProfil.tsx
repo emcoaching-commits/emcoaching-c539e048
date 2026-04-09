@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { ClipboardList, User, MapPin, Phone, Ruler, Weight, Calendar, ArrowLeft, Sparkles, Save, ChevronRight } from "lucide-react";
+import { ClipboardList, User, MapPin, Phone, Ruler, Weight, Calendar, ArrowLeft, Sparkles, Save, ChevronRight, Send, MessageCircle } from "lucide-react";
 import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const MonProfil = () => {
   const navigate = useNavigate();
@@ -15,6 +17,7 @@ const MonProfil = () => {
   const [editing, setEditing] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [userEmail, setUserEmail] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
   const [form, setForm] = useState({
     full_name: "",
     phone: "",
@@ -25,11 +28,21 @@ const MonProfil = () => {
     gender: "",
   });
 
+  // Messaging
+  const [messages, setMessages] = useState<any[]>([]);
+  const [newMsg, setNewMsg] = useState("");
+  const [sendingMsg, setSendingMsg] = useState(false);
+  const [adminId, setAdminId] = useState<string | null>(null);
+  const msgBottomRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { navigate("/auth"); return; }
       setUserEmail(user.email || "");
+      setUserId(user.id);
+
+      // Load profile
       const { data } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
       if (data) {
         setProfile(data);
@@ -42,15 +55,52 @@ const MonProfil = () => {
           height: data.height?.toString() || "",
           gender: data.gender || "",
         });
-        // Auto open edit if profile is incomplete
         if (!data.full_name || !data.age || !data.city) setEditing(true);
       } else {
         setEditing(true);
       }
+
+      // Load admin ID
+      const { data: adminRole } = await supabase.from("user_roles").select("user_id").eq("role", "admin").limit(1);
+      if (adminRole && adminRole.length > 0) setAdminId(adminRole[0].user_id);
+
+      // Load messages
+      const { data: msgs } = await supabase
+        .from("messages")
+        .select("*")
+        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+        .order("created_at", { ascending: true });
+      setMessages(msgs || []);
+
+      // Mark as read
+      await supabase.from("messages").update({ is_read: true }).eq("receiver_id", user.id).eq("is_read", false);
+
       setLoading(false);
     };
     load();
   }, [navigate]);
+
+  // Realtime messages
+  useEffect(() => {
+    if (!userId) return;
+    const channel = supabase
+      .channel("profile-messages")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, (payload) => {
+        const msg = payload.new as any;
+        if (msg.sender_id === userId || msg.receiver_id === userId) {
+          setMessages((prev) => [...prev, msg]);
+          if (msg.receiver_id === userId) {
+            supabase.from("messages").update({ is_read: true }).eq("id", msg.id);
+          }
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [userId]);
+
+  useEffect(() => {
+    msgBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages.length]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,6 +124,20 @@ const MonProfil = () => {
       setEditing(false);
     }
     setSaving(false);
+  };
+
+  const handleSendMsg = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMsg.trim() || !adminId || !userId) return;
+    setSendingMsg(true);
+    const { error } = await supabase.from("messages").insert({
+      sender_id: userId,
+      receiver_id: adminId,
+      content: newMsg.trim(),
+    });
+    if (error) toast.error("Erreur d'envoi");
+    else setNewMsg("");
+    setSendingMsg(false);
   };
 
   const firstName = form.full_name?.split(" ")[0] || "Coach";
@@ -348,6 +412,72 @@ const MonProfil = () => {
               )}
             </motion.div>
           </div>
+
+          {/* Messagerie avec Emma */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="bg-card border border-border rounded-xl overflow-hidden"
+          >
+            <div className="p-5 border-b border-border flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center">
+                <span className="font-display text-lg text-primary">E</span>
+              </div>
+              <div>
+                <h3 className="text-foreground font-display text-lg">MESSAGERIE</h3>
+                <p className="text-muted-foreground text-xs">Discute avec Emma</p>
+              </div>
+              <MessageCircle size={20} className="ml-auto text-primary" />
+            </div>
+
+            <ScrollArea className="h-72 p-4">
+              <div className="space-y-3">
+                {messages.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                    <MessageCircle size={40} className="mb-2 text-primary/20" />
+                    <p className="text-sm">Envoie ton premier message à Emma !</p>
+                  </div>
+                )}
+                {messages.map((msg) => {
+                  const isMe = msg.sender_id === userId;
+                  return (
+                    <motion.div
+                      key={msg.id}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`flex ${isMe ? "justify-end" : "justify-start"}`}
+                    >
+                      <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
+                        isMe
+                          ? "bg-primary text-primary-foreground rounded-br-md"
+                          : "bg-muted text-foreground rounded-bl-md"
+                      }`}>
+                        <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                        <p className={`text-[10px] mt-1 ${isMe ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
+                          {format(new Date(msg.created_at), "HH:mm · dd MMM", { locale: fr })}
+                        </p>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+                <div ref={msgBottomRef} />
+              </div>
+            </ScrollArea>
+
+            <form onSubmit={handleSendMsg} className="flex gap-2 p-3 border-t border-border">
+              <Input
+                value={newMsg}
+                onChange={(e) => setNewMsg(e.target.value)}
+                placeholder="Écrire un message..."
+                className="flex-1 bg-background border-border"
+                maxLength={1000}
+              />
+              <Button type="submit" variant="hero" size="icon" disabled={sendingMsg || !newMsg.trim()}>
+                <Send size={18} />
+              </Button>
+            </form>
+          </motion.div>
         </div>
       </div>
     </div>
