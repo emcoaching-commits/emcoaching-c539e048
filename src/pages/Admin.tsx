@@ -54,8 +54,15 @@ const Admin = () => {
   const { data: reviews } = useQuery({
     queryKey: ["admin_reviews"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("reviews").select("*, profiles(full_name)").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("reviews").select("*").order("created_at", { ascending: false });
       if (error) throw error;
+      // Fetch profile names for each review
+      if (data) {
+        const userIds = [...new Set(data.map((r: any) => r.user_id))];
+        const { data: profs } = await supabase.from("profiles").select("user_id, full_name").in("user_id", userIds);
+        const profMap = Object.fromEntries((profs || []).map((p: any) => [p.user_id, p.full_name]));
+        for (const r of data) { (r as any).profile_name = profMap[r.user_id] || "Anonyme"; }
+      }
       return data;
     },
     enabled: isAdmin === true,
@@ -87,11 +94,15 @@ const Admin = () => {
   const { data: bookings } = useQuery({
     queryKey: ["admin_bookings"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("bookings").select("*, profiles(full_name, phone), time_slots(date, start_time, end_time)").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("bookings").select("*, time_slots!bookings_time_slot_id_fkey(date, start_time, end_time)").order("created_at", { ascending: false });
       if (error) throw error;
-      // Load proposed slot details separately
       if (data) {
+        // Fetch profile info
+        const userIds = [...new Set(data.map((b: any) => b.user_id))];
+        const { data: profs } = await supabase.from("profiles").select("user_id, full_name, phone").in("user_id", userIds);
+        const profMap = Object.fromEntries((profs || []).map((p: any) => [p.user_id, p]));
         for (const b of data) {
+          (b as any).profiles = profMap[b.user_id] || { full_name: "Client", phone: null };
           if ((b as any).proposed_slot_id) {
             const { data: ps } = await supabase.from("time_slots").select("date, start_time, end_time").eq("id", (b as any).proposed_slot_id).single();
             (b as any).proposed_slot = ps;
@@ -122,7 +133,7 @@ const Admin = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bookings")
-        .select("*, time_slots(*)")
+        .select("*, time_slots!bookings_time_slot_id_fkey(*)")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
@@ -383,7 +394,7 @@ const Admin = () => {
                   </div>
                   <p className="text-foreground text-sm mb-1">"{r.comment}"</p>
                   <p className="text-muted-foreground text-xs">
-                    {(r.profiles as any)?.full_name || "Anonyme"} — {r.is_approved ? "✅ Approuvé" : "⏳ En attente"}
+                    {(r as any).profile_name || "Anonyme"} — {r.is_approved ? "✅ Approuvé" : "⏳ En attente"}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -511,9 +522,9 @@ const Admin = () => {
                 <div key={b.id} className="bg-card border border-border rounded-lg p-4 space-y-3">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="text-foreground text-sm font-medium">{(b.profiles as any)?.full_name || "Client"}</p>
+                      <p className="text-foreground text-sm font-medium">{(b as any).profiles?.full_name || "Client"}</p>
                       <p className="text-muted-foreground text-xs">
-                        📞 {(b.profiles as any)?.phone || "—"} | 📅 {(b.time_slots as any)?.date} {(b.time_slots as any)?.start_time?.toString().slice(0, 5)}-{(b.time_slots as any)?.end_time?.toString().slice(0, 5)}
+                        📞 {(b as any).profiles?.phone || "—"} | 📅 {(b.time_slots as any)?.date} {(b.time_slots as any)?.start_time?.toString().slice(0, 5)}-{(b.time_slots as any)?.end_time?.toString().slice(0, 5)}
                       </p>
                       <p className={`text-xs font-medium mt-1 ${
                         b.status === "confirmed" ? "text-green-500" 
