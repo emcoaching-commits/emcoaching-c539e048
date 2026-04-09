@@ -126,7 +126,9 @@ export type Database = {
           has_active_subscription: boolean
           height: number | null
           id: string
+          next_payment_date: string | null
           phone: string | null
+          subscription_start_date: string | null
           updated_at: string
           user_id: string
           weight: number | null
@@ -140,7 +142,9 @@ export type Database = {
           has_active_subscription?: boolean
           height?: number | null
           id?: string
+          next_payment_date?: string | null
           phone?: string | null
+          subscription_start_date?: string | null
           updated_at?: string
           user_id: string
           weight?: number | null
@@ -154,7 +158,9 @@ export type Database = {
           has_active_subscription?: boolean
           height?: number | null
           id?: string
+          next_payment_date?: string | null
           phone?: string | null
+          subscription_start_date?: string | null
           updated_at?: string
           user_id?: string
           weight?: number | null
