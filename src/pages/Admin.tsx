@@ -390,7 +390,7 @@ const Admin = () => {
                   </div>
                   <p className="text-foreground text-sm mb-1">"{r.comment}"</p>
                   <p className="text-muted-foreground text-xs">
-                    {(r.profiles as any)?.full_name || "Anonyme"} — {r.is_approved ? "✅ Approuvé" : "⏳ En attente"}
+                    {(r as any).profile_name || "Anonyme"} — {r.is_approved ? "✅ Approuvé" : "⏳ En attente"}
                   </p>
                 </div>
                 <div className="flex gap-2">
