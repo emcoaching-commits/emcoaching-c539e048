@@ -1,11 +1,20 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, LogIn, UserPlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/hero-fitness.jpg";
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setUser(data.session?.user ?? null));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => setUser(session?.user ?? null));
+    return () => subscription.unsubscribe();
+  }, []);
 
   return (
     <section id="accueil" className="relative min-h-screen flex items-center overflow-hidden">
@@ -30,14 +39,26 @@ const HeroSection = () => {
           <p className="text-muted-foreground text-lg max-w-md mb-8 font-light leading-relaxed">
             Coaching personnalisé, suivi sur Google Sheets, bilans hebdomadaires. Emma est là, présente à chaque étape.
           </p>
-          <div className="flex flex-wrap gap-4">
-            <Button variant="hero" size="lg" className="px-8 py-6 text-base" onClick={() => window.open("https://forms.gle/fjX1G24EuvHMu7W99", "_blank")}>
-              Remplir le questionnaire <ArrowRight className="ml-2" size={18} />
-            </Button>
-            <Button variant="heroOutline" size="lg" className="px-8 py-6 text-base" onClick={() => navigate("/services")}>
-              Découvrir mes services
-            </Button>
-          </div>
+
+          {user ? (
+            <div className="flex flex-wrap gap-4">
+              <Button variant="hero" size="lg" className="px-8 py-6 text-base" onClick={() => window.open("https://forms.gle/fjX1G24EuvHMu7W99", "_blank")}>
+                Remplir le questionnaire <ArrowRight className="ml-2" size={18} />
+              </Button>
+              <Button variant="heroOutline" size="lg" className="px-8 py-6 text-base" onClick={() => navigate("/mon-profil")}>
+                Mon profil
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-wrap gap-4">
+              <Button variant="hero" size="lg" className="px-8 py-6 text-base animate-pulse" onClick={() => navigate("/auth")}>
+                <UserPlus className="mr-2" size={18} /> S'inscrire gratuitement
+              </Button>
+              <Button variant="heroOutline" size="lg" className="px-8 py-6 text-base" onClick={() => navigate("/auth")}>
+                <LogIn className="mr-2" size={18} /> Se connecter
+              </Button>
+            </div>
+          )}
         </motion.div>
       </div>
     </section>
