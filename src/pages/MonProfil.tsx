@@ -34,6 +34,7 @@ const MonProfil = () => {
   const [newMsg, setNewMsg] = useState("");
   const [sendingMsg, setSendingMsg] = useState(false);
   const [adminId, setAdminId] = useState<string | null>(null);
+  const [bookings, setBookings] = useState<any[]>([]);
   const msgBottomRef = useRef<HTMLDivElement>(null);
   const messagerieRef = useRef<HTMLDivElement>(null);
 
