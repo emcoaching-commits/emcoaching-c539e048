@@ -444,8 +444,42 @@ const MonProfil = () => {
             </motion.div>
           </div>
 
+          {/* Service client */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.45 }}
+            className="relative overflow-hidden rounded-xl border border-destructive/30 bg-gradient-to-r from-destructive/10 via-destructive/5 to-card p-5"
+          >
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-destructive/20 flex items-center justify-center shrink-0">
+                <Headphones size={24} className="text-destructive" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-foreground font-display text-lg">UN PROBLÈME ?</h3>
+                <p className="text-muted-foreground text-sm">Signale un souci et Emma te répondra rapidement.</p>
+              </div>
+              <Button
+                variant="heroOutline"
+                size="lg"
+                className="shrink-0 border-destructive text-destructive hover:bg-destructive/10"
+                onClick={() => {
+                  setNewMsg("🚨 Service client : Bonjour Emma, j'ai un problème avec ");
+                  messagerieRef.current?.scrollIntoView({ behavior: "smooth" });
+                  setTimeout(() => {
+                    const input = messagerieRef.current?.querySelector("input");
+                    input?.focus();
+                  }, 500);
+                }}
+              >
+                Signaler un problème
+              </Button>
+            </div>
+          </motion.div>
+
           {/* Messagerie avec Emma */}
           <motion.div
+            ref={messagerieRef}
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.5 }}
