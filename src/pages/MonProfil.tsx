@@ -520,7 +520,7 @@ const MonProfil = () => {
                                   }).eq("id", b.id);
                                   toast.success("Nouveau créneau accepté ! ✅");
                                   // Reload bookings
-                                  const { data: updated } = await supabase.from("bookings").select("*, time_slots(date, start_time, end_time)").eq("user_id", userId!).order("created_at", { ascending: false });
+                                  const { data: updated } = await supabase.from("bookings").select("*, time_slots!bookings_time_slot_id_fkey(date, start_time, end_time)").eq("user_id", userId!).order("created_at", { ascending: false });
                                   if (updated) {
                                     for (const u of updated) {
                                       if ((u as any).proposed_slot_id) {
