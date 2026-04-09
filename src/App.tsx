@@ -7,6 +7,12 @@ import Index from "./pages/Index.tsx";
 import Auth from "./pages/Auth.tsx";
 import Admin from "./pages/Admin.tsx";
 import Questionnaire from "./pages/Questionnaire.tsx";
+import Services from "./pages/Services.tsx";
+import Tarifs from "./pages/Tarifs.tsx";
+import Planning from "./pages/Planning.tsx";
+import Avis from "./pages/Avis.tsx";
+import APropos from "./pages/APropos.tsx";
+import Contact from "./pages/Contact.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -19,6 +25,12 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/services" element={<Services />} />
+          <Route path="/tarifs" element={<Tarifs />} />
+          <Route path="/planning" element={<Planning />} />
+          <Route path="/avis" element={<Avis />} />
+          <Route path="/a-propos" element={<APropos />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/questionnaire" element={<Questionnaire />} />
