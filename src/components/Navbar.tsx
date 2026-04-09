@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, LogIn, LogOut, Shield, UserPlus } from "lucide-react";
+import { Menu, X, LogIn, LogOut, Shield, UserPlus, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -76,9 +76,14 @@ const Navbar = () => {
             </Button>
           )}
           {user ? (
-            <Button variant="heroOutline" size="sm" onClick={handleLogout}>
-              <LogOut size={16} className="mr-1" /> Déconnexion
-            </Button>
+            <>
+              <Button variant="heroOutline" size="sm" onClick={() => navigate("/mon-profil")}>
+                <User size={16} className="mr-1" /> Mon Profil
+              </Button>
+              <Button variant="heroOutline" size="sm" onClick={handleLogout}>
+                <LogOut size={16} className="mr-1" /> Déconnexion
+              </Button>
+            </>
           ) : (
             <>
               <Button variant="heroOutline" size="sm" onClick={() => navigate("/auth")}>
@@ -117,9 +122,14 @@ const Navbar = () => {
               </Button>
             )}
             {user ? (
-              <Button variant="heroOutline" size="lg" onClick={() => { handleLogout(); setOpen(false); }}>
-                <LogOut size={16} className="mr-1" /> Déconnexion
-              </Button>
+              <>
+                <Button variant="heroOutline" size="lg" onClick={() => { navigate("/mon-profil"); setOpen(false); }}>
+                  <User size={16} className="mr-1" /> Mon Profil
+                </Button>
+                <Button variant="heroOutline" size="lg" onClick={() => { handleLogout(); setOpen(false); }}>
+                  <LogOut size={16} className="mr-1" /> Déconnexion
+                </Button>
+              </>
             ) : (
               <>
                 <Button variant="heroOutline" size="lg" onClick={() => { navigate("/auth"); setOpen(false); }}>

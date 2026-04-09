@@ -91,28 +91,46 @@ export type Database = {
       }
       profiles: {
         Row: {
+          age: number | null
+          city: string | null
           created_at: string
           full_name: string | null
+          gender: string | null
+          has_active_subscription: boolean
+          height: number | null
           id: string
           phone: string | null
           updated_at: string
           user_id: string
+          weight: number | null
         }
         Insert: {
+          age?: number | null
+          city?: string | null
           created_at?: string
           full_name?: string | null
+          gender?: string | null
+          has_active_subscription?: boolean
+          height?: number | null
           id?: string
           phone?: string | null
           updated_at?: string
           user_id: string
+          weight?: number | null
         }
         Update: {
+          age?: number | null
+          city?: string | null
           created_at?: string
           full_name?: string | null
+          gender?: string | null
+          has_active_subscription?: boolean
+          height?: number | null
           id?: string
           phone?: string | null
           updated_at?: string
           user_id?: string
+          weight?: number | null
         }
         Relationships: []
       }

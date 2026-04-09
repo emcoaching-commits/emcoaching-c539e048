@@ -189,12 +189,30 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="clients" className="space-y-4">
-            {clients?.map((c) => (
+            {clients?.map((c: any) => (
               <div key={c.id} className="bg-card border border-border rounded-lg p-4">
-                <p className="text-foreground text-sm font-medium">{c.full_name || "Sans nom"}</p>
-                <p className="text-muted-foreground text-xs">
-                  📞 {c.phone || "—"} | Inscrit le {format(new Date(c.created_at), "dd/MM/yyyy")}
-                </p>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <p className="text-foreground text-sm font-medium">{c.full_name || "Sans nom"}</p>
+                    <p className="text-muted-foreground text-xs mt-1">
+                      📞 {c.phone || "—"} | 🏙️ {c.city || "—"} | 🎂 {c.age ? `${c.age} ans` : "—"} | {c.gender || "—"}
+                    </p>
+                    <p className="text-muted-foreground text-xs">
+                      ⚖️ {c.weight ? `${c.weight} kg` : "—"} | 📏 {c.height ? `${c.height} cm` : "—"} | Inscrit le {format(new Date(c.created_at), "dd/MM/yyyy")}
+                    </p>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant={c.has_active_subscription ? "hero" : "heroOutline"}
+                    onClick={async () => {
+                      await supabase.from("profiles").update({ has_active_subscription: !c.has_active_subscription }).eq("id", c.id);
+                      queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                      toast.success(c.has_active_subscription ? "Abonnement désactivé" : "Abonnement activé");
+                    }}
+                  >
+                    {c.has_active_subscription ? "✅ Abonné" : "❌ Non abonné"}
+                  </Button>
+                </div>
               </div>
             ))}
           </TabsContent>
