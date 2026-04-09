@@ -328,59 +328,11 @@ const Admin = () => {
 
           <TabsContent value="clients" className="space-y-4">
             {clients?.map((c: any) => (
-              <div key={c.id} className="bg-card border border-border rounded-lg p-4">
+              <div key={c.id} className="bg-card border border-border rounded-lg p-4 space-y-3">
                 <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <p className="text-foreground text-sm font-medium">{c.full_name || "Sans nom"}</p>
-                    <p className="text-muted-foreground text-xs mt-1">
-                      📞 {c.phone || "—"} | 🏙️ {c.city || "—"} | 🎂 {c.age ? `${c.age} ans` : "—"} | {c.gender || "—"}
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      ⚖️ {c.weight ? `${c.weight} kg` : "—"} | 📏 {c.height ? `${c.height} cm` : "—"} | Inscrit le {format(new Date(c.created_at), "dd/MM/yyyy")}
-                    </p>
-                    {c.has_active_subscription && (
-                      <div className="flex flex-wrap gap-3 mt-2">
-                        <div className="flex items-center gap-1">
-                          <label className="text-muted-foreground text-xs">1er paiement:</label>
-                          <Input
-                            type="date"
-                            className="h-7 text-xs w-36 bg-background border-border"
-                            defaultValue={c.subscription_start_date || ""}
-                            onChange={async (e) => {
-                              await supabase.from("profiles").update({ subscription_start_date: e.target.value || null }).eq("id", c.id);
-                              queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
-                            }}
-                          />
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <label className="text-muted-foreground text-xs">Prochain:</label>
-                          <Input
-                            type="date"
-                            className="h-7 text-xs w-36 bg-background border-border"
-                            defaultValue={c.next_payment_date || ""}
-                            onChange={async (e) => {
-                              await supabase.from("profiles").update({ next_payment_date: e.target.value || null }).eq("id", c.id);
-                              queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
-                            }}
-                          />
-                        </div>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-1 mt-2">
-                      <label className="text-muted-foreground text-xs">📊 Google Sheet:</label>
-                      <Input
-                        type="url"
-                        placeholder="https://docs.google.com/spreadsheets/..."
-                        className="h-7 text-xs flex-1 bg-background border-border"
-                        defaultValue={c.google_sheet_url || ""}
-                        onBlur={async (e) => {
-                          await supabase.from("profiles").update({ google_sheet_url: e.target.value || null }).eq("id", c.id);
-                          queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
-                          toast.success("Lien Google Sheet mis à jour");
-                        }}
-                      />
-                    </div>
-                  </div>
+                  <p className="text-foreground font-medium text-sm">
+                    {c.full_name || "Sans nom"} — Inscrit le {format(new Date(c.created_at), "dd/MM/yyyy")}
+                  </p>
                   <Button
                     size="sm"
                     variant={c.has_active_subscription ? "hero" : "heroOutline"}
@@ -392,6 +344,83 @@ const Admin = () => {
                   >
                     {c.has_active_subscription ? "✅ Abonné" : "❌ Non abonné"}
                   </Button>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                  <div>
+                    <label className="text-muted-foreground text-xs">👤 Nom</label>
+                    <Input className="h-7 text-xs bg-background border-border" defaultValue={c.full_name || ""} onBlur={async (e) => {
+                      await supabase.from("profiles").update({ full_name: e.target.value || null }).eq("id", c.id);
+                      queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                    }} />
+                  </div>
+                  <div>
+                    <label className="text-muted-foreground text-xs">📞 Téléphone</label>
+                    <Input className="h-7 text-xs bg-background border-border" defaultValue={c.phone || ""} onBlur={async (e) => {
+                      await supabase.from("profiles").update({ phone: e.target.value || null }).eq("id", c.id);
+                      queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                    }} />
+                  </div>
+                  <div>
+                    <label className="text-muted-foreground text-xs">🏙️ Ville</label>
+                    <Input className="h-7 text-xs bg-background border-border" defaultValue={c.city || ""} onBlur={async (e) => {
+                      await supabase.from("profiles").update({ city: e.target.value || null }).eq("id", c.id);
+                      queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                    }} />
+                  </div>
+                  <div>
+                    <label className="text-muted-foreground text-xs">🎂 Âge</label>
+                    <Input type="number" className="h-7 text-xs bg-background border-border" defaultValue={c.age || ""} onBlur={async (e) => {
+                      await supabase.from("profiles").update({ age: e.target.value ? parseInt(e.target.value) : null }).eq("id", c.id);
+                      queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                    }} />
+                  </div>
+                  <div>
+                    <label className="text-muted-foreground text-xs">⚧ Genre</label>
+                    <Input className="h-7 text-xs bg-background border-border" defaultValue={c.gender || ""} placeholder="F / M / Autre" onBlur={async (e) => {
+                      await supabase.from("profiles").update({ gender: e.target.value || null }).eq("id", c.id);
+                      queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                    }} />
+                  </div>
+                  <div>
+                    <label className="text-muted-foreground text-xs">⚖️ Poids (kg)</label>
+                    <Input type="number" className="h-7 text-xs bg-background border-border" defaultValue={c.weight || ""} onBlur={async (e) => {
+                      await supabase.from("profiles").update({ weight: e.target.value ? parseFloat(e.target.value) : null }).eq("id", c.id);
+                      queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                    }} />
+                  </div>
+                  <div>
+                    <label className="text-muted-foreground text-xs">📏 Taille (cm)</label>
+                    <Input type="number" className="h-7 text-xs bg-background border-border" defaultValue={c.height || ""} onBlur={async (e) => {
+                      await supabase.from("profiles").update({ height: e.target.value ? parseFloat(e.target.value) : null }).eq("id", c.id);
+                      queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                    }} />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <div>
+                    <label className="text-muted-foreground text-xs">💳 1er paiement</label>
+                    <Input type="date" className="h-7 text-xs bg-background border-border" defaultValue={c.subscription_start_date || ""} onChange={async (e) => {
+                      await supabase.from("profiles").update({ subscription_start_date: e.target.value || null }).eq("id", c.id);
+                      queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                    }} />
+                  </div>
+                  <div>
+                    <label className="text-muted-foreground text-xs">💳 Prochain paiement</label>
+                    <Input type="date" className="h-7 text-xs bg-background border-border" defaultValue={c.next_payment_date || ""} onChange={async (e) => {
+                      await supabase.from("profiles").update({ next_payment_date: e.target.value || null }).eq("id", c.id);
+                      queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                    }} />
+                  </div>
+                  <div>
+                    <label className="text-muted-foreground text-xs">📊 Google Sheet</label>
+                    <Input type="url" placeholder="https://docs.google.com/..." className="h-7 text-xs bg-background border-border" defaultValue={c.google_sheet_url || ""} onBlur={async (e) => {
+                      await supabase.from("profiles").update({ google_sheet_url: e.target.value || null }).eq("id", c.id);
+                      queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                      toast.success("Mis à jour");
+                    }} />
+                  </div>
                 </div>
               </div>
             ))}
