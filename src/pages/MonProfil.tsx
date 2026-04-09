@@ -126,6 +126,20 @@ const MonProfil = () => {
     setSaving(false);
   };
 
+  const handleSendMsg = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMsg.trim() || !adminId || !userId) return;
+    setSendingMsg(true);
+    const { error } = await supabase.from("messages").insert({
+      sender_id: userId,
+      receiver_id: adminId,
+      content: newMsg.trim(),
+    });
+    if (error) toast.error("Erreur d'envoi");
+    else setNewMsg("");
+    setSendingMsg(false);
+  };
+
   const firstName = form.full_name?.split(" ")[0] || "Coach";
   const initials = form.full_name
     ? form.full_name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
