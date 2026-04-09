@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search, Users, Settings } from "lucide-react";
+import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search, Users, Settings, CalendarClock } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -30,6 +30,8 @@ const Admin = () => {
   const [clientSearch, setClientSearch] = useState("");
   const [maxUsers, setMaxUsers] = useState("2");
   const [deletingUser, setDeletingUser] = useState<string | null>(null);
+  const [rescheduleBookingId, setRescheduleBookingId] = useState<string | null>(null);
+  const [rescheduleSlotId, setRescheduleSlotId] = useState("");
 
   useEffect(() => {
     const check = async () => {
@@ -71,6 +73,15 @@ const Admin = () => {
     queryFn: async () => {
       const { data, error } = await supabase.from("bookings").select("*, profiles(full_name, phone), time_slots(date, start_time, end_time)").order("created_at", { ascending: false });
       if (error) throw error;
+      // Load proposed slot details separately
+      if (data) {
+        for (const b of data) {
+          if ((b as any).proposed_slot_id) {
+            const { data: ps } = await supabase.from("time_slots").select("date, start_time, end_time").eq("id", (b as any).proposed_slot_id).single();
+            (b as any).proposed_slot = ps;
+          }
+        }
+      }
       return data;
     },
     enabled: isAdmin === true,
@@ -351,14 +362,96 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="bookings" className="space-y-4">
-            {bookings?.map((b) => (
-              <div key={b.id} className="bg-card border border-border rounded-lg p-4">
-                <p className="text-foreground text-sm font-medium">{(b.profiles as any)?.full_name || "Client"}</p>
-                <p className="text-muted-foreground text-xs">
-                  📞 {(b.profiles as any)?.phone || "—"} | 📅 {(b.time_slots as any)?.date} {(b.time_slots as any)?.start_time?.toString().slice(0, 5)}-{(b.time_slots as any)?.end_time?.toString().slice(0, 5)} | Status: {b.status}
-                </p>
-              </div>
-            ))}
+            {bookings?.map((b) => {
+              const isRescheduling = rescheduleBookingId === b.id;
+              const availableSlots = slots?.filter((s: any) => s.is_available && s.id !== b.time_slot_id) || [];
+              return (
+                <div key={b.id} className="bg-card border border-border rounded-lg p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-foreground text-sm font-medium">{(b.profiles as any)?.full_name || "Client"}</p>
+                      <p className="text-muted-foreground text-xs">
+                        📞 {(b.profiles as any)?.phone || "—"} | 📅 {(b.time_slots as any)?.date} {(b.time_slots as any)?.start_time?.toString().slice(0, 5)}-{(b.time_slots as any)?.end_time?.toString().slice(0, 5)}
+                      </p>
+                      <p className={`text-xs font-medium mt-1 ${
+                        b.status === "confirmed" ? "text-green-500" 
+                        : b.status === "cancelled" ? "text-destructive" 
+                        : b.status === "reschedule_pending" ? "text-yellow-500"
+                        : "text-muted-foreground"
+                      }`}>
+                        {b.status === "confirmed" ? "✅ Confirmé" 
+                         : b.status === "cancelled" ? "❌ Annulé" 
+                         : b.status === "reschedule_pending" ? "⏳ Report proposé — en attente du client"
+                         : b.status}
+                      </p>
+                      {b.status === "reschedule_pending" && (b as any).proposed_slot && (
+                        <p className="text-primary text-xs mt-1">
+                          → Nouveau créneau : {(b as any).proposed_slot.date} {(b as any).proposed_slot.start_time?.toString().slice(0, 5)}-{(b as any).proposed_slot.end_time?.toString().slice(0, 5)}
+                        </p>
+                      )}
+                    </div>
+                    {b.status === "confirmed" && (
+                      <Button
+                        size="sm"
+                        variant="heroOutline"
+                        onClick={() => {
+                          setRescheduleBookingId(isRescheduling ? null : b.id);
+                          setRescheduleSlotId("");
+                        }}
+                      >
+                        <CalendarClock size={14} className="mr-1" /> Décaler
+                      </Button>
+                    )}
+                  </div>
+
+                  {isRescheduling && (
+                    <div className="bg-muted/50 rounded-lg p-3 space-y-2">
+                      <p className="text-foreground text-xs font-medium">Proposer un nouveau créneau :</p>
+                      {availableSlots.length === 0 ? (
+                        <p className="text-muted-foreground text-xs">Aucun créneau disponible. Ajoute-en d'abord dans l'onglet Créneaux.</p>
+                      ) : (
+                        <>
+                          <select
+                            className="w-full h-8 text-xs bg-background border border-border rounded-md px-2 text-foreground"
+                            value={rescheduleSlotId}
+                            onChange={(e) => setRescheduleSlotId(e.target.value)}
+                          >
+                            <option value="">Choisir un créneau...</option>
+                            {availableSlots.map((s: any) => (
+                              <option key={s.id} value={s.id}>
+                                {s.date} — {s.start_time?.toString().slice(0, 5)} à {s.end_time?.toString().slice(0, 5)}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="hero"
+                              disabled={!rescheduleSlotId}
+                              onClick={async () => {
+                                await supabase.from("bookings").update({
+                                  status: "reschedule_pending",
+                                  proposed_slot_id: rescheduleSlotId,
+                                }).eq("id", b.id);
+                                toast.success("Proposition de report envoyée au client");
+                                setRescheduleBookingId(null);
+                                setRescheduleSlotId("");
+                                queryClient.invalidateQueries({ queryKey: ["admin_bookings"] });
+                              }}
+                            >
+                              <Send size={14} className="mr-1" /> Proposer
+                            </Button>
+                            <Button size="sm" variant="heroOutline" onClick={() => setRescheduleBookingId(null)}>
+                              Annuler
+                            </Button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
             {(!bookings || bookings.length === 0) && <p className="text-muted-foreground text-center">Aucune réservation</p>}
           </TabsContent>
 

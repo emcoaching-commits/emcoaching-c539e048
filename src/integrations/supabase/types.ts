@@ -19,6 +19,7 @@ export type Database = {
           created_at: string
           id: string
           pricing_plan_id: string | null
+          proposed_slot_id: string | null
           status: string
           time_slot_id: string
           user_id: string
@@ -27,6 +28,7 @@ export type Database = {
           created_at?: string
           id?: string
           pricing_plan_id?: string | null
+          proposed_slot_id?: string | null
           status?: string
           time_slot_id: string
           user_id: string
@@ -35,6 +37,7 @@ export type Database = {
           created_at?: string
           id?: string
           pricing_plan_id?: string | null
+          proposed_slot_id?: string | null
           status?: string
           time_slot_id?: string
           user_id?: string
@@ -45,6 +48,13 @@ export type Database = {
             columns: ["pricing_plan_id"]
             isOneToOne: false
             referencedRelation: "pricing_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_proposed_slot_id_fkey"
+            columns: ["proposed_slot_id"]
+            isOneToOne: false
+            referencedRelation: "time_slots"
             referencedColumns: ["id"]
           },
           {

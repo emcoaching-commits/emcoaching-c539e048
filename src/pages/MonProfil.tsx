@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { ClipboardList, User, MapPin, Phone, Ruler, Weight, Calendar, ArrowLeft, Sparkles, Save, ChevronRight, Send, MessageCircle, Headphones, Camera, Star, FileSpreadsheet, CalendarCheck } from "lucide-react";
+import { ClipboardList, User, MapPin, Phone, Ruler, Weight, Calendar, ArrowLeft, Sparkles, Save, ChevronRight, Send, MessageCircle, Headphones, Camera, Star, FileSpreadsheet, CalendarCheck, Check, X } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -94,6 +94,15 @@ const MonProfil = () => {
         .select("*, time_slots(date, start_time, end_time)")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
+      // Load proposed slot details for reschedules
+      if (bookingsData) {
+        for (const b of bookingsData) {
+          if ((b as any).proposed_slot_id) {
+            const { data: ps } = await supabase.from("time_slots").select("date, start_time, end_time").eq("id", (b as any).proposed_slot_id).single();
+            (b as any).proposed_slot = ps;
+          }
+        }
+      }
       setBookings(bookingsData || []);
 
       setLoading(false);
@@ -418,23 +427,79 @@ const MonProfil = () => {
                 <p className="text-foreground font-medium text-sm flex items-center gap-2 mb-3">
                   <CalendarCheck size={16} className="text-primary" /> Mes rendez-vous
                 </p>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {bookings.map((b: any) => {
                     const slot = b.time_slots as any;
                     const isPast = slot?.date && new Date(slot.date) < new Date(new Date().toDateString());
-                    const statusLabel = b.status === "cancelled" ? "Annulé" : isPast ? "Passé" : "Confirmé";
-                    const statusColor = b.status === "cancelled" ? "text-destructive" : isPast ? "text-muted-foreground" : "text-green-500";
+                    const isReschedule = b.status === "reschedule_pending";
+                    const statusLabel = b.status === "cancelled" ? "Annulé" : isReschedule ? "Report proposé" : isPast ? "Passé" : "Confirmé";
+                    const statusColor = b.status === "cancelled" ? "text-destructive" : isReschedule ? "text-yellow-500" : isPast ? "text-muted-foreground" : "text-green-500";
                     return (
-                      <div key={b.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                        <div>
-                          <p className="text-foreground text-sm font-medium">
-                            📅 {slot?.date ? new Date(slot.date).toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" }) : "—"}
-                          </p>
-                          <p className="text-muted-foreground text-xs">
-                            🕐 {slot?.start_time?.toString().slice(0, 5)} - {slot?.end_time?.toString().slice(0, 5)}
-                          </p>
+                      <div key={b.id} className="py-2 border-b border-border last:border-0">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-foreground text-sm font-medium">
+                              📅 {slot?.date ? new Date(slot.date).toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" }) : "—"}
+                            </p>
+                            <p className="text-muted-foreground text-xs">
+                              🕐 {slot?.start_time?.toString().slice(0, 5)} - {slot?.end_time?.toString().slice(0, 5)}
+                            </p>
+                          </div>
+                          <span className={`text-xs font-medium ${statusColor}`}>{statusLabel}</span>
                         </div>
-                        <span className={`text-xs font-medium ${statusColor}`}>{statusLabel}</span>
+
+                        {/* Reschedule proposal */}
+                        {isReschedule && b.proposed_slot && (
+                          <div className="mt-2 bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+                            <p className="text-foreground text-xs font-medium mb-1">📩 Emma propose un nouveau créneau :</p>
+                            <p className="text-primary text-sm font-display">
+                              {new Date(b.proposed_slot.date).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })} — {b.proposed_slot.start_time?.toString().slice(0, 5)} à {b.proposed_slot.end_time?.toString().slice(0, 5)}
+                            </p>
+                            <div className="flex gap-2 mt-2">
+                              <Button
+                                size="sm"
+                                variant="hero"
+                                onClick={async () => {
+                                  await supabase.from("bookings").update({
+                                    time_slot_id: b.proposed_slot_id,
+                                    proposed_slot_id: null,
+                                    status: "confirmed",
+                                  }).eq("id", b.id);
+                                  toast.success("Nouveau créneau accepté ! ✅");
+                                  // Reload bookings
+                                  const { data: updated } = await supabase.from("bookings").select("*, time_slots(date, start_time, end_time)").eq("user_id", userId!).order("created_at", { ascending: false });
+                                  if (updated) {
+                                    for (const u of updated) {
+                                      if ((u as any).proposed_slot_id) {
+                                        const { data: ps } = await supabase.from("time_slots").select("date, start_time, end_time").eq("id", (u as any).proposed_slot_id).single();
+                                        (u as any).proposed_slot = ps;
+                                      }
+                                    }
+                                    setBookings(updated);
+                                  }
+                                }}
+                              >
+                                <Check size={14} className="mr-1" /> Accepter
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="heroOutline"
+                                className="text-destructive border-destructive/30"
+                                onClick={async () => {
+                                  await supabase.from("bookings").update({
+                                    proposed_slot_id: null,
+                                    status: "confirmed",
+                                  }).eq("id", b.id);
+                                  toast.info("Report refusé — créneau initial maintenu");
+                                  const { data: updated } = await supabase.from("bookings").select("*, time_slots(date, start_time, end_time)").eq("user_id", userId!).order("created_at", { ascending: false });
+                                  if (updated) setBookings(updated);
+                                }}
+                              >
+                                <X size={14} className="mr-1" /> Refuser
+                              </Button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
