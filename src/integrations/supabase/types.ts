@@ -83,6 +83,36 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          client_id: string | null
+          client_name: string | null
+          content: string
+          created_at: string
+          id: string
+          is_read: boolean
+          type: string
+        }
+        Insert: {
+          client_id?: string | null
+          client_name?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          type: string
+        }
+        Update: {
+          client_id?: string | null
+          client_name?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          type?: string
+        }
+        Relationships: []
+      }
       pricing_plans: {
         Row: {
           created_at: string
