@@ -59,8 +59,11 @@ const PlanningSection = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <p className="text-primary font-semibold tracking-widest uppercase text-sm mb-3">Réserve ta séance</p>
-          <h2 className="font-display text-5xl sm:text-6xl text-gradient-blue">PLANNING</h2>
+          <p className="text-primary font-semibold tracking-widest uppercase text-sm mb-3">Réserve ton rendez-vous</p>
+          <h2 className="font-display text-5xl sm:text-6xl text-gradient-blue">RDV EN LIGNE</h2>
+          <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
+            Choisis un créneau pour ton rendez-vous en visio avec Emma. Tous les accompagnements se font en ligne.
+          </p>
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
