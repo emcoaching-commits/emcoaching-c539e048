@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { ClipboardList, User, MapPin, Phone, Ruler, Weight, Calendar, ArrowLeft, Sparkles, Save, ChevronRight, Send, MessageCircle, Headphones, Camera, Star, FileSpreadsheet, CalendarCheck, Check, X, CalendarPlus } from "lucide-react";
+import { ClipboardList, User, MapPin, Phone, Ruler, Weight, Calendar, ArrowLeft, Sparkles, Save, ChevronRight, Send, MessageCircle, Headphones, Camera, Star, FileSpreadsheet, CalendarCheck, Check, X, CalendarPlus, CalendarClock } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -35,6 +35,9 @@ const MonProfil = () => {
   const [sendingMsg, setSendingMsg] = useState(false);
   const [adminId, setAdminId] = useState<string | null>(null);
   const [bookings, setBookings] = useState<any[]>([]);
+  const [rescheduleBookingId, setRescheduleBookingId] = useState<string | null>(null);
+  const [rescheduleSlotId, setRescheduleSlotId] = useState("");
+  const [availableSlots, setAvailableSlots] = useState<any[]>([]);
   const msgBottomRef = useRef<HTMLDivElement>(null);
   const messagerieRef = useRef<HTMLDivElement>(null);
 
@@ -497,9 +500,7 @@ const MonProfil = () => {
                                 </button>
                                 <button
                                   onClick={async () => {
-                                    // Cancel the booking
                                     await supabase.from("bookings").update({ status: "cancelled" }).eq("id", b.id);
-                                    // Re-enable the time slot
                                     await supabase.from("time_slots").update({ is_available: true }).eq("id", b.time_slot_id);
                                     toast.success("Rendez-vous annulé ✅");
                                     const { data: updated } = await supabase.from("bookings").select("*, time_slots!bookings_time_slot_id_fkey(date, start_time, end_time)").eq("user_id", userId!).order("created_at", { ascending: false });
@@ -510,11 +511,87 @@ const MonProfil = () => {
                                 >
                                   Annuler
                                 </button>
+                                <button
+                                  onClick={async () => {
+                                    if (rescheduleBookingId === b.id) {
+                                      setRescheduleBookingId(null);
+                                      return;
+                                    }
+                                    // Fetch available slots
+                                    const { data: slotsData } = await supabase
+                                      .from("time_slots")
+                                      .select("*")
+                                      .eq("is_available", true)
+                                      .gte("date", new Date().toISOString().split("T")[0])
+                                      .order("date")
+                                      .order("start_time");
+                                    setAvailableSlots(slotsData || []);
+                                    setRescheduleBookingId(b.id);
+                                    setRescheduleSlotId("");
+                                  }}
+                                  className="text-[10px] px-2 py-1 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                                  title="Décaler le rendez-vous"
+                                >
+                                  Décaler
+                                </button>
                               </div>
                             )}
                             <span className={`text-xs font-medium ${statusColor}`}>{statusLabel}</span>
                           </div>
                         </div>
+
+                        {/* Client reschedule picker */}
+                        {rescheduleBookingId === b.id && (
+                          <div className="mt-2 bg-primary/5 border border-primary/20 rounded-lg p-3 space-y-2">
+                            <p className="text-foreground text-xs font-medium">📅 Choisir un nouveau créneau :</p>
+                            {availableSlots.length === 0 ? (
+                              <p className="text-muted-foreground text-xs">Aucun créneau disponible pour le moment.</p>
+                            ) : (
+                              <>
+                                <select
+                                  className="w-full h-8 text-xs bg-background border border-border rounded-md px-2 text-foreground"
+                                  value={rescheduleSlotId}
+                                  onChange={(e) => setRescheduleSlotId(e.target.value)}
+                                >
+                                  <option value="">Choisir un créneau...</option>
+                                  {availableSlots.map((s: any) => (
+                                    <option key={s.id} value={s.id}>
+                                      {new Date(s.date).toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" })} — {s.start_time?.toString().slice(0, 5)} à {s.end_time?.toString().slice(0, 5)}
+                                    </option>
+                                  ))}
+                                </select>
+                                <div className="flex gap-2">
+                                  <Button
+                                    size="sm"
+                                    variant="hero"
+                                    disabled={!rescheduleSlotId}
+                                    onClick={async () => {
+                                      // Free old slot
+                                      await supabase.from("time_slots").update({ is_available: true }).eq("id", b.time_slot_id);
+                                      // Book new slot
+                                      await supabase.from("time_slots").update({ is_available: false }).eq("id", rescheduleSlotId);
+                                      // Update booking
+                                      await supabase.from("bookings").update({ time_slot_id: rescheduleSlotId }).eq("id", b.id);
+                                      toast.success("Rendez-vous décalé ✅");
+                                      setRescheduleBookingId(null);
+                                      const { data: updated } = await supabase.from("bookings").select("*, time_slots!bookings_time_slot_id_fkey(date, start_time, end_time)").eq("user_id", userId!).order("created_at", { ascending: false });
+                                      if (updated) setBookings(updated);
+                                    }}
+                                  >
+                                    <Check size={14} className="mr-1" /> Confirmer
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="heroOutline"
+                                    onClick={() => setRescheduleBookingId(null)}
+                                  >
+                                    <X size={14} className="mr-1" /> Annuler
+                                  </Button>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        )}
 
                         {/* Reschedule proposal */}
                         {isReschedule && b.proposed_slot && (
