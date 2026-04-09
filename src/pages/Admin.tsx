@@ -162,7 +162,7 @@ const Admin = () => {
     setAdminMsg("");
     setSendingMsg(false);
   };
-
+  const [clientSearch, setClientSearch] = useState("");
 
     const toggleReview = async (id: string, approved: boolean) => {
     queryClient.invalidateQueries({ queryKey: ["admin_reviews"] });
