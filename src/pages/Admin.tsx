@@ -84,6 +84,36 @@ const Admin = () => {
     enabled: isAdmin === true,
   });
 
+  // Notifications
+  const { data: notifications } = useQuery({
+    queryKey: ["admin_notifications"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("notifications").select("*").order("created_at", { ascending: false }).limit(50);
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin === true,
+  });
+
+  const unreadCount = notifications?.filter((n: any) => !n.is_read).length || 0;
+
+  const markAllRead = async () => {
+    await supabase.from("notifications").update({ is_read: true }).eq("is_read", false);
+    queryClient.invalidateQueries({ queryKey: ["admin_notifications"] });
+  };
+
+  // Realtime notifications
+  useEffect(() => {
+    if (!currentUserId) return;
+    const channel = supabase
+      .channel("admin-notifications")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["admin_notifications"] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [currentUserId, queryClient]);
+
   // Messages - all conversations
   const { data: allMessages } = useQuery({
     queryKey: ["admin_messages"],
