@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { ClipboardList, User, MapPin, Phone, Ruler, Weight, Calendar, ArrowLeft, Sparkles, Save, ChevronRight, Send, MessageCircle, Headphones, Camera, Star, FileSpreadsheet, CalendarCheck, Check, X, CalendarPlus } from "lucide-react";
+import { ClipboardList, User, MapPin, Phone, Ruler, Weight, Calendar, ArrowLeft, Sparkles, Save, ChevronRight, Send, MessageCircle, Headphones, Camera, Star, FileSpreadsheet, CalendarCheck, Check, X, CalendarPlus, CalendarClock } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
