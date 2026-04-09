@@ -1,14 +1,7 @@
 import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
 
-const stats = [
-  { value: "500+", label: "Clients accompagnés" },
-  { value: "8 ans", label: "D'expérience" },
-  { value: "98%", label: "Satisfaction client" },
-];
-
 const points = [
-  "Diplômée d'État en coaching sportif",
   "Spécialiste en transformation physique",
   "Approche bienveillante et motivante",
   "Suivi personnalisé et régulier",
