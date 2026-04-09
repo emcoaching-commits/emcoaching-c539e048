@@ -98,6 +98,42 @@ const Admin = () => {
     enabled: isAdmin === true,
   });
 
+  // Max users setting
+  useEffect(() => {
+    if (!isAdmin) return;
+    const loadMaxUsers = async () => {
+      const { data } = await supabase.from("site_settings").select("value").eq("key", "max_users").single();
+      if (data) setMaxUsers(data.value);
+    };
+    loadMaxUsers();
+  }, [isAdmin]);
+
+  const updateMaxUsers = async (val: string) => {
+    setMaxUsers(val);
+    const num = parseInt(val);
+    if (isNaN(num) || num < 1) return;
+    await supabase.from("site_settings").upsert({ key: "max_users", value: val });
+    toast.success(`Capacité mise à jour : ${val} clients max`);
+  };
+
+  const deleteClient = async (userId: string, name: string) => {
+    if (!confirm(`Supprimer définitivement ${name || "ce client"} et toutes ses données ? Cette action est irréversible.`)) return;
+    setDeletingUser(userId);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await supabase.functions.invoke("delete-user", {
+        body: { user_id: userId },
+      });
+      if (res.error) throw res.error;
+      toast.success(`${name || "Client"} supprimé`);
+      queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+      queryClient.invalidateQueries({ queryKey: ["admin_messages"] });
+    } catch (err: any) {
+      toast.error("Erreur : " + (err.message || "Impossible de supprimer"));
+    }
+    setDeletingUser(null);
+  };
+
   const unreadCount = notifications?.filter((n: any) => !n.is_read).length || 0;
 
   const markAllRead = async () => {
