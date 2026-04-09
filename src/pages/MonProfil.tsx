@@ -91,7 +91,7 @@ const MonProfil = () => {
       // Load bookings with time slot info
       const { data: bookingsData } = await supabase
         .from("bookings")
-        .select("*, time_slots(date, start_time, end_time)")
+        .select("*, time_slots!bookings_time_slot_id_fkey(date, start_time, end_time)")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
       // Load proposed slot details for reschedules
