@@ -5,7 +5,7 @@ const services = [
   {
     icon: Dumbbell,
     title: "Coaching Individuel",
-    description: "Emma est présente à tes côtés. Séances personnalisées en présentiel ou en ligne, adaptées à tes objectifs.",
+    description: "Emma est présente à tes côtés. Séances personnalisées 100% en ligne, adaptées à tes objectifs.",
   },
   {
     icon: Apple,

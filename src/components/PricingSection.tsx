@@ -6,9 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
 const sessionDetails: Record<string, string> = {
-  "Découverte": "Programme en ligne uniquement",
-  "Essentiel": "1 séance présentielle / mois avec Emma",
-  "Premium": "2 séances présentielles / mois avec Emma",
+  "Découverte": "Coaching 100% en ligne",
+  "Essentiel": "1 RDV en ligne / mois avec Emma",
+  "Premium": "2 RDV en ligne / mois avec Emma",
 };
 
 const PricingSection = () => {
