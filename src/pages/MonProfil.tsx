@@ -224,6 +224,36 @@ const MonProfil = () => {
               )}
             </motion.div>
 
+            {/* Payment dates */}
+            {profile?.has_active_subscription && (profile?.subscription_start_date || profile?.next_payment_date) && (
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.25 }}
+                className="bg-card border border-border rounded-xl p-5 space-y-3"
+              >
+                <p className="text-foreground font-medium text-sm flex items-center gap-2">
+                  💳 Paiement
+                </p>
+                {profile?.subscription_start_date && (
+                  <div>
+                    <p className="text-muted-foreground text-xs">Premier paiement</p>
+                    <p className="text-foreground text-sm font-medium">
+                      {new Date(profile.subscription_start_date).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
+                    </p>
+                  </div>
+                )}
+                {profile?.next_payment_date && (
+                  <div>
+                    <p className="text-muted-foreground text-xs">Prochain paiement</p>
+                    <p className="text-primary text-sm font-display">
+                      {new Date(profile.next_payment_date).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
+                    </p>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
             {/* Profile completion */}
             <motion.div
               initial={{ x: -20, opacity: 0 }}
