@@ -80,9 +80,12 @@ const Admin = () => {
   const { data: clients } = useQuery({
     queryKey: ["admin_clients"],
     queryFn: async () => {
+      // Get admin user IDs to exclude them
+      const { data: adminRoles } = await supabase.from("user_roles").select("user_id").eq("role", "admin");
+      const adminIds = adminRoles?.map((r: any) => r.user_id) || [];
       const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
       if (error) throw error;
-      return data;
+      return (data || []).filter((p: any) => !adminIds.includes(p.user_id));
     },
     enabled: isAdmin === true,
   });
