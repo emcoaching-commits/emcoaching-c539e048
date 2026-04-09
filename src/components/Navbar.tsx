@@ -55,7 +55,7 @@ const Navbar = () => {
           <div className="w-10 h-10 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center">
             <span className="font-display text-lg text-primary">E</span>
           </div>
-          <span className="font-display text-2xl text-gradient-blue">EMMA FIT</span>
+          <span className="font-display text-2xl text-gradient-blue">EM' COACHING</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-5">
