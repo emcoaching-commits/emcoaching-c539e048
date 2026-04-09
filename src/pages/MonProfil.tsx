@@ -18,6 +18,7 @@ const MonProfil = () => {
   const [profile, setProfile] = useState<any>(null);
   const [userEmail, setUserEmail] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
+  const [avatarSignedUrl, setAvatarSignedUrl] = useState<string | null>(null);
   const [form, setForm] = useState({
     full_name: "",
     phone: "",
@@ -57,6 +58,11 @@ const MonProfil = () => {
           gender: data.gender || "",
         });
         if (!data.full_name || !data.age || !data.city) setEditing(true);
+        // Load signed avatar URL
+        if (data.avatar_url) {
+          const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(data.avatar_url, 3600);
+          if (signed?.signedUrl) setAvatarSignedUrl(signed.signedUrl);
+        }
       } else {
         setEditing(true);
       }
@@ -81,22 +87,25 @@ const MonProfil = () => {
     load();
   }, [navigate]);
 
-  // Realtime messages
+  // Poll for new messages every 5 seconds
   useEffect(() => {
     if (!userId) return;
-    const channel = supabase
-      .channel("profile-messages")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, (payload) => {
-        const msg = payload.new as any;
-        if (msg.sender_id === userId || msg.receiver_id === userId) {
-          setMessages((prev) => [...prev, msg]);
-          if (msg.receiver_id === userId) {
-            supabase.from("messages").update({ is_read: true }).eq("id", msg.id);
-          }
+    const interval = setInterval(async () => {
+      const { data: msgs } = await supabase
+        .from("messages")
+        .select("*")
+        .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+        .order("created_at", { ascending: true });
+      if (msgs) {
+        setMessages(msgs);
+        // Mark unread as read
+        const unread = msgs.filter((m: any) => m.receiver_id === userId && !m.is_read);
+        for (const m of unread) {
+          await supabase.from("messages").update({ is_read: true }).eq("id", m.id);
         }
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+      }
+    }, 5000);
+    return () => clearInterval(interval);
   }, [userId]);
 
   useEffect(() => {
@@ -158,11 +167,13 @@ const MonProfil = () => {
 
     if (uploadError) { toast.error("Erreur d'upload"); return; }
 
-    const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
-    const avatarUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+    // Store path, use signed URL for display
+    const { data: signedData } = await supabase.storage.from("avatars").createSignedUrl(path, 3600);
+    const avatarPath = path;
 
-    await supabase.from("profiles").update({ avatar_url: avatarUrl }).eq("user_id", userId);
-    setProfile({ ...profile, avatar_url: avatarUrl });
+    await supabase.from("profiles").update({ avatar_url: avatarPath }).eq("user_id", userId);
+    setProfile({ ...profile, avatar_url: avatarPath });
+    if (signedData?.signedUrl) setAvatarSignedUrl(signedData.signedUrl);
     toast.success("Photo de profil mise à jour ! 📸");
   };
 
@@ -208,9 +219,9 @@ const MonProfil = () => {
                 className="hidden"
                 onChange={handleAvatarUpload}
               />
-              {profile?.avatar_url ? (
+              {(avatarSignedUrl || profile?.avatar_url) ? (
                 <img
-                  src={profile.avatar_url}
+                  src={avatarSignedUrl || profile.avatar_url}
                   alt="Photo de profil"
                   className="w-24 h-24 rounded-2xl object-cover shadow-lg shadow-primary/25"
                 />
