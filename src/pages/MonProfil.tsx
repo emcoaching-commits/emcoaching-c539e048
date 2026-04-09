@@ -211,6 +211,39 @@ const MonProfil = () => {
     toast.success("Photo de profil mise à jour ! 📸");
   };
 
+  const addToCalendar = (slot: any, type: "google" | "ics") => {
+    if (!slot?.date || !slot?.start_time || !slot?.end_time) return;
+    const dateStr = slot.date.replace(/-/g, "");
+    const startStr = slot.start_time.toString().slice(0, 5).replace(":", "") + "00";
+    const endStr = slot.end_time.toString().slice(0, 5).replace(":", "") + "00";
+    const title = "RDV Em' Coaching";
+    const details = "Rendez-vous coaching avec Emma";
+
+    if (type === "google") {
+      const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${dateStr}T${startStr}/${dateStr}T${endStr}&details=${encodeURIComponent(details)}&ctz=Europe/Paris`;
+      window.open(url, "_blank");
+    } else {
+      const icsContent = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "BEGIN:VEVENT",
+        `DTSTART;TZID=Europe/Paris:${dateStr}T${startStr}`,
+        `DTEND;TZID=Europe/Paris:${dateStr}T${endStr}`,
+        `SUMMARY:${title}`,
+        `DESCRIPTION:${details}`,
+        "END:VEVENT",
+        "END:VCALENDAR",
+      ].join("\r\n");
+      const blob = new Blob([icsContent], { type: "text/calendar" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "rdv-emcoaching.ics";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  };
+
   const firstName = form.full_name?.trim() ? form.full_name.split(" ")[0] : "";
   const initials = form.full_name
     ? form.full_name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
