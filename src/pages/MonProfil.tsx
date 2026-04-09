@@ -87,22 +87,25 @@ const MonProfil = () => {
     load();
   }, [navigate]);
 
-  // Realtime messages
+  // Poll for new messages every 5 seconds
   useEffect(() => {
     if (!userId) return;
-    const channel = supabase
-      .channel("profile-messages")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, (payload) => {
-        const msg = payload.new as any;
-        if (msg.sender_id === userId || msg.receiver_id === userId) {
-          setMessages((prev) => [...prev, msg]);
-          if (msg.receiver_id === userId) {
-            supabase.from("messages").update({ is_read: true }).eq("id", msg.id);
-          }
+    const interval = setInterval(async () => {
+      const { data: msgs } = await supabase
+        .from("messages")
+        .select("*")
+        .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+        .order("created_at", { ascending: true });
+      if (msgs) {
+        setMessages(msgs);
+        // Mark unread as read
+        const unread = msgs.filter((m: any) => m.receiver_id === userId && !m.is_read);
+        for (const m of unread) {
+          await supabase.from("messages").update({ is_read: true }).eq("id", m.id);
         }
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+      }
+    }, 5000);
+    return () => clearInterval(interval);
   }, [userId]);
 
   useEffect(() => {
