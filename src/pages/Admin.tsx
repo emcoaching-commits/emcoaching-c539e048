@@ -262,6 +262,34 @@ const Admin = () => {
                     <p className="text-muted-foreground text-xs">
                       ⚖️ {c.weight ? `${c.weight} kg` : "—"} | 📏 {c.height ? `${c.height} cm` : "—"} | Inscrit le {format(new Date(c.created_at), "dd/MM/yyyy")}
                     </p>
+                    {c.has_active_subscription && (
+                      <div className="flex flex-wrap gap-3 mt-2">
+                        <div className="flex items-center gap-1">
+                          <label className="text-muted-foreground text-xs">1er paiement:</label>
+                          <Input
+                            type="date"
+                            className="h-7 text-xs w-36 bg-background border-border"
+                            defaultValue={c.subscription_start_date || ""}
+                            onChange={async (e) => {
+                              await supabase.from("profiles").update({ subscription_start_date: e.target.value || null }).eq("id", c.id);
+                              queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                            }}
+                          />
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <label className="text-muted-foreground text-xs">Prochain:</label>
+                          <Input
+                            type="date"
+                            className="h-7 text-xs w-36 bg-background border-border"
+                            defaultValue={c.next_payment_date || ""}
+                            onChange={async (e) => {
+                              await supabase.from("profiles").update({ next_payment_date: e.target.value || null }).eq("id", c.id);
+                              queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <Button
                     size="sm"
