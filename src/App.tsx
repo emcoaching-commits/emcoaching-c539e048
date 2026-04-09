@@ -7,6 +7,7 @@ import Index from "./pages/Index.tsx";
 import Auth from "./pages/Auth.tsx";
 import Admin from "./pages/Admin.tsx";
 import Questionnaire from "./pages/Questionnaire.tsx";
+import MonProfil from "./pages/MonProfil.tsx";
 import Services from "./pages/Services.tsx";
 import Tarifs from "./pages/Tarifs.tsx";
 import Planning from "./pages/Planning.tsx";
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/questionnaire" element={<Questionnaire />} />
+          <Route path="/mon-profil" element={<MonProfil />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
