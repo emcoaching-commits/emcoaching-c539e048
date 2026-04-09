@@ -543,18 +543,37 @@ const Admin = () => {
                         </p>
                       )}
                     </div>
-                    {b.status === "confirmed" && (
+                    <div className="flex gap-2">
+                      {b.status === "confirmed" && (
+                        <Button
+                          size="sm"
+                          variant="heroOutline"
+                          onClick={() => {
+                            setRescheduleBookingId(isRescheduling ? null : b.id);
+                            setRescheduleSlotId("");
+                          }}
+                        >
+                          <CalendarClock size={14} className="mr-1" /> Décaler
+                        </Button>
+                      )}
                       <Button
                         size="sm"
                         variant="heroOutline"
-                        onClick={() => {
-                          setRescheduleBookingId(isRescheduling ? null : b.id);
-                          setRescheduleSlotId("");
+                        className="text-destructive border-destructive/30 hover:bg-destructive/10"
+                        onClick={async () => {
+                          if (!confirm("Supprimer ce rendez-vous ?")) return;
+                          // Re-enable the time slot
+                          await supabase.from("time_slots").update({ is_available: true }).eq("id", b.time_slot_id);
+                          await supabase.from("bookings").delete().eq("id", b.id);
+                          queryClient.invalidateQueries({ queryKey: ["admin_bookings"] });
+                          queryClient.invalidateQueries({ queryKey: ["admin_client_bookings"] });
+                          queryClient.invalidateQueries({ queryKey: ["admin_slots"] });
+                          toast.success("Rendez-vous supprimé");
                         }}
                       >
-                        <CalendarClock size={14} className="mr-1" /> Décaler
+                        <Trash2 size={14} />
                       </Button>
-                    )}
+                    </div>
                   </div>
 
                   {isRescheduling && (
