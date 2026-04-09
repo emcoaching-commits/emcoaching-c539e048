@@ -31,10 +31,10 @@ const HeroSection = () => {
             Coaching personnalisé, suivi sur Google Sheets, bilans hebdomadaires. Emma est là, présente à chaque étape.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Button variant="hero" size="lg" className="px-8 py-6 text-base" onClick={() => navigate("/auth")}>
-              Commencer maintenant <ArrowRight className="ml-2" size={18} />
+            <Button variant="hero" size="lg" className="px-8 py-6 text-base" onClick={() => window.open("https://forms.gle/fjX1G24EuvHMu7W99", "_blank")}>
+              Remplir le questionnaire <ArrowRight className="ml-2" size={18} />
             </Button>
-            <Button variant="heroOutline" size="lg" className="px-8 py-6 text-base" onClick={() => document.getElementById("services")?.scrollIntoView({ behavior: "smooth" })}>
+            <Button variant="heroOutline" size="lg" className="px-8 py-6 text-base" onClick={() => navigate("/services")}>
               Découvrir mes services
             </Button>
           </div>
