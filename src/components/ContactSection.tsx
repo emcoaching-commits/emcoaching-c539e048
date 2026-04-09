@@ -70,7 +70,7 @@ const ContactSection = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Instagram</p>
-                <p className="text-foreground font-medium">@emma.fit</p>
+                <a href="https://instagram.com/emma_berlin1" target="_blank" rel="noopener noreferrer" className="text-foreground font-medium hover:text-primary transition-colors">@emma_berlin1</a>
               </div>
             </div>
           </motion.div>
