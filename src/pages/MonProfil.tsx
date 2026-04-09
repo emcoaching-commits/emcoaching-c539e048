@@ -67,9 +67,9 @@ const MonProfil = () => {
         setEditing(true);
       }
 
-      // Load admin ID
-      const { data: adminRole } = await supabase.from("user_roles").select("user_id").eq("role", "admin").limit(1);
-      if (adminRole && adminRole.length > 0) setAdminId(adminRole[0].user_id);
+      // Load admin ID via secure function
+      const { data: adminData } = await supabase.rpc("get_admin_id");
+      if (adminData) setAdminId(adminData);
 
       // Load messages
       const { data: msgs } = await supabase
