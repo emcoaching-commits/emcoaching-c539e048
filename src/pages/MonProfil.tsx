@@ -216,9 +216,9 @@ const MonProfil = () => {
                 className="hidden"
                 onChange={handleAvatarUpload}
               />
-              {profile?.avatar_url ? (
+              {(avatarSignedUrl || profile?.avatar_url) ? (
                 <img
-                  src={profile.avatar_url}
+                  src={avatarSignedUrl || profile.avatar_url}
                   alt="Photo de profil"
                   className="w-24 h-24 rounded-2xl object-cover shadow-lg shadow-primary/25"
                 />
