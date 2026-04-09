@@ -94,11 +94,15 @@ const Admin = () => {
   const { data: bookings } = useQuery({
     queryKey: ["admin_bookings"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("bookings").select("*, profiles(full_name, phone), time_slots(date, start_time, end_time)").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("bookings").select("*, time_slots!bookings_time_slot_id_fkey(date, start_time, end_time)").order("created_at", { ascending: false });
       if (error) throw error;
-      // Load proposed slot details separately
       if (data) {
+        // Fetch profile info
+        const userIds = [...new Set(data.map((b: any) => b.user_id))];
+        const { data: profs } = await supabase.from("profiles").select("user_id, full_name, phone").in("user_id", userIds);
+        const profMap = Object.fromEntries((profs || []).map((p: any) => [p.user_id, p]));
         for (const b of data) {
+          (b as any).profiles = profMap[b.user_id] || { full_name: "Client", phone: null };
           if ((b as any).proposed_slot_id) {
             const { data: ps } = await supabase.from("time_slots").select("date, start_time, end_time").eq("id", (b as any).proposed_slot_id).single();
             (b as any).proposed_slot = ps;
