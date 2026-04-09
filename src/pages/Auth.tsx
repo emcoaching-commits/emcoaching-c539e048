@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { Camera, X } from "lucide-react";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -14,6 +15,9 @@ const Auth = () => {
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [signupClosed, setSignupClosed] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,6 +29,24 @@ const Auth = () => {
     };
     checkCapacity();
   }, []);
+
+  const handleAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) { toast.error("Fichier non valide"); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image trop lourde (max 5MB)"); return; }
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  };
+
+  const uploadAvatar = async (userId: string) => {
+    if (!avatarFile) return;
+    const ext = avatarFile.name.split(".").pop();
+    const path = `${userId}/avatar.${ext}`;
+    await supabase.storage.from("avatars").upload(path, avatarFile, { upsert: true });
+    const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+    await supabase.from("profiles").update({ avatar_url: `${urlData.publicUrl}?t=${Date.now()}` }).eq("user_id", userId);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +66,7 @@ const Auth = () => {
         setLoading(false);
         return;
       }
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -55,6 +77,9 @@ const Auth = () => {
       if (error) {
         toast.error(error.message);
       } else {
+        if (data.user && avatarFile) {
+          await uploadAvatar(data.user.id);
+        }
         toast.success("Inscription réussie ! Vérifie ton email pour confirmer.");
       }
     }
@@ -77,7 +102,7 @@ const Auth = () => {
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         <a href="/" className="font-display text-4xl text-gradient-blue block text-center mb-8">
-          EMMA FIT
+          EM' COACHING
         </a>
         <div className="bg-card border border-border rounded-lg p-8">
           <h2 className="font-display text-3xl text-center mb-6 text-foreground">
@@ -116,6 +141,39 @@ const Auth = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <>
+                {/* Avatar upload */}
+                <div className="flex flex-col items-center gap-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleAvatarSelect}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="relative w-20 h-20 rounded-2xl bg-muted border-2 border-dashed border-border hover:border-primary transition-colors flex items-center justify-center overflow-hidden group"
+                  >
+                    {avatarPreview ? (
+                      <img src={avatarPreview} alt="Aperçu" className="w-full h-full object-cover" />
+                    ) : (
+                      <Camera size={24} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                    )}
+                  </button>
+                  {avatarPreview ? (
+                    <button
+                      type="button"
+                      onClick={() => { setAvatarFile(null); setAvatarPreview(null); }}
+                      className="text-muted-foreground text-xs hover:text-destructive flex items-center gap-1"
+                    >
+                      <X size={12} /> Retirer la photo
+                    </button>
+                  ) : (
+                    <p className="text-muted-foreground text-xs">Ajouter une photo de profil (optionnel)</p>
+                  )}
+                </div>
+
                 <Input
                   placeholder="Nom complet"
                   value={fullName}
