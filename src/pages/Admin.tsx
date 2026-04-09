@@ -219,7 +219,46 @@ const Admin = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="reviews" className="space-y-4">
+          <TabsContent value="notifications" className="space-y-4">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-foreground font-display text-xl">ACTIVITÉ RÉCENTE</h2>
+              {unreadCount > 0 && (
+                <Button variant="heroOutline" size="sm" onClick={markAllRead}>
+                  <Check size={14} className="mr-1" /> Tout marquer comme lu
+                </Button>
+              )}
+            </div>
+            {(!notifications || notifications.length === 0) && (
+              <p className="text-muted-foreground text-center py-8">Aucune activité pour le moment</p>
+            )}
+            {notifications?.map((n: any) => {
+              const icon = n.type === "inscription" ? <UserPlus size={16} /> 
+                : n.type === "message" ? <MessageCircle size={16} />
+                : n.type === "profil_update" ? <RefreshCw size={16} />
+                : <AlertTriangle size={16} />;
+              const color = n.type === "inscription" ? "text-green-500"
+                : n.type === "message" ? "text-primary"
+                : n.type === "profil_update" ? "text-accent"
+                : "text-destructive";
+              return (
+                <div key={n.id} className={`flex items-start gap-3 p-3 rounded-lg border ${n.is_read ? "bg-card border-border" : "bg-primary/5 border-primary/20"}`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${color} bg-muted`}>
+                    {icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-foreground text-sm">{n.content}</p>
+                    <p className="text-muted-foreground text-xs mt-0.5">
+                      {format(new Date(n.created_at), "dd MMM yyyy · HH:mm", { locale: fr })}
+                    </p>
+                  </div>
+                  {!n.is_read && (
+                    <div className="w-2.5 h-2.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                  )}
+                </div>
+              );
+            })}
+          </TabsContent>
+
             {reviews?.map((r) => (
               <div key={r.id} className="bg-card border border-border rounded-lg p-4 flex items-start justify-between gap-4">
                 <div className="flex-1">
