@@ -40,6 +40,9 @@ const MonProfil = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { navigate("/auth"); return; }
       setUserEmail(user.email || "");
+      setUserId(user.id);
+
+      // Load profile
       const { data } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
       if (data) {
         setProfile(data);
@@ -52,15 +55,52 @@ const MonProfil = () => {
           height: data.height?.toString() || "",
           gender: data.gender || "",
         });
-        // Auto open edit if profile is incomplete
         if (!data.full_name || !data.age || !data.city) setEditing(true);
       } else {
         setEditing(true);
       }
+
+      // Load admin ID
+      const { data: adminRole } = await supabase.from("user_roles").select("user_id").eq("role", "admin").limit(1);
+      if (adminRole && adminRole.length > 0) setAdminId(adminRole[0].user_id);
+
+      // Load messages
+      const { data: msgs } = await supabase
+        .from("messages")
+        .select("*")
+        .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+        .order("created_at", { ascending: true });
+      setMessages(msgs || []);
+
+      // Mark as read
+      await supabase.from("messages").update({ is_read: true }).eq("receiver_id", user.id).eq("is_read", false);
+
       setLoading(false);
     };
     load();
   }, [navigate]);
+
+  // Realtime messages
+  useEffect(() => {
+    if (!userId) return;
+    const channel = supabase
+      .channel("profile-messages")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, (payload) => {
+        const msg = payload.new as any;
+        if (msg.sender_id === userId || msg.receiver_id === userId) {
+          setMessages((prev) => [...prev, msg]);
+          if (msg.receiver_id === userId) {
+            supabase.from("messages").update({ is_read: true }).eq("id", msg.id);
+          }
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [userId]);
+
+  useEffect(() => {
+    msgBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages.length]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
