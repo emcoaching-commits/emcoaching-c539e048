@@ -18,6 +18,7 @@ const MonProfil = () => {
   const [profile, setProfile] = useState<any>(null);
   const [userEmail, setUserEmail] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
+  const [avatarSignedUrl, setAvatarSignedUrl] = useState<string | null>(null);
   const [form, setForm] = useState({
     full_name: "",
     phone: "",
