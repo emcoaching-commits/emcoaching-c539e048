@@ -95,10 +95,26 @@ const Navbar = () => {
             </>
           )}
         </div>
-
-        <button className="md:hidden text-foreground" onClick={() => setOpen(!open)}>
-          {open ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        {/* Mobile: boutons visibles + hamburger */}
+        <div className="md:hidden flex items-center gap-2">
+          {user ? (
+            <Button variant="heroOutline" size="sm" onClick={() => navigate("/mon-profil")}>
+              <User size={16} />
+            </Button>
+          ) : (
+            <>
+              <Button variant="hero" size="sm" onClick={() => navigate("/auth")}>
+                <UserPlus size={14} className="mr-1" /> S'inscrire
+              </Button>
+              <Button variant="heroOutline" size="sm" onClick={() => navigate("/auth")}>
+                <LogIn size={14} />
+              </Button>
+            </>
+          )}
+          <button className="text-foreground ml-1" onClick={() => setOpen(!open)}>
+            {open ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       {open && (
