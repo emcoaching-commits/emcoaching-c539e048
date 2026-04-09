@@ -591,7 +591,7 @@ const MonProfil = () => {
                               </>
                             )}
                           </div>
-                        )
+                        )}
 
                         {/* Reschedule proposal */}
                         {isReschedule && b.proposed_slot && (
