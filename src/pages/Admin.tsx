@@ -91,12 +91,25 @@ const Admin = () => {
   const { data: clients } = useQuery({
     queryKey: ["admin_clients"],
     queryFn: async () => {
-      // Get admin user IDs to exclude them
       const { data: adminRoles } = await supabase.from("user_roles").select("user_id").eq("role", "admin");
       const adminIds = adminRoles?.map((r: any) => r.user_id) || [];
       const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
       if (error) throw error;
       return (data || []).filter((p: any) => !adminIds.includes(p.user_id));
+    },
+    enabled: isAdmin === true,
+  });
+
+  // All client bookings with time slots
+  const { data: clientBookings } = useQuery({
+    queryKey: ["admin_client_bookings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("bookings")
+        .select("*, time_slots(*)")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
     },
     enabled: isAdmin === true,
   });
@@ -594,6 +607,36 @@ const Admin = () => {
                     }} />
                   </div>
                 </div>
+
+                {/* Client bookings */}
+                {(() => {
+                  const userBookings = clientBookings?.filter((b: any) => b.user_id === c.user_id) || [];
+                  if (userBookings.length === 0) return (
+                    <p className="text-muted-foreground text-xs italic">Aucun rendez-vous</p>
+                  );
+                  return (
+                    <div className="space-y-1">
+                      <label className="text-muted-foreground text-xs font-semibold">📅 Rendez-vous ({userBookings.length})</label>
+                      {userBookings.map((b: any) => {
+                        const slot = b.time_slots as any;
+                        const isPast = slot && new Date(slot.date) < new Date(new Date().toDateString());
+                        return (
+                          <div key={b.id} className={`flex items-center gap-2 text-xs rounded px-2 py-1 ${isPast ? "bg-muted/30 text-muted-foreground" : "bg-primary/10 text-foreground"}`}>
+                            <span>{slot?.date ? format(new Date(slot.date), "dd/MM/yyyy") : "—"}</span>
+                            <span>{slot?.start_time?.toString().slice(0, 5)} - {slot?.end_time?.toString().slice(0, 5)}</span>
+                            <span className={`ml-auto text-xs px-1.5 py-0.5 rounded ${
+                              b.status === "confirmed" ? "bg-green-500/20 text-green-400" :
+                              b.status === "reschedule_pending" ? "bg-yellow-500/20 text-yellow-400" :
+                              "bg-muted text-muted-foreground"
+                            }`}>
+                              {b.status === "confirmed" ? "Confirmé" : b.status === "reschedule_pending" ? "Report proposé" : b.status}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })()}
               </div>
             ))}
           </TabsContent>
