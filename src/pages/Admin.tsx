@@ -561,14 +561,14 @@ const Admin = () => {
                         variant="heroOutline"
                         className="text-destructive border-destructive/30 hover:bg-destructive/10"
                         onClick={async () => {
-                          if (!confirm("Supprimer ce rendez-vous ?")) return;
-                          // Re-enable the time slot
-                          await supabase.from("time_slots").update({ is_available: true }).eq("id", b.time_slot_id);
+                          if (!confirm("Supprimer ce rendez-vous ? Le créneau sera aussi retiré du planning.")) return;
                           await supabase.from("bookings").delete().eq("id", b.id);
+                          // Admin cancel: remove the slot entirely from the planning
+                          await supabase.from("time_slots").delete().eq("id", b.time_slot_id);
                           queryClient.invalidateQueries({ queryKey: ["admin_bookings"] });
                           queryClient.invalidateQueries({ queryKey: ["admin_client_bookings"] });
                           queryClient.invalidateQueries({ queryKey: ["admin_slots"] });
-                          toast.success("Rendez-vous supprimé");
+                          toast.success("Rendez-vous et créneau supprimés");
                         }}
                       >
                         <Trash2 size={14} />
