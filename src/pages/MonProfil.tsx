@@ -450,8 +450,16 @@ const MonProfil = () => {
             )}
 
             {/* Bookings / Rendez-vous */}
-            {bookings.length > 0 && (
-              <motion.div
+            <motion.div
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.45 }}
+              className="bg-card border border-border rounded-xl p-5"
+            >
+              <p className="text-foreground font-medium text-sm flex items-center gap-2 mb-3">
+                <CalendarCheck size={16} className="text-primary" /> Mes rendez-vous
+              </p>
+              {bookings.length > 0 ? (
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.45 }}
