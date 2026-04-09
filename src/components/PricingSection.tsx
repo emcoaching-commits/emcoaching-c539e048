@@ -75,7 +75,7 @@ const PricingSection = () => {
                   {plan.price}€
                 </p>
                 <p className="text-muted-foreground text-xs mb-1">
-                  /mois • {plan.sessions_count} séance{plan.sessions_count > 1 ? "s" : ""} incluse{plan.sessions_count > 1 ? "s" : ""}
+                  /mois • séances illimitées
                 </p>
                 {detail && (
                   <p className="text-primary text-xs font-medium mb-6">{detail}</p>
