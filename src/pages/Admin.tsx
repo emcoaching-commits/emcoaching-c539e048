@@ -501,6 +501,8 @@ const Admin = () => {
               </div>
             ))}
           </TabsContent>
+
+          <TabsContent value="messages">
             <div className="flex gap-4 h-[500px]">
               {/* Client list */}
               <div className="w-1/3 bg-card border border-border rounded-lg overflow-y-auto">
