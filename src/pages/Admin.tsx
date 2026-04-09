@@ -30,6 +30,8 @@ const Admin = () => {
   const [clientSearch, setClientSearch] = useState("");
   const [maxUsers, setMaxUsers] = useState("2");
   const [deletingUser, setDeletingUser] = useState<string | null>(null);
+  const [rescheduleBookingId, setRescheduleBookingId] = useState<string | null>(null);
+  const [rescheduleSlotId, setRescheduleSlotId] = useState("");
 
   useEffect(() => {
     const check = async () => {
