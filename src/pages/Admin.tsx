@@ -522,9 +522,9 @@ const Admin = () => {
                 <div key={b.id} className="bg-card border border-border rounded-lg p-4 space-y-3">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <p className="text-foreground text-sm font-medium">{(b.profiles as any)?.full_name || "Client"}</p>
+                      <p className="text-foreground text-sm font-medium">{(b as any).profiles?.full_name || "Client"}</p>
                       <p className="text-muted-foreground text-xs">
-                        📞 {(b.profiles as any)?.phone || "—"} | 📅 {(b.time_slots as any)?.date} {(b.time_slots as any)?.start_time?.toString().slice(0, 5)}-{(b.time_slots as any)?.end_time?.toString().slice(0, 5)}
+                        📞 {(b as any).profiles?.phone || "—"} | 📅 {(b.time_slots as any)?.date} {(b.time_slots as any)?.start_time?.toString().slice(0, 5)}-{(b.time_slots as any)?.end_time?.toString().slice(0, 5)}
                       </p>
                       <p className={`text-xs font-medium mt-1 ${
                         b.status === "confirmed" ? "text-green-500" 
