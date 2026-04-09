@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -13,7 +13,18 @@ const Auth = () => {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
+  const [signupClosed, setSignupClosed] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkCapacity = async () => {
+      const { data: setting } = await supabase.from("site_settings").select("value").eq("key", "max_users").single();
+      const max = setting ? parseInt(setting.value) : 2;
+      const { count } = await supabase.from("profiles").select("*", { count: "exact", head: true });
+      if (count !== null && count >= max) setSignupClosed(true);
+    };
+    checkCapacity();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +39,11 @@ const Auth = () => {
         navigate("/");
       }
     } else {
+      if (signupClosed) {
+        toast.error("Les inscriptions sont complètes pour le moment.");
+        setLoading(false);
+        return;
+      }
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -67,6 +83,13 @@ const Auth = () => {
           <h2 className="font-display text-3xl text-center mb-6 text-foreground">
             {isLogin ? "CONNEXION" : "INSCRIPTION"}
           </h2>
+
+          {!isLogin && signupClosed && (
+            <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 mb-4 text-center">
+              <p className="text-destructive text-sm font-medium">Les inscriptions sont complètes pour le moment.</p>
+              <p className="text-muted-foreground text-xs mt-1">Contacte Emma pour plus d'infos.</p>
+            </div>
+          )}
 
           {/* Google login */}
           <Button
@@ -127,7 +150,7 @@ const Auth = () => {
               minLength={6}
               required
             />
-            <Button variant="hero" size="lg" className="w-full" disabled={loading}>
+            <Button variant="hero" size="lg" className="w-full" disabled={loading || (!isLogin && signupClosed)}>
               {loading ? "Chargement..." : isLogin ? "Se connecter" : "S'inscrire"}
             </Button>
           </form>
