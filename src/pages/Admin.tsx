@@ -28,6 +28,8 @@ const Admin = () => {
   const [sendingMsg, setSendingMsg] = useState(false);
   const msgBottomRef = useRef<HTMLDivElement>(null);
   const [clientSearch, setClientSearch] = useState("");
+  const [maxUsers, setMaxUsers] = useState("2");
+  const [deletingUser, setDeletingUser] = useState<string | null>(null);
 
   useEffect(() => {
     const check = async () => {
