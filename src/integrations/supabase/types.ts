@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointment_types: {
+        Row: {
+          created_at: string
+          duration_minutes: number
+          id: string
+          is_active: boolean
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          is_active?: boolean
+          name: string
+        }
+        Update: {
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           created_at: string
@@ -293,6 +317,7 @@ export type Database = {
       }
       time_slots: {
         Row: {
+          appointment_type_id: string | null
           created_at: string
           date: string
           end_time: string
@@ -301,6 +326,7 @@ export type Database = {
           start_time: string
         }
         Insert: {
+          appointment_type_id?: string | null
           created_at?: string
           date: string
           end_time: string
@@ -309,6 +335,7 @@ export type Database = {
           start_time: string
         }
         Update: {
+          appointment_type_id?: string | null
           created_at?: string
           date?: string
           end_time?: string
@@ -316,7 +343,15 @@ export type Database = {
           is_available?: boolean | null
           start_time?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "time_slots_appointment_type_id_fkey"
+            columns: ["appointment_type_id"]
+            isOneToOne: false
+            referencedRelation: "appointment_types"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
