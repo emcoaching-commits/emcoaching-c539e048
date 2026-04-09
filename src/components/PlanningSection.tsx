@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -13,6 +13,7 @@ import { toast } from "sonner";
 const PlanningSection = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { data: slots } = useQuery({
     queryKey: ["time_slots", selectedDate?.toISOString()],
@@ -45,7 +46,10 @@ const PlanningSection = () => {
     if (error) {
       toast.error("Erreur lors de la réservation");
     } else {
+      // Mark slot as unavailable
+      await supabase.from("time_slots").update({ is_available: false }).eq("id", slotId);
       toast.success("Créneau réservé avec succès !");
+      queryClient.invalidateQueries({ queryKey: ["time_slots"] });
     }
   };
 
