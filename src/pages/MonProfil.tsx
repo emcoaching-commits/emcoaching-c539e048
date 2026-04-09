@@ -58,6 +58,11 @@ const MonProfil = () => {
           gender: data.gender || "",
         });
         if (!data.full_name || !data.age || !data.city) setEditing(true);
+        // Load signed avatar URL
+        if (data.avatar_url) {
+          const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(data.avatar_url, 3600);
+          if (signed?.signedUrl) setAvatarSignedUrl(signed.signedUrl);
+        }
       } else {
         setEditing(true);
       }
