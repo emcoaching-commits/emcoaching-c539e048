@@ -401,6 +401,41 @@ const MonProfil = () => {
                 )}
               </motion.div>
             )}
+
+            {/* Bookings / Rendez-vous */}
+            {bookings.length > 0 && (
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.45 }}
+                className="bg-card border border-border rounded-xl p-5"
+              >
+                <p className="text-foreground font-medium text-sm flex items-center gap-2 mb-3">
+                  <CalendarCheck size={16} className="text-primary" /> Mes rendez-vous
+                </p>
+                <div className="space-y-2">
+                  {bookings.map((b: any) => {
+                    const slot = b.time_slots as any;
+                    const isPast = slot?.date && new Date(slot.date) < new Date(new Date().toDateString());
+                    const statusLabel = b.status === "cancelled" ? "Annulé" : isPast ? "Passé" : "Confirmé";
+                    const statusColor = b.status === "cancelled" ? "text-destructive" : isPast ? "text-muted-foreground" : "text-green-500";
+                    return (
+                      <div key={b.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                        <div>
+                          <p className="text-foreground text-sm font-medium">
+                            📅 {slot?.date ? new Date(slot.date).toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" }) : "—"}
+                          </p>
+                          <p className="text-muted-foreground text-xs">
+                            🕐 {slot?.start_time?.toString().slice(0, 5)} - {slot?.end_time?.toString().slice(0, 5)}
+                          </p>
+                        </div>
+                        <span className={`text-xs font-medium ${statusColor}`}>{statusLabel}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
           </div>
 
           {/* Right column - Profile form + questionnaire */}
