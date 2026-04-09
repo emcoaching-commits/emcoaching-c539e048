@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle } from "lucide-react";
+import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -27,6 +27,7 @@ const Admin = () => {
   const [adminMsg, setAdminMsg] = useState("");
   const [sendingMsg, setSendingMsg] = useState(false);
   const msgBottomRef = useRef<HTMLDivElement>(null);
+  const [clientSearch, setClientSearch] = useState("");
 
   useEffect(() => {
     const check = async () => {
@@ -327,7 +328,20 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="clients" className="space-y-4">
-            {clients?.map((c: any) => (
+            <div className="relative">
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher un client..."
+                className="pl-9 bg-background border-border"
+                value={clientSearch}
+                onChange={(e) => setClientSearch(e.target.value)}
+              />
+            </div>
+            {clients?.filter((c: any) => {
+              if (!clientSearch.trim()) return true;
+              const q = clientSearch.toLowerCase();
+              return (c.full_name || "").toLowerCase().includes(q) || (c.phone || "").includes(q) || (c.city || "").toLowerCase().includes(q);
+            }).map((c: any) => (
               <div key={c.id} className="bg-card border border-border rounded-lg p-4 space-y-3">
                 <div className="flex items-start justify-between gap-4">
                   <p className="text-foreground font-medium text-sm">
