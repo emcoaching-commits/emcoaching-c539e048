@@ -141,6 +141,31 @@ const MonProfil = () => {
     setSendingMsg(false);
   };
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !userId) return;
+    if (!file.type.startsWith("image/")) { toast.error("Fichier non valide"); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image trop lourde (max 5MB)"); return; }
+
+    const ext = file.name.split(".").pop();
+    const path = `${userId}/avatar.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
+      .upload(path, file, { upsert: true });
+
+    if (uploadError) { toast.error("Erreur d'upload"); return; }
+
+    const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+    const avatarUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+
+    await supabase.from("profiles").update({ avatar_url: avatarUrl }).eq("user_id", userId);
+    setProfile({ ...profile, avatar_url: avatarUrl });
+    toast.success("Photo de profil mise à jour ! 📸");
+  };
+
   const firstName = form.full_name?.split(" ")[0] || "Coach";
   const initials = form.full_name
     ? form.full_name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
