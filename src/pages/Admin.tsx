@@ -366,6 +366,20 @@ const Admin = () => {
                         </div>
                       </div>
                     )}
+                    <div className="flex items-center gap-1 mt-2">
+                      <label className="text-muted-foreground text-xs">📊 Google Sheet:</label>
+                      <Input
+                        type="url"
+                        placeholder="https://docs.google.com/spreadsheets/..."
+                        className="h-7 text-xs flex-1 bg-background border-border"
+                        defaultValue={c.google_sheet_url || ""}
+                        onBlur={async (e) => {
+                          await supabase.from("profiles").update({ google_sheet_url: e.target.value || null }).eq("id", c.id);
+                          queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                          toast.success("Lien Google Sheet mis à jour");
+                        }}
+                      />
+                    </div>
                   </div>
                   <Button
                     size="sm"
