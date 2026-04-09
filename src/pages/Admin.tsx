@@ -84,7 +84,56 @@ const Admin = () => {
     enabled: isAdmin === true,
   });
 
-  const toggleReview = async (id: string, approved: boolean) => {
+  // Messages - all conversations
+  const { data: allMessages } = useQuery({
+    queryKey: ["admin_messages"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("messages").select("*").order("created_at", { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin === true,
+  });
+
+  // Get unique client IDs from messages
+  const messageClients = allMessages
+    ? [...new Set(allMessages.flatMap((m: any) => [m.sender_id, m.receiver_id]).filter((id: string) => id !== currentUserId))]
+    : [];
+
+  const selectedMessages = allMessages?.filter(
+    (m: any) => m.sender_id === selectedClient || m.receiver_id === selectedClient
+  ) || [];
+
+  // Realtime for admin messages
+  useEffect(() => {
+    if (!currentUserId) return;
+    const channel = supabase
+      .channel("admin-messages")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["admin_messages"] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [currentUserId, queryClient]);
+
+  useEffect(() => {
+    msgBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [selectedMessages.length]);
+
+  const sendAdminMsg = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adminMsg.trim() || !selectedClient || !currentUserId) return;
+    setSendingMsg(true);
+    await supabase.from("messages").insert({
+      sender_id: currentUserId,
+      receiver_id: selectedClient,
+      content: adminMsg.trim(),
+    });
+    setAdminMsg("");
+    setSendingMsg(false);
+  };
+
+
     await supabase.from("reviews").update({ is_approved: approved }).eq("id", id);
     queryClient.invalidateQueries({ queryKey: ["admin_reviews"] });
     toast.success(approved ? "Avis approuvé" : "Avis masqué");
