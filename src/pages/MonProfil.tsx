@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { ClipboardList, User, MapPin, Phone, Ruler, Weight, Calendar, ArrowLeft, Sparkles, Save, ChevronRight, Send, MessageCircle, Headphones, Camera, Star, FileSpreadsheet } from "lucide-react";
+import { ClipboardList, User, MapPin, Phone, Ruler, Weight, Calendar, ArrowLeft, Sparkles, Save, ChevronRight, Send, MessageCircle, Headphones, Camera, Star, FileSpreadsheet, CalendarCheck } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -34,6 +34,7 @@ const MonProfil = () => {
   const [newMsg, setNewMsg] = useState("");
   const [sendingMsg, setSendingMsg] = useState(false);
   const [adminId, setAdminId] = useState<string | null>(null);
+  const [bookings, setBookings] = useState<any[]>([]);
   const msgBottomRef = useRef<HTMLDivElement>(null);
   const messagerieRef = useRef<HTMLDivElement>(null);
 
@@ -81,6 +82,14 @@ const MonProfil = () => {
 
       // Mark as read
       await supabase.from("messages").update({ is_read: true }).eq("receiver_id", user.id).eq("is_read", false);
+
+      // Load bookings with time slot info
+      const { data: bookingsData } = await supabase
+        .from("bookings")
+        .select("*, time_slots(date, start_time, end_time)")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+      setBookings(bookingsData || []);
 
       setLoading(false);
     };
@@ -390,6 +399,41 @@ const MonProfil = () => {
                     <p className="text-foreground font-display text-2xl">{form.height}<span className="text-muted-foreground text-sm ml-1">cm</span></p>
                   </div>
                 )}
+              </motion.div>
+            )}
+
+            {/* Bookings / Rendez-vous */}
+            {bookings.length > 0 && (
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.45 }}
+                className="bg-card border border-border rounded-xl p-5"
+              >
+                <p className="text-foreground font-medium text-sm flex items-center gap-2 mb-3">
+                  <CalendarCheck size={16} className="text-primary" /> Mes rendez-vous
+                </p>
+                <div className="space-y-2">
+                  {bookings.map((b: any) => {
+                    const slot = b.time_slots as any;
+                    const isPast = slot?.date && new Date(slot.date) < new Date(new Date().toDateString());
+                    const statusLabel = b.status === "cancelled" ? "Annulé" : isPast ? "Passé" : "Confirmé";
+                    const statusColor = b.status === "cancelled" ? "text-destructive" : isPast ? "text-muted-foreground" : "text-green-500";
+                    return (
+                      <div key={b.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                        <div>
+                          <p className="text-foreground text-sm font-medium">
+                            📅 {slot?.date ? new Date(slot.date).toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" }) : "—"}
+                          </p>
+                          <p className="text-muted-foreground text-xs">
+                            🕐 {slot?.start_time?.toString().slice(0, 5)} - {slot?.end_time?.toString().slice(0, 5)}
+                          </p>
+                        </div>
+                        <span className={`text-xs font-medium ${statusColor}`}>{statusLabel}</span>
+                      </div>
+                    );
+                  })}
+                </div>
               </motion.div>
             )}
           </div>
