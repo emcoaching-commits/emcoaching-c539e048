@@ -17,6 +17,7 @@ const MonProfil = () => {
   const [editing, setEditing] = useState(false);
   const [profile, setProfile] = useState<any>(null);
   const [userEmail, setUserEmail] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
   const [form, setForm] = useState({
     full_name: "",
     phone: "",
@@ -26,6 +27,13 @@ const MonProfil = () => {
     height: "",
     gender: "",
   });
+
+  // Messaging
+  const [messages, setMessages] = useState<any[]>([]);
+  const [newMsg, setNewMsg] = useState("");
+  const [sendingMsg, setSendingMsg] = useState(false);
+  const [adminId, setAdminId] = useState<string | null>(null);
+  const msgBottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const load = async () => {
