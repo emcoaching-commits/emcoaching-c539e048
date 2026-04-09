@@ -395,31 +395,107 @@ const Admin = () => {
             ))}
           </TabsContent>
 
+          <TabsContent value="types" className="space-y-4">
+            <form onSubmit={addAppointmentType} className="bg-card border border-border rounded-lg p-4 flex flex-wrap gap-3 items-end">
+              <div>
+                <label className="text-muted-foreground text-xs block mb-1">Nom du type</label>
+                <Input value={newTypeName} onChange={(e) => setNewTypeName(e.target.value)} placeholder="Ex: RDV téléphonique" className="bg-background border-border" required />
+              </div>
+              <div>
+                <label className="text-muted-foreground text-xs block mb-1">Durée (min)</label>
+                <Input type="number" min="5" value={newTypeDuration} onChange={(e) => setNewTypeDuration(e.target.value)} className="bg-background border-border w-24" required />
+              </div>
+              <Button variant="hero" size="sm" type="submit">
+                <Plus size={14} className="mr-1" /> Créer
+              </Button>
+            </form>
+
+            {appointmentTypes?.map((t: any) => (
+              <div key={t.id} className="bg-card border border-border rounded-lg p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Tag size={16} className="text-primary" />
+                  <span className="text-foreground text-sm font-medium">{t.name}</span>
+                  <span className="text-muted-foreground text-xs flex items-center gap-1">
+                    <Clock size={12} /> {t.duration_minutes} min
+                  </span>
+                </div>
+                <Button size="sm" variant="heroOutline" onClick={() => deleteAppointmentType(t.id)}>
+                  <Trash2 size={14} />
+                </Button>
+              </div>
+            ))}
+            {(!appointmentTypes || appointmentTypes.length === 0) && (
+              <p className="text-muted-foreground text-center py-4">Aucun type de RDV créé</p>
+            )}
+          </TabsContent>
+
           <TabsContent value="slots" className="space-y-4">
             <form onSubmit={addSlot} className="bg-card border border-border rounded-lg p-4 flex flex-wrap gap-3 items-end">
+              <div>
+                <label className="text-muted-foreground text-xs block mb-1">Type de RDV</label>
+                <select
+                  value={slotTypeId}
+                  onChange={(e) => {
+                    setSlotTypeId(e.target.value);
+                    // Auto-fill end time if start time is set
+                    if (e.target.value && slotStart) {
+                      const type = appointmentTypes?.find((t: any) => t.id === e.target.value);
+                      if (type) {
+                        const [h, m] = slotStart.split(":").map(Number);
+                        const totalMin = h * 60 + m + type.duration_minutes;
+                        setSlotEnd(`${Math.floor(totalMin / 60).toString().padStart(2, "0")}:${(totalMin % 60).toString().padStart(2, "0")}`);
+                      }
+                    }
+                  }}
+                  className="h-9 rounded-md border border-border bg-background px-3 text-sm text-foreground"
+                >
+                  <option value="">— Sans type —</option>
+                  {appointmentTypes?.filter((t: any) => t.is_active).map((t: any) => (
+                    <option key={t.id} value={t.id}>{t.name} ({t.duration_minutes} min)</option>
+                  ))}
+                </select>
+              </div>
               <div>
                 <label className="text-muted-foreground text-xs block mb-1">Date</label>
                 <Input type="date" value={slotDate} onChange={(e) => setSlotDate(e.target.value)} className="bg-background border-border" required />
               </div>
               <div>
                 <label className="text-muted-foreground text-xs block mb-1">Début</label>
-                <Input type="time" value={slotStart} onChange={(e) => setSlotStart(e.target.value)} className="bg-background border-border" required />
+                <Input type="time" value={slotStart} onChange={(e) => {
+                  setSlotStart(e.target.value);
+                  // Auto-calculate end if type selected
+                  if (slotTypeId && e.target.value) {
+                    const type = appointmentTypes?.find((t: any) => t.id === slotTypeId);
+                    if (type) {
+                      const [h, m] = e.target.value.split(":").map(Number);
+                      const totalMin = h * 60 + m + type.duration_minutes;
+                      setSlotEnd(`${Math.floor(totalMin / 60).toString().padStart(2, "0")}:${(totalMin % 60).toString().padStart(2, "0")}`);
+                    }
+                  }
+                }} className="bg-background border-border" required />
               </div>
               <div>
-                <label className="text-muted-foreground text-xs block mb-1">Fin</label>
-                <Input type="time" value={slotEnd} onChange={(e) => setSlotEnd(e.target.value)} className="bg-background border-border" required />
+                <label className="text-muted-foreground text-xs block mb-1">Fin {slotTypeId ? "(auto)" : ""}</label>
+                <Input type="time" value={slotEnd} onChange={(e) => setSlotEnd(e.target.value)} className="bg-background border-border" required readOnly={!!slotTypeId} />
               </div>
               <Button variant="hero" size="sm" type="submit">
                 <Plus size={14} className="mr-1" /> Ajouter
               </Button>
             </form>
 
-            {slots?.map((s) => (
+            {slots?.map((s: any) => (
               <div key={s.id} className="bg-card border border-border rounded-lg p-4 flex items-center justify-between">
-                <span className="text-foreground text-sm">
-                  {s.date} — {s.start_time?.toString().slice(0, 5)} à {s.end_time?.toString().slice(0, 5)}
-                  {s.is_available ? " ✅" : " ❌ Réservé"}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-foreground text-sm">
+                    {s.date} — {s.start_time?.toString().slice(0, 5)} à {s.end_time?.toString().slice(0, 5)}
+                    {s.is_available ? " ✅" : " ❌ Réservé"}
+                  </span>
+                  {s.appointment_types && (
+                    <span className="text-xs bg-primary/15 text-primary px-2 py-0.5 rounded-full">
+                      {(s.appointment_types as any).name}
+                    </span>
+                  )}
+                </div>
                 <Button size="sm" variant="heroOutline" onClick={() => deleteSlot(s.id)}>
                   <Trash2 size={14} />
                 </Button>
