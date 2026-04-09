@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle } from "lucide-react";
+import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -83,6 +83,36 @@ const Admin = () => {
     },
     enabled: isAdmin === true,
   });
+
+  // Notifications
+  const { data: notifications } = useQuery({
+    queryKey: ["admin_notifications"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("notifications").select("*").order("created_at", { ascending: false }).limit(50);
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin === true,
+  });
+
+  const unreadCount = notifications?.filter((n: any) => !n.is_read).length || 0;
+
+  const markAllRead = async () => {
+    await supabase.from("notifications").update({ is_read: true }).eq("is_read", false);
+    queryClient.invalidateQueries({ queryKey: ["admin_notifications"] });
+  };
+
+  // Realtime notifications
+  useEffect(() => {
+    if (!currentUserId) return;
+    const channel = supabase
+      .channel("admin-notifications")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["admin_notifications"] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [currentUserId, queryClient]);
 
   // Messages - all conversations
   const { data: allMessages } = useQuery({
@@ -172,8 +202,14 @@ const Admin = () => {
           <h1 className="font-display text-4xl text-gradient-blue">ADMIN</h1>
         </div>
 
-        <Tabs defaultValue="reviews">
-          <TabsList className="bg-card border border-border mb-6">
+        <Tabs defaultValue="notifications">
+          <TabsList className="bg-card border border-border mb-6 flex-wrap">
+            <TabsTrigger value="notifications" className="relative">
+              <Bell size={14} className="mr-1" /> Activité
+              {unreadCount > 0 && (
+                <span className="ml-1 bg-destructive text-destructive-foreground text-[10px] px-1.5 py-0.5 rounded-full">{unreadCount}</span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="reviews">Avis ({reviews?.length || 0})</TabsTrigger>
             <TabsTrigger value="slots">Créneaux ({slots?.length || 0})</TabsTrigger>
             <TabsTrigger value="bookings">Réservations ({bookings?.length || 0})</TabsTrigger>
@@ -182,6 +218,46 @@ const Admin = () => {
               <MessageCircle size={14} className="mr-1" /> Messages
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="notifications" className="space-y-4">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-foreground font-display text-xl">ACTIVITÉ RÉCENTE</h2>
+              {unreadCount > 0 && (
+                <Button variant="heroOutline" size="sm" onClick={markAllRead}>
+                  <Check size={14} className="mr-1" /> Tout marquer comme lu
+                </Button>
+              )}
+            </div>
+            {(!notifications || notifications.length === 0) && (
+              <p className="text-muted-foreground text-center py-8">Aucune activité pour le moment</p>
+            )}
+            {notifications?.map((n: any) => {
+              const icon = n.type === "inscription" ? <UserPlus size={16} /> 
+                : n.type === "message" ? <MessageCircle size={16} />
+                : n.type === "profil_update" ? <RefreshCw size={16} />
+                : <AlertTriangle size={16} />;
+              const color = n.type === "inscription" ? "text-green-500"
+                : n.type === "message" ? "text-primary"
+                : n.type === "profil_update" ? "text-accent"
+                : "text-destructive";
+              return (
+                <div key={n.id} className={`flex items-start gap-3 p-3 rounded-lg border ${n.is_read ? "bg-card border-border" : "bg-primary/5 border-primary/20"}`}>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${color} bg-muted`}>
+                    {icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-foreground text-sm">{n.content}</p>
+                    <p className="text-muted-foreground text-xs mt-0.5">
+                      {format(new Date(n.created_at), "dd MMM yyyy · HH:mm", { locale: fr })}
+                    </p>
+                  </div>
+                  {!n.is_read && (
+                    <div className="w-2.5 h-2.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                  )}
+                </div>
+              );
+            })}
+          </TabsContent>
 
           <TabsContent value="reviews" className="space-y-4">
             {reviews?.map((r) => (
