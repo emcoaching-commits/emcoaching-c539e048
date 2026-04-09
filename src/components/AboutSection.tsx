@@ -34,8 +34,6 @@ const AboutSection = () => {
           </motion.div>
         </div>
       </div>
-        </div>
-      </div>
     </section>
   );
 };
