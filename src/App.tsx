@@ -8,7 +8,6 @@ import Auth from "./pages/Auth.tsx";
 import Admin from "./pages/Admin.tsx";
 import Questionnaire from "./pages/Questionnaire.tsx";
 import MonProfil from "./pages/MonProfil.tsx";
-import Messagerie from "./pages/Messagerie.tsx";
 import Services from "./pages/Services.tsx";
 import Tarifs from "./pages/Tarifs.tsx";
 import Planning from "./pages/Planning.tsx";
@@ -37,7 +36,6 @@ const App = () => (
           <Route path="/admin" element={<Admin />} />
           <Route path="/questionnaire" element={<Questionnaire />} />
           <Route path="/mon-profil" element={<MonProfil />} />
-          <Route path="/messagerie" element={<Messagerie />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
