@@ -134,7 +134,7 @@ const Admin = () => {
   };
 
 
-    await supabase.from("reviews").update({ is_approved: approved }).eq("id", id);
+    const toggleReview = async (id: string, approved: boolean) => {
     queryClient.invalidateQueries({ queryKey: ["admin_reviews"] });
     toast.success(approved ? "Avis approuvé" : "Avis masqué");
   };
