@@ -478,7 +478,27 @@ const MonProfil = () => {
                               🕐 {slot?.start_time?.toString().slice(0, 5)} - {slot?.end_time?.toString().slice(0, 5)}
                             </p>
                           </div>
-                          <span className={`text-xs font-medium ${statusColor}`}>{statusLabel}</span>
+                          <div className="flex items-center gap-2">
+                            {b.status === "confirmed" && !isPast && slot && (
+                              <div className="flex gap-1">
+                                <button
+                                  onClick={() => addToCalendar(slot, "google")}
+                                  className="text-[10px] px-2 py-1 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                                  title="Google Calendar"
+                                >
+                                  Google
+                                </button>
+                                <button
+                                  onClick={() => addToCalendar(slot, "ics")}
+                                  className="text-[10px] px-2 py-1 rounded bg-muted text-muted-foreground hover:bg-muted/80 transition-colors"
+                                  title="Apple / Outlook"
+                                >
+                                  <CalendarPlus size={12} />
+                                </button>
+                              </div>
+                            )}
+                            <span className={`text-xs font-medium ${statusColor}`}>{statusLabel}</span>
+                          </div>
                         </div>
 
                         {/* Reschedule proposal */}
