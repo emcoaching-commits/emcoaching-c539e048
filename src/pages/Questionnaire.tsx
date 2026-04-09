@@ -20,9 +20,16 @@ const Questionnaire = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) navigate("/auth");
-    });
+    const check = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { navigate("/auth"); return; }
+      const { data: profile } = await supabase.from("profiles").select("has_active_subscription").eq("user_id", user.id).single();
+      if (!profile?.has_active_subscription) {
+        navigate("/mon-profil");
+        toast.error("Tu dois avoir un abonnement actif pour accéder au questionnaire.");
+      }
+    };
+    check();
   }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
