@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { ClipboardList, User, MapPin, Phone, Ruler, Weight, Calendar, ArrowLeft, Sparkles, Save, ChevronRight, Send, MessageCircle, Headphones, Camera, Star, FileSpreadsheet, CalendarCheck, Check, X } from "lucide-react";
+import { ClipboardList, User, MapPin, Phone, Ruler, Weight, Calendar, ArrowLeft, Sparkles, Save, ChevronRight, Send, MessageCircle, Headphones, Camera, Star, FileSpreadsheet, CalendarCheck, Check, X, CalendarPlus } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -209,6 +209,39 @@ const MonProfil = () => {
     setProfile({ ...profile, avatar_url: avatarPath });
     if (signedData?.signedUrl) setAvatarSignedUrl(signedData.signedUrl);
     toast.success("Photo de profil mise à jour ! 📸");
+  };
+
+  const addToCalendar = (slot: any, type: "google" | "ics") => {
+    if (!slot?.date || !slot?.start_time || !slot?.end_time) return;
+    const dateStr = slot.date.replace(/-/g, "");
+    const startStr = slot.start_time.toString().slice(0, 5).replace(":", "") + "00";
+    const endStr = slot.end_time.toString().slice(0, 5).replace(":", "") + "00";
+    const title = "RDV Em' Coaching";
+    const details = "Rendez-vous coaching avec Emma";
+
+    if (type === "google") {
+      const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${dateStr}T${startStr}/${dateStr}T${endStr}&details=${encodeURIComponent(details)}&ctz=Europe/Paris`;
+      window.open(url, "_blank");
+    } else {
+      const icsContent = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "BEGIN:VEVENT",
+        `DTSTART;TZID=Europe/Paris:${dateStr}T${startStr}`,
+        `DTEND;TZID=Europe/Paris:${dateStr}T${endStr}`,
+        `SUMMARY:${title}`,
+        `DESCRIPTION:${details}`,
+        "END:VEVENT",
+        "END:VCALENDAR",
+      ].join("\r\n");
+      const blob = new Blob([icsContent], { type: "text/calendar" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "rdv-emcoaching.ics";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
   };
 
   const firstName = form.full_name?.trim() ? form.full_name.split(" ")[0] : "";
@@ -445,7 +478,27 @@ const MonProfil = () => {
                               🕐 {slot?.start_time?.toString().slice(0, 5)} - {slot?.end_time?.toString().slice(0, 5)}
                             </p>
                           </div>
-                          <span className={`text-xs font-medium ${statusColor}`}>{statusLabel}</span>
+                          <div className="flex items-center gap-2">
+                            {b.status === "confirmed" && !isPast && slot && (
+                              <div className="flex gap-1">
+                                <button
+                                  onClick={() => addToCalendar(slot, "google")}
+                                  className="text-[10px] px-2 py-1 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                                  title="Google Calendar"
+                                >
+                                  Google
+                                </button>
+                                <button
+                                  onClick={() => addToCalendar(slot, "ics")}
+                                  className="text-[10px] px-2 py-1 rounded bg-muted text-muted-foreground hover:bg-muted/80 transition-colors"
+                                  title="Apple / Outlook"
+                                >
+                                  <CalendarPlus size={12} />
+                                </button>
+                              </div>
+                            )}
+                            <span className={`text-xs font-medium ${statusColor}`}>{statusLabel}</span>
+                          </div>
                         </div>
 
                         {/* Reschedule proposal */}
