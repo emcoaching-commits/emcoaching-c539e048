@@ -94,6 +94,15 @@ const MonProfil = () => {
         .select("*, time_slots(date, start_time, end_time)")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
+      // Load proposed slot details for reschedules
+      if (bookingsData) {
+        for (const b of bookingsData) {
+          if ((b as any).proposed_slot_id) {
+            const { data: ps } = await supabase.from("time_slots").select("date, start_time, end_time").eq("id", (b as any).proposed_slot_id).single();
+            (b as any).proposed_slot = ps;
+          }
+        }
+      }
       setBookings(bookingsData || []);
 
       setLoading(false);
