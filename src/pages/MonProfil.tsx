@@ -412,6 +412,72 @@ const MonProfil = () => {
               )}
             </motion.div>
           </div>
+
+          {/* Messagerie avec Emma */}
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="bg-card border border-border rounded-xl overflow-hidden"
+          >
+            <div className="p-5 border-b border-border flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center">
+                <span className="font-display text-lg text-primary">E</span>
+              </div>
+              <div>
+                <h3 className="text-foreground font-display text-lg">MESSAGERIE</h3>
+                <p className="text-muted-foreground text-xs">Discute avec Emma</p>
+              </div>
+              <MessageCircle size={20} className="ml-auto text-primary" />
+            </div>
+
+            <ScrollArea className="h-72 p-4">
+              <div className="space-y-3">
+                {messages.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                    <MessageCircle size={40} className="mb-2 text-primary/20" />
+                    <p className="text-sm">Envoie ton premier message à Emma !</p>
+                  </div>
+                )}
+                {messages.map((msg) => {
+                  const isMe = msg.sender_id === userId;
+                  return (
+                    <motion.div
+                      key={msg.id}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`flex ${isMe ? "justify-end" : "justify-start"}`}
+                    >
+                      <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
+                        isMe
+                          ? "bg-primary text-primary-foreground rounded-br-md"
+                          : "bg-muted text-foreground rounded-bl-md"
+                      }`}>
+                        <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                        <p className={`text-[10px] mt-1 ${isMe ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
+                          {format(new Date(msg.created_at), "HH:mm · dd MMM", { locale: fr })}
+                        </p>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+                <div ref={msgBottomRef} />
+              </div>
+            </ScrollArea>
+
+            <form onSubmit={handleSendMsg} className="flex gap-2 p-3 border-t border-border">
+              <Input
+                value={newMsg}
+                onChange={(e) => setNewMsg(e.target.value)}
+                placeholder="Écrire un message..."
+                className="flex-1 bg-background border-border"
+                maxLength={1000}
+              />
+              <Button type="submit" variant="hero" size="icon" disabled={sendingMsg || !newMsg.trim()}>
+                <Send size={18} />
+              </Button>
+            </form>
+          </motion.div>
         </div>
       </div>
     </div>
