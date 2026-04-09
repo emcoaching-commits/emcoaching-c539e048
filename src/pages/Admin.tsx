@@ -259,6 +259,7 @@ const Admin = () => {
             })}
           </TabsContent>
 
+          <TabsContent value="reviews" className="space-y-4">
             {reviews?.map((r) => (
               <div key={r.id} className="bg-card border border-border rounded-lg p-4 flex items-start justify-between gap-4">
                 <div className="flex-1">
