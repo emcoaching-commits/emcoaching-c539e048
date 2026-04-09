@@ -202,8 +202,14 @@ const Admin = () => {
           <h1 className="font-display text-4xl text-gradient-blue">ADMIN</h1>
         </div>
 
-        <Tabs defaultValue="reviews">
-          <TabsList className="bg-card border border-border mb-6">
+        <Tabs defaultValue="notifications">
+          <TabsList className="bg-card border border-border mb-6 flex-wrap">
+            <TabsTrigger value="notifications" className="relative">
+              <Bell size={14} className="mr-1" /> Activité
+              {unreadCount > 0 && (
+                <span className="ml-1 bg-destructive text-destructive-foreground text-[10px] px-1.5 py-0.5 rounded-full">{unreadCount}</span>
+              )}
+            </TabsTrigger>
             <TabsTrigger value="reviews">Avis ({reviews?.length || 0})</TabsTrigger>
             <TabsTrigger value="slots">Créneaux ({slots?.length || 0})</TabsTrigger>
             <TabsTrigger value="bookings">Réservations ({bookings?.length || 0})</TabsTrigger>
