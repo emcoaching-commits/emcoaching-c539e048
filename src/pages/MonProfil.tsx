@@ -188,7 +188,7 @@ const MonProfil = () => {
     toast.success("Photo de profil mise à jour ! 📸");
   };
 
-  const firstName = form.full_name?.split(" ")[0] || "Coach";
+  const firstName = form.full_name?.trim() ? form.full_name.split(" ")[0] : "";
   const initials = form.full_name
     ? form.full_name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
     : "?";
@@ -253,7 +253,7 @@ const MonProfil = () => {
 
             <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }} className="text-center sm:text-left">
               <h1 className="font-display text-4xl sm:text-5xl text-foreground">
-                Salut {firstName} 👋
+                {firstName ? `Salut ${firstName} 👋` : "Bienvenue à toi 👋"}
               </h1>
               <p className="text-muted-foreground mt-1">{userEmail}</p>
               {profile?.created_at && (
