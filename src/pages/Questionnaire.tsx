@@ -18,18 +18,40 @@ const Questionnaire = () => {
   const [blessures, setBlessures] = useState("");
   const [commentaire, setCommentaire] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
-    const check = async () => {
+    const load = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { navigate("/auth"); return; }
+
       const { data: profile } = await supabase.from("profiles").select("has_active_subscription").eq("user_id", user.id).single();
       if (!profile?.has_active_subscription) {
         navigate("/mon-profil");
         toast.error("Tu dois avoir un abonnement actif pour accéder au questionnaire.");
+        return;
       }
+
+      // Load existing questionnaire responses
+      const { data: existing } = await supabase
+        .from("questionnaire_responses")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+
+      if (existing) {
+        setObjectifs(existing.objectifs || "");
+        setNiveau(existing.niveau || "");
+        setFrequence(existing.frequence || "");
+        setBlessures(existing.blessures || "");
+        setCommentaire(existing.commentaire || "");
+        setIsUpdate(true);
+      }
+
+      setInitialLoading(false);
     };
-    check();
+    load();
   }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,30 +59,59 @@ const Questionnaire = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     setLoading(true);
-    const { error } = await supabase.from("questionnaire_responses").insert({
+
+    const payload = {
       user_id: user.id,
       objectifs,
       niveau,
       frequence,
       blessures,
       commentaire,
-    });
-    if (error) toast.error("Erreur lors de l'envoi");
-    else {
-      toast.success("Merci ! Emma va analyser tes réponses 💪");
-      navigate("/");
+    };
+
+    if (isUpdate) {
+      const { error } = await supabase
+        .from("questionnaire_responses")
+        .update({ objectifs, niveau, frequence, blessures, commentaire })
+        .eq("user_id", user.id);
+      if (error) toast.error("Erreur lors de la mise à jour");
+      else {
+        toast.success("Questionnaire mis à jour ! 💪");
+        navigate("/mon-profil");
+      }
+    } else {
+      const { error } = await supabase.from("questionnaire_responses").insert(payload);
+      if (error) toast.error("Erreur lors de l'envoi");
+      else {
+        toast.success("Merci ! Emma va analyser tes réponses 💪");
+        navigate("/mon-profil");
+      }
     }
     setLoading(false);
   };
+
+  if (initialLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-lg">
         <a href="/" className="font-display text-4xl text-gradient-blue block text-center mb-4">EMMA FIT</a>
-        <p className="text-muted-foreground text-center mb-8">Aide Emma à mieux te connaître pour personnaliser ton programme !</p>
+        <p className="text-muted-foreground text-center mb-8">
+          {isUpdate
+            ? "Tu peux modifier tes réponses à tout moment !"
+            : "Aide Emma à mieux te connaître pour personnaliser ton programme !"}
+        </p>
 
         <div className="bg-card border border-border rounded-lg p-8">
-          <h2 className="font-display text-3xl text-center mb-6 text-foreground">QUESTIONNAIRE</h2>
+          <h2 className="font-display text-3xl text-center mb-6 text-foreground">
+            {isUpdate ? "MODIFIER MON QUESTIONNAIRE" : "QUESTIONNAIRE"}
+          </h2>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="text-foreground text-sm font-medium mb-2 block">Quels sont tes objectifs ? *</label>
@@ -134,7 +185,7 @@ const Questionnaire = () => {
             </div>
 
             <Button variant="hero" size="lg" className="w-full" disabled={loading || !objectifs || !niveau || !frequence}>
-              {loading ? "Envoi..." : "Envoyer mes réponses"}
+              {loading ? "Envoi..." : isUpdate ? "Mettre à jour" : "Envoyer mes réponses"}
             </Button>
           </form>
         </div>
