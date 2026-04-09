@@ -178,6 +178,9 @@ const Admin = () => {
             <TabsTrigger value="slots">Créneaux ({slots?.length || 0})</TabsTrigger>
             <TabsTrigger value="bookings">Réservations ({bookings?.length || 0})</TabsTrigger>
             <TabsTrigger value="clients">Clients ({clients?.length || 0})</TabsTrigger>
+            <TabsTrigger value="messages">
+              <MessageCircle size={14} className="mr-1" /> Messages
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="reviews" className="space-y-4">
@@ -274,6 +277,98 @@ const Admin = () => {
                 </div>
               </div>
             ))}
+          </TabsContent>
+
+          <TabsContent value="messages">
+            <div className="flex gap-4 h-[500px]">
+              {/* Client list */}
+              <div className="w-1/3 bg-card border border-border rounded-lg overflow-y-auto">
+                {messageClients.length === 0 && (
+                  <p className="text-muted-foreground text-sm p-4 text-center">Aucun message</p>
+                )}
+                {messageClients.map((clientId: string) => {
+                  const client = clients?.find((c: any) => c.user_id === clientId);
+                  const lastMsg = allMessages?.filter(
+                    (m: any) => m.sender_id === clientId || m.receiver_id === clientId
+                  ).slice(-1)[0];
+                  const unread = allMessages?.filter(
+                    (m: any) => m.sender_id === clientId && m.receiver_id === currentUserId && !m.is_read
+                  ).length || 0;
+                  return (
+                    <button
+                      key={clientId}
+                      onClick={() => {
+                        setSelectedClient(clientId);
+                        // Mark as read
+                        supabase.from("messages").update({ is_read: true })
+                          .eq("sender_id", clientId).eq("receiver_id", currentUserId!).eq("is_read", false)
+                          .then(() => queryClient.invalidateQueries({ queryKey: ["admin_messages"] }));
+                      }}
+                      className={`w-full text-left p-3 border-b border-border hover:bg-muted/50 transition-colors ${
+                        selectedClient === clientId ? "bg-primary/10 border-l-2 border-l-primary" : ""
+                      }`}
+                    >
+                      <p className="text-sm font-medium text-foreground">{client?.full_name || "Client"}</p>
+                      <p className="text-xs text-muted-foreground truncate">{lastMsg?.content}</p>
+                      {unread > 0 && (
+                        <span className="inline-block mt-1 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full">
+                          {unread}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Chat */}
+              <div className="flex-1 flex flex-col bg-card border border-border rounded-lg">
+                {!selectedClient ? (
+                  <div className="flex-1 flex items-center justify-center text-muted-foreground">
+                    <div className="text-center">
+                      <MessageCircle size={40} className="mx-auto mb-2 text-primary/30" />
+                      <p className="text-sm">Sélectionnez un client</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <ScrollArea className="flex-1 p-4">
+                      <div className="space-y-3">
+                        {selectedMessages.map((msg: any) => {
+                          const isAdmin = msg.sender_id === currentUserId;
+                          return (
+                            <div key={msg.id} className={`flex ${isAdmin ? "justify-end" : "justify-start"}`}>
+                              <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
+                                isAdmin
+                                  ? "bg-primary text-primary-foreground rounded-br-md"
+                                  : "bg-muted text-foreground rounded-bl-md"
+                              }`}>
+                                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                                <p className={`text-[10px] mt-1 ${isAdmin ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
+                                  {format(new Date(msg.created_at), "HH:mm · dd MMM", { locale: fr })}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                        <div ref={msgBottomRef} />
+                      </div>
+                    </ScrollArea>
+                    <form onSubmit={sendAdminMsg} className="flex gap-2 p-3 border-t border-border">
+                      <Input
+                        value={adminMsg}
+                        onChange={(e) => setAdminMsg(e.target.value)}
+                        placeholder="Répondre..."
+                        className="flex-1 bg-background border-border"
+                        maxLength={1000}
+                      />
+                      <Button type="submit" variant="hero" size="icon" disabled={sendingMsg || !adminMsg.trim()}>
+                        <Send size={18} />
+                      </Button>
+                    </form>
+                  </>
+                )}
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
