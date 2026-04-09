@@ -65,7 +65,18 @@ const Admin = () => {
   const { data: slots } = useQuery({
     queryKey: ["admin_slots"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("time_slots").select("*").order("date").order("start_time");
+      const { data, error } = await supabase.from("time_slots").select("*, appointment_types(name, duration_minutes)").order("date").order("start_time");
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin === true,
+  });
+
+  // Appointment types
+  const { data: appointmentTypes } = useQuery({
+    queryKey: ["admin_appointment_types"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("appointment_types").select("*").order("created_at");
       if (error) throw error;
       return data;
     },
