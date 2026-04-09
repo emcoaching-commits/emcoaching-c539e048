@@ -1,14 +1,16 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-fitness.jpg";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
   return (
     <section id="accueil" className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Background image */}
       <div className="absolute inset-0">
-        <img src={heroImage} alt="Coaching sportif" width={1920} height={1080} className="w-full h-full object-cover" />
+        <img src={heroImage} alt="Coaching sportif avec Emma" width={1920} height={1080} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/40" />
       </div>
 
@@ -26,13 +28,13 @@ const HeroSection = () => {
             TON MINDSET
           </h1>
           <p className="text-muted-foreground text-lg max-w-md mb-8 font-light leading-relaxed">
-            Coaching personnalisé pour atteindre tes objectifs. Programmes sur mesure, suivi continu et motivation sans faille.
+            Coaching personnalisé, suivi sur Google Sheets, bilans hebdomadaires. Emma est là, présente à chaque étape.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Button variant="hero" size="lg" className="px-8 py-6 text-base">
+            <Button variant="hero" size="lg" className="px-8 py-6 text-base" onClick={() => navigate("/auth")}>
               Commencer maintenant <ArrowRight className="ml-2" size={18} />
             </Button>
-            <Button variant="heroOutline" size="lg" className="px-8 py-6 text-base">
+            <Button variant="heroOutline" size="lg" className="px-8 py-6 text-base" onClick={() => document.getElementById("services")?.scrollIntoView({ behavior: "smooth" })}>
               Découvrir mes services
             </Button>
           </div>
