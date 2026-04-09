@@ -450,16 +450,16 @@ const MonProfil = () => {
             )}
 
             {/* Bookings / Rendez-vous */}
-            {bookings.length > 0 && (
-              <motion.div
-                initial={{ x: -20, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.45 }}
-                className="bg-card border border-border rounded-xl p-5"
-              >
-                <p className="text-foreground font-medium text-sm flex items-center gap-2 mb-3">
-                  <CalendarCheck size={16} className="text-primary" /> Mes rendez-vous
-                </p>
+            <motion.div
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.45 }}
+              className="bg-card border border-border rounded-xl p-5"
+            >
+              <p className="text-foreground font-medium text-sm flex items-center gap-2 mb-3">
+                <CalendarCheck size={16} className="text-primary" /> Mes rendez-vous
+              </p>
+              {bookings.length > 0 ? (
                 <div className="space-y-3">
                   {bookings.map((b: any) => {
                     const slot = b.time_slots as any;
@@ -519,7 +519,6 @@ const MonProfil = () => {
                                     status: "confirmed",
                                   }).eq("id", b.id);
                                   toast.success("Nouveau créneau accepté ! ✅");
-                                  // Reload bookings
                                   const { data: updated } = await supabase.from("bookings").select("*, time_slots!bookings_time_slot_id_fkey(date, start_time, end_time)").eq("user_id", userId!).order("created_at", { ascending: false });
                                   if (updated) {
                                     for (const u of updated) {
@@ -557,8 +556,10 @@ const MonProfil = () => {
                     );
                   })}
                 </div>
-              </motion.div>
-            )}
+              ) : (
+                <p className="text-muted-foreground text-sm italic">Aucun rendez-vous pour le moment 📭</p>
+              )}
+            </motion.div>
           </div>
 
           {/* Right column - Profile form + questionnaire */}
