@@ -110,9 +110,10 @@ const Auth = () => {
           </h2>
 
           {!isLogin && signupClosed && (
-            <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 mb-4 text-center">
-              <p className="text-destructive text-sm font-medium">Les inscriptions sont complètes pour le moment.</p>
-              <p className="text-muted-foreground text-xs mt-1">Contacte Emma pour plus d'infos.</p>
+            <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-5 mb-4 text-center">
+              <p className="text-destructive text-base font-display">🔥 VICTIME DE SON SUCCÈS</p>
+              <p className="text-foreground text-sm mt-2">Emma n'a plus de place disponible pour assurer au mieux votre programme personnalisé.</p>
+              <p className="text-muted-foreground text-xs mt-2">Revenez bientôt ou contactez Emma directement au 06 70 61 96 28 pour être sur liste d'attente.</p>
             </div>
           )}
 
