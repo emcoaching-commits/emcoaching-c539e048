@@ -158,11 +158,13 @@ const MonProfil = () => {
 
     if (uploadError) { toast.error("Erreur d'upload"); return; }
 
-    const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
-    const avatarUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+    // Store path, use signed URL for display
+    const { data: signedData } = await supabase.storage.from("avatars").createSignedUrl(path, 3600);
+    const avatarPath = path;
 
-    await supabase.from("profiles").update({ avatar_url: avatarUrl }).eq("user_id", userId);
-    setProfile({ ...profile, avatar_url: avatarUrl });
+    await supabase.from("profiles").update({ avatar_url: avatarPath }).eq("user_id", userId);
+    setProfile({ ...profile, avatar_url: avatarPath });
+    if (signedData?.signedUrl) setAvatarSignedUrl(signedData.signedUrl);
     toast.success("Photo de profil mise à jour ! 📸");
   };
 
