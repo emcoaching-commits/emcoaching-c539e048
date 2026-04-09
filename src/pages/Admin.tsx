@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search } from "lucide-react";
+import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search, Users, Settings } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -28,6 +28,8 @@ const Admin = () => {
   const [sendingMsg, setSendingMsg] = useState(false);
   const msgBottomRef = useRef<HTMLDivElement>(null);
   const [clientSearch, setClientSearch] = useState("");
+  const [maxUsers, setMaxUsers] = useState("2");
+  const [deletingUser, setDeletingUser] = useState<string | null>(null);
 
   useEffect(() => {
     const check = async () => {
@@ -95,6 +97,42 @@ const Admin = () => {
     },
     enabled: isAdmin === true,
   });
+
+  // Max users setting
+  useEffect(() => {
+    if (!isAdmin) return;
+    const loadMaxUsers = async () => {
+      const { data } = await supabase.from("site_settings").select("value").eq("key", "max_users").single();
+      if (data) setMaxUsers(data.value);
+    };
+    loadMaxUsers();
+  }, [isAdmin]);
+
+  const updateMaxUsers = async (val: string) => {
+    setMaxUsers(val);
+    const num = parseInt(val);
+    if (isNaN(num) || num < 1) return;
+    await supabase.from("site_settings").upsert({ key: "max_users", value: val });
+    toast.success(`Capacité mise à jour : ${val} clients max`);
+  };
+
+  const deleteClient = async (userId: string, name: string) => {
+    if (!confirm(`Supprimer définitivement ${name || "ce client"} et toutes ses données ? Cette action est irréversible.`)) return;
+    setDeletingUser(userId);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await supabase.functions.invoke("delete-user", {
+        body: { user_id: userId },
+      });
+      if (res.error) throw res.error;
+      toast.success(`${name || "Client"} supprimé`);
+      queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+      queryClient.invalidateQueries({ queryKey: ["admin_messages"] });
+    } catch (err: any) {
+      toast.error("Erreur : " + (err.message || "Impossible de supprimer"));
+    }
+    setDeletingUser(null);
+  };
 
   const unreadCount = notifications?.filter((n: any) => !n.is_read).length || 0;
 
@@ -322,6 +360,25 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="clients" className="space-y-4">
+            {/* Capacity control */}
+            <div className="bg-card border border-border rounded-lg p-4 flex flex-wrap items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Users size={18} className="text-primary" />
+                <span className="text-foreground text-sm font-medium">Capacité max :</span>
+              </div>
+              <Input
+                type="number"
+                min={1}
+                className="w-20 h-8 text-sm bg-background border-border"
+                value={maxUsers}
+                onChange={(e) => setMaxUsers(e.target.value)}
+                onBlur={(e) => updateMaxUsers(e.target.value)}
+              />
+              <span className="text-muted-foreground text-xs">
+                {clients?.length || 0} / {maxUsers} clients inscrits
+              </span>
+            </div>
+
             <div className="relative">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -341,17 +398,28 @@ const Admin = () => {
                   <p className="text-foreground font-medium text-sm">
                     {c.full_name || "Sans nom"} — Inscrit le {format(new Date(c.created_at), "dd/MM/yyyy")}
                   </p>
-                  <Button
-                    size="sm"
-                    variant={c.has_active_subscription ? "hero" : "heroOutline"}
-                    onClick={async () => {
-                      await supabase.from("profiles").update({ has_active_subscription: !c.has_active_subscription }).eq("id", c.id);
-                      queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
-                      toast.success(c.has_active_subscription ? "Abonnement désactivé" : "Abonnement activé");
-                    }}
-                  >
-                    {c.has_active_subscription ? "✅ Abonné" : "❌ Non abonné"}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant={c.has_active_subscription ? "hero" : "heroOutline"}
+                      onClick={async () => {
+                        await supabase.from("profiles").update({ has_active_subscription: !c.has_active_subscription }).eq("id", c.id);
+                        queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                        toast.success(c.has_active_subscription ? "Abonnement désactivé" : "Abonnement activé");
+                      }}
+                    >
+                      {c.has_active_subscription ? "✅ Abonné" : "❌ Non abonné"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="heroOutline"
+                      className="text-destructive border-destructive/30 hover:bg-destructive/10"
+                      disabled={deletingUser === c.user_id}
+                      onClick={() => deleteClient(c.user_id, c.full_name)}
+                    >
+                      <Trash2 size={14} />
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
