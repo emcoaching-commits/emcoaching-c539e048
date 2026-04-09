@@ -54,8 +54,15 @@ const Admin = () => {
   const { data: reviews } = useQuery({
     queryKey: ["admin_reviews"],
     queryFn: async () => {
-      const { data, error } = await supabase.from("reviews").select("*, profiles(full_name)").order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("reviews").select("*").order("created_at", { ascending: false });
       if (error) throw error;
+      // Fetch profile names for each review
+      if (data) {
+        const userIds = [...new Set(data.map((r: any) => r.user_id))];
+        const { data: profs } = await supabase.from("profiles").select("user_id, full_name").in("user_id", userIds);
+        const profMap = Object.fromEntries((profs || []).map((p: any) => [p.user_id, p.full_name]));
+        for (const r of data) { (r as any).profile_name = profMap[r.user_id] || "Anonyme"; }
+      }
       return data;
     },
     enabled: isAdmin === true,
