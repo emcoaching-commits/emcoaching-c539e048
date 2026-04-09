@@ -21,6 +21,11 @@ const Admin = () => {
   const [slotDate, setSlotDate] = useState("");
   const [slotStart, setSlotStart] = useState("");
   const [slotEnd, setSlotEnd] = useState("");
+  const [slotTypeId, setSlotTypeId] = useState("");
+
+  // New appointment type form
+  const [newTypeName, setNewTypeName] = useState("");
+  const [newTypeDuration, setNewTypeDuration] = useState("30");
 
   // Messaging
   const [selectedClient, setSelectedClient] = useState<string | null>(null);
