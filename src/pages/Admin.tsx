@@ -133,10 +133,13 @@ const Admin = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bookings")
-        .select("*, time_slots(*)")
+        .select("*, time_slots!bookings_time_slot_id_fkey(*)")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
+    },
+    enabled: isAdmin === true,
+  });
     },
     enabled: isAdmin === true,
   });
