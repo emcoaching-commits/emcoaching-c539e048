@@ -132,16 +132,13 @@ const Admin = () => {
     (m: any) => m.sender_id === selectedClient || m.receiver_id === selectedClient
   ) || [];
 
-  // Realtime for admin messages
+  // Poll messages every 5 seconds
   useEffect(() => {
     if (!currentUserId) return;
-    const channel = supabase
-      .channel("admin-messages")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, () => {
-        queryClient.invalidateQueries({ queryKey: ["admin_messages"] });
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    const interval = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: ["admin_messages"] });
+    }, 5000);
+    return () => clearInterval(interval);
   }, [currentUserId, queryClient]);
 
   useEffect(() => {
