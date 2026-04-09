@@ -495,6 +495,21 @@ const MonProfil = () => {
                                 >
                                   <CalendarPlus size={12} />
                                 </button>
+                                <button
+                                  onClick={async () => {
+                                    // Cancel the booking
+                                    await supabase.from("bookings").update({ status: "cancelled" }).eq("id", b.id);
+                                    // Re-enable the time slot
+                                    await supabase.from("time_slots").update({ is_available: true }).eq("id", b.time_slot_id);
+                                    toast.success("Rendez-vous annulé ✅");
+                                    const { data: updated } = await supabase.from("bookings").select("*, time_slots!bookings_time_slot_id_fkey(date, start_time, end_time)").eq("user_id", userId!).order("created_at", { ascending: false });
+                                    if (updated) setBookings(updated);
+                                  }}
+                                  className="text-[10px] px-2 py-1 rounded bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
+                                  title="Annuler le rendez-vous"
+                                >
+                                  Annuler
+                                </button>
                               </div>
                             )}
                             <span className={`text-xs font-medium ${statusColor}`}>{statusLabel}</span>
