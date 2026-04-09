@@ -360,6 +360,25 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="clients" className="space-y-4">
+            {/* Capacity control */}
+            <div className="bg-card border border-border rounded-lg p-4 flex flex-wrap items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Users size={18} className="text-primary" />
+                <span className="text-foreground text-sm font-medium">Capacité max :</span>
+              </div>
+              <Input
+                type="number"
+                min={1}
+                className="w-20 h-8 text-sm bg-background border-border"
+                value={maxUsers}
+                onChange={(e) => setMaxUsers(e.target.value)}
+                onBlur={(e) => updateMaxUsers(e.target.value)}
+              />
+              <span className="text-muted-foreground text-xs">
+                {clients?.length || 0} / {maxUsers} clients inscrits
+              </span>
+            </div>
+
             <div className="relative">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -379,17 +398,28 @@ const Admin = () => {
                   <p className="text-foreground font-medium text-sm">
                     {c.full_name || "Sans nom"} — Inscrit le {format(new Date(c.created_at), "dd/MM/yyyy")}
                   </p>
-                  <Button
-                    size="sm"
-                    variant={c.has_active_subscription ? "hero" : "heroOutline"}
-                    onClick={async () => {
-                      await supabase.from("profiles").update({ has_active_subscription: !c.has_active_subscription }).eq("id", c.id);
-                      queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
-                      toast.success(c.has_active_subscription ? "Abonnement désactivé" : "Abonnement activé");
-                    }}
-                  >
-                    {c.has_active_subscription ? "✅ Abonné" : "❌ Non abonné"}
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant={c.has_active_subscription ? "hero" : "heroOutline"}
+                      onClick={async () => {
+                        await supabase.from("profiles").update({ has_active_subscription: !c.has_active_subscription }).eq("id", c.id);
+                        queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                        toast.success(c.has_active_subscription ? "Abonnement désactivé" : "Abonnement activé");
+                      }}
+                    >
+                      {c.has_active_subscription ? "✅ Abonné" : "❌ Non abonné"}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="heroOutline"
+                      className="text-destructive border-destructive/30 hover:bg-destructive/10"
+                      disabled={deletingUser === c.user_id}
+                      onClick={() => deleteClient(c.user_id, c.full_name)}
+                    >
+                      <Trash2 size={14} />
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
@@ -471,8 +501,6 @@ const Admin = () => {
               </div>
             ))}
           </TabsContent>
-
-          <TabsContent value="messages">
             <div className="flex gap-4 h-[500px]">
               {/* Client list */}
               <div className="w-1/3 bg-card border border-border rounded-lg overflow-y-auto">
