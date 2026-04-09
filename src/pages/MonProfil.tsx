@@ -83,6 +83,14 @@ const MonProfil = () => {
       // Mark as read
       await supabase.from("messages").update({ is_read: true }).eq("receiver_id", user.id).eq("is_read", false);
 
+      // Load bookings with time slot info
+      const { data: bookingsData } = await supabase
+        .from("bookings")
+        .select("*, time_slots(date, start_time, end_time)")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+      setBookings(bookingsData || []);
+
       setLoading(false);
     };
     load();
