@@ -145,8 +145,19 @@ const MonProfil = () => {
       receiver_id: adminId,
       content: newMsg.trim(),
     });
-    if (error) toast.error("Erreur d'envoi");
-    else setNewMsg("");
+    if (error) {
+      console.error("Message send error:", error);
+      toast.error("Erreur d'envoi du message");
+    } else {
+      setNewMsg("");
+      // Refresh messages immediately
+      const { data: msgs } = await supabase
+        .from("messages")
+        .select("*")
+        .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+        .order("created_at", { ascending: true });
+      if (msgs) setMessages(msgs);
+    }
     setSendingMsg(false);
   };
 
