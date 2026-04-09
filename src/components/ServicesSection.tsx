@@ -1,16 +1,26 @@
 import { motion } from "framer-motion";
-import { Dumbbell, Apple, Video, Heart } from "lucide-react";
+import { Dumbbell, Apple, Video, Heart, ClipboardList, FileSpreadsheet } from "lucide-react";
 
 const services = [
   {
     icon: Dumbbell,
     title: "Coaching Individuel",
-    description: "Séances personnalisées adaptées à tes objectifs et ton niveau. Suivi complet de ta progression.",
+    description: "Emma est présente à tes côtés. Séances personnalisées en présentiel ou en ligne, adaptées à tes objectifs.",
   },
   {
     icon: Apple,
     title: "Plan Nutritionnel",
     description: "Conseils alimentaires sur mesure pour optimiser tes résultats et adopter de bonnes habitudes.",
+  },
+  {
+    icon: FileSpreadsheet,
+    title: "Suivi Google Sheets",
+    description: "Emma te suit via un Google Sheets partagé : exercices, performances, évolution — tout est noté pour progresser efficacement.",
+  },
+  {
+    icon: ClipboardList,
+    title: "Bilan Hebdomadaire",
+    description: "Chaque semaine, un bilan complet avec Emma pour ajuster ton programme et garder le cap.",
   },
   {
     icon: Video,
@@ -20,7 +30,7 @@ const services = [
   {
     icon: Heart,
     title: "Suivi & Motivation",
-    description: "Accompagnement continu pour rester motivée et progresser à ton rythme. Bilan régulier.",
+    description: "Accompagnement continu pour rester motivée. Programme renouvelé toutes les 6 semaines.",
   },
 ];
 
@@ -37,9 +47,12 @@ const ServicesSection = () => {
         >
           <p className="text-primary font-semibold tracking-widest uppercase text-sm mb-3">Ce que je propose</p>
           <h2 className="font-display text-5xl sm:text-6xl text-gradient-blue">MES SERVICES</h2>
+          <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
+            Un accompagnement complet et personnalisé — Emma est là, présente et impliquée dans ta transformation.
+          </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((s, i) => (
             <motion.div
               key={s.title}
