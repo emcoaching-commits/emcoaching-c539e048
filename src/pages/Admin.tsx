@@ -73,6 +73,15 @@ const Admin = () => {
     queryFn: async () => {
       const { data, error } = await supabase.from("bookings").select("*, profiles(full_name, phone), time_slots(date, start_time, end_time)").order("created_at", { ascending: false });
       if (error) throw error;
+      // Load proposed slot details separately
+      if (data) {
+        for (const b of data) {
+          if ((b as any).proposed_slot_id) {
+            const { data: ps } = await supabase.from("time_slots").select("date, start_time, end_time").eq("id", (b as any).proposed_slot_id).single();
+            (b as any).proposed_slot = ps;
+          }
+        }
+      }
       return data;
     },
     enabled: isAdmin === true,
