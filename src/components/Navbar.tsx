@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, LogIn, LogOut, Shield, UserPlus, User } from "lucide-react";
+import { Menu, X, LogIn, LogOut, Shield, UserPlus, User, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -77,6 +77,9 @@ const Navbar = () => {
           )}
           {user ? (
             <>
+              <Button variant="heroOutline" size="sm" onClick={() => navigate("/messagerie")}>
+                <MessageCircle size={16} className="mr-1" /> Messages
+              </Button>
               <Button variant="heroOutline" size="sm" onClick={() => navigate("/mon-profil")}>
                 <User size={16} className="mr-1" /> Mon Profil
               </Button>
@@ -123,6 +126,9 @@ const Navbar = () => {
             )}
             {user ? (
               <>
+                <Button variant="heroOutline" size="lg" onClick={() => { navigate("/messagerie"); setOpen(false); }}>
+                  <MessageCircle size={16} className="mr-1" /> Messages
+                </Button>
                 <Button variant="heroOutline" size="lg" onClick={() => { navigate("/mon-profil"); setOpen(false); }}>
                   <User size={16} className="mr-1" /> Mon Profil
                 </Button>

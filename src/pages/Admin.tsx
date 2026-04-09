@@ -1,23 +1,32 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, ArrowLeft, Trash2, Check, X, Plus } from "lucide-react";
+import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Admin = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   // New slot form
   const [slotDate, setSlotDate] = useState("");
   const [slotStart, setSlotStart] = useState("");
   const [slotEnd, setSlotEnd] = useState("");
+
+  // Messaging
+  const [selectedClient, setSelectedClient] = useState<string | null>(null);
+  const [adminMsg, setAdminMsg] = useState("");
+  const [sendingMsg, setSendingMsg] = useState(false);
+  const msgBottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const check = async () => {
@@ -26,6 +35,7 @@ const Admin = () => {
       const { data } = await supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin");
       if (!data || data.length === 0) { navigate("/"); toast.error("Accès refusé"); return; }
       setIsAdmin(true);
+      setCurrentUserId(user.id);
     };
     check();
   }, [navigate]);
@@ -74,8 +84,57 @@ const Admin = () => {
     enabled: isAdmin === true,
   });
 
-  const toggleReview = async (id: string, approved: boolean) => {
-    await supabase.from("reviews").update({ is_approved: approved }).eq("id", id);
+  // Messages - all conversations
+  const { data: allMessages } = useQuery({
+    queryKey: ["admin_messages"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("messages").select("*").order("created_at", { ascending: true });
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin === true,
+  });
+
+  // Get unique client IDs from messages
+  const messageClients = allMessages
+    ? [...new Set(allMessages.flatMap((m: any) => [m.sender_id, m.receiver_id]).filter((id: string) => id !== currentUserId))]
+    : [];
+
+  const selectedMessages = allMessages?.filter(
+    (m: any) => m.sender_id === selectedClient || m.receiver_id === selectedClient
+  ) || [];
+
+  // Realtime for admin messages
+  useEffect(() => {
+    if (!currentUserId) return;
+    const channel = supabase
+      .channel("admin-messages")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, () => {
+        queryClient.invalidateQueries({ queryKey: ["admin_messages"] });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [currentUserId, queryClient]);
+
+  useEffect(() => {
+    msgBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [selectedMessages.length]);
+
+  const sendAdminMsg = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!adminMsg.trim() || !selectedClient || !currentUserId) return;
+    setSendingMsg(true);
+    await supabase.from("messages").insert({
+      sender_id: currentUserId,
+      receiver_id: selectedClient,
+      content: adminMsg.trim(),
+    });
+    setAdminMsg("");
+    setSendingMsg(false);
+  };
+
+
+    const toggleReview = async (id: string, approved: boolean) => {
     queryClient.invalidateQueries({ queryKey: ["admin_reviews"] });
     toast.success(approved ? "Avis approuvé" : "Avis masqué");
   };
@@ -119,6 +178,9 @@ const Admin = () => {
             <TabsTrigger value="slots">Créneaux ({slots?.length || 0})</TabsTrigger>
             <TabsTrigger value="bookings">Réservations ({bookings?.length || 0})</TabsTrigger>
             <TabsTrigger value="clients">Clients ({clients?.length || 0})</TabsTrigger>
+            <TabsTrigger value="messages">
+              <MessageCircle size={14} className="mr-1" /> Messages
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="reviews" className="space-y-4">
@@ -215,6 +277,98 @@ const Admin = () => {
                 </div>
               </div>
             ))}
+          </TabsContent>
+
+          <TabsContent value="messages">
+            <div className="flex gap-4 h-[500px]">
+              {/* Client list */}
+              <div className="w-1/3 bg-card border border-border rounded-lg overflow-y-auto">
+                {messageClients.length === 0 && (
+                  <p className="text-muted-foreground text-sm p-4 text-center">Aucun message</p>
+                )}
+                {messageClients.map((clientId: string) => {
+                  const client = clients?.find((c: any) => c.user_id === clientId);
+                  const lastMsg = allMessages?.filter(
+                    (m: any) => m.sender_id === clientId || m.receiver_id === clientId
+                  ).slice(-1)[0];
+                  const unread = allMessages?.filter(
+                    (m: any) => m.sender_id === clientId && m.receiver_id === currentUserId && !m.is_read
+                  ).length || 0;
+                  return (
+                    <button
+                      key={clientId}
+                      onClick={() => {
+                        setSelectedClient(clientId);
+                        // Mark as read
+                        supabase.from("messages").update({ is_read: true })
+                          .eq("sender_id", clientId).eq("receiver_id", currentUserId!).eq("is_read", false)
+                          .then(() => queryClient.invalidateQueries({ queryKey: ["admin_messages"] }));
+                      }}
+                      className={`w-full text-left p-3 border-b border-border hover:bg-muted/50 transition-colors ${
+                        selectedClient === clientId ? "bg-primary/10 border-l-2 border-l-primary" : ""
+                      }`}
+                    >
+                      <p className="text-sm font-medium text-foreground">{client?.full_name || "Client"}</p>
+                      <p className="text-xs text-muted-foreground truncate">{lastMsg?.content}</p>
+                      {unread > 0 && (
+                        <span className="inline-block mt-1 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 rounded-full">
+                          {unread}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Chat */}
+              <div className="flex-1 flex flex-col bg-card border border-border rounded-lg">
+                {!selectedClient ? (
+                  <div className="flex-1 flex items-center justify-center text-muted-foreground">
+                    <div className="text-center">
+                      <MessageCircle size={40} className="mx-auto mb-2 text-primary/30" />
+                      <p className="text-sm">Sélectionnez un client</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <ScrollArea className="flex-1 p-4">
+                      <div className="space-y-3">
+                        {selectedMessages.map((msg: any) => {
+                          const isAdmin = msg.sender_id === currentUserId;
+                          return (
+                            <div key={msg.id} className={`flex ${isAdmin ? "justify-end" : "justify-start"}`}>
+                              <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
+                                isAdmin
+                                  ? "bg-primary text-primary-foreground rounded-br-md"
+                                  : "bg-muted text-foreground rounded-bl-md"
+                              }`}>
+                                <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                                <p className={`text-[10px] mt-1 ${isAdmin ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
+                                  {format(new Date(msg.created_at), "HH:mm · dd MMM", { locale: fr })}
+                                </p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                        <div ref={msgBottomRef} />
+                      </div>
+                    </ScrollArea>
+                    <form onSubmit={sendAdminMsg} className="flex gap-2 p-3 border-t border-border">
+                      <Input
+                        value={adminMsg}
+                        onChange={(e) => setAdminMsg(e.target.value)}
+                        placeholder="Répondre..."
+                        className="flex-1 bg-background border-border"
+                        maxLength={1000}
+                      />
+                      <Button type="submit" variant="hero" size="icon" disabled={sendingMsg || !adminMsg.trim()}>
+                        <Send size={18} />
+                      </Button>
+                    </form>
+                  </>
+                )}
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
