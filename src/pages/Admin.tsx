@@ -1,23 +1,32 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, ArrowLeft, Trash2, Check, X, Plus } from "lucide-react";
+import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Admin = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   // New slot form
   const [slotDate, setSlotDate] = useState("");
   const [slotStart, setSlotStart] = useState("");
   const [slotEnd, setSlotEnd] = useState("");
+
+  // Messaging
+  const [selectedClient, setSelectedClient] = useState<string | null>(null);
+  const [adminMsg, setAdminMsg] = useState("");
+  const [sendingMsg, setSendingMsg] = useState(false);
+  const msgBottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const check = async () => {
@@ -26,6 +35,7 @@ const Admin = () => {
       const { data } = await supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin");
       if (!data || data.length === 0) { navigate("/"); toast.error("Accès refusé"); return; }
       setIsAdmin(true);
+      setCurrentUserId(user.id);
     };
     check();
   }, [navigate]);
