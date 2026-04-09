@@ -27,6 +27,7 @@ const Admin = () => {
   const [adminMsg, setAdminMsg] = useState("");
   const [sendingMsg, setSendingMsg] = useState(false);
   const msgBottomRef = useRef<HTMLDivElement>(null);
+  const [clientSearch, setClientSearch] = useState("");
 
   useEffect(() => {
     const check = async () => {
