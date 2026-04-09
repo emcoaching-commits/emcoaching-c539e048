@@ -299,6 +299,36 @@ const MonProfil = () => {
               </motion.div>
             )}
 
+            {/* Monday review prompt */}
+            {profile?.has_active_subscription && new Date().getDay() === 1 && (
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.28 }}
+                className="relative overflow-hidden rounded-xl border border-yellow-500/30 bg-gradient-to-r from-yellow-500/10 via-yellow-500/5 to-card p-5"
+              >
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                  <div className="flex gap-0.5">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <Star key={s} size={18} className="text-yellow-500 fill-yellow-500" />
+                    ))}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-foreground font-display text-sm">C'EST LUNDI, LAISSE TON AVIS !</p>
+                    <p className="text-muted-foreground text-xs">Ton retour aide Emma à s'améliorer 💪</p>
+                  </div>
+                  <Button
+                    variant="heroOutline"
+                    size="sm"
+                    className="border-yellow-500 text-yellow-500 hover:bg-yellow-500/10 shrink-0"
+                    onClick={() => navigate("/avis")}
+                  >
+                    Donner mon avis
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
             {/* Profile completion */}
             <motion.div
               initial={{ x: -20, opacity: 0 }}
