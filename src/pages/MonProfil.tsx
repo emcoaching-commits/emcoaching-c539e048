@@ -544,7 +544,7 @@ const MonProfil = () => {
                                     status: "confirmed",
                                   }).eq("id", b.id);
                                   toast.info("Report refusé — créneau initial maintenu");
-                                  const { data: updated } = await supabase.from("bookings").select("*, time_slots(date, start_time, end_time)").eq("user_id", userId!).order("created_at", { ascending: false });
+                                  const { data: updated } = await supabase.from("bookings").select("*, time_slots!bookings_time_slot_id_fkey(date, start_time, end_time)").eq("user_id", userId!).order("created_at", { ascending: false });
                                   if (updated) setBookings(updated);
                                 }}
                               >
