@@ -158,14 +158,27 @@ const Admin = () => {
     enabled: isAdmin === true,
   });
 
-  // Max users setting
+  // About media
+  const { data: aboutMedia } = useQuery({
+    queryKey: ["admin_about_media"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("about_media").select("*").order("position");
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin === true,
+  });
+
+  // Max users setting + about description
   useEffect(() => {
     if (!isAdmin) return;
-    const loadMaxUsers = async () => {
-      const { data } = await supabase.from("site_settings").select("value").eq("key", "max_users").single();
-      if (data) setMaxUsers(data.value);
+    const loadSettings = async () => {
+      const { data: mu } = await supabase.from("site_settings").select("value").eq("key", "max_users").single();
+      if (mu) setMaxUsers(mu.value);
+      const { data: ad } = await supabase.from("site_settings").select("value").eq("key", "about_description").single();
+      if (ad) { setAboutDesc(ad.value); setAboutDescLoaded(true); }
     };
-    loadMaxUsers();
+    loadSettings();
   }, [isAdmin]);
 
   const updateMaxUsers = async (val: string) => {
