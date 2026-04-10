@@ -388,6 +388,9 @@ const Admin = () => {
             <TabsTrigger value="messages">
               <MessageCircle size={14} className="mr-1" /> Messages
             </TabsTrigger>
+            <TabsTrigger value="about">
+              <Image size={14} className="mr-1" /> À propos
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="notifications" className="space-y-4">
