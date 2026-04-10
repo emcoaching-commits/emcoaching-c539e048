@@ -37,6 +37,8 @@ const Admin = () => {
   const [deletingUser, setDeletingUser] = useState<string | null>(null);
   const [rescheduleBookingId, setRescheduleBookingId] = useState<string | null>(null);
   const [rescheduleSlotId, setRescheduleSlotId] = useState("");
+  const [bookForClientId, setBookForClientId] = useState("");
+  const [bookForSlotId, setBookForSlotId] = useState("");
 
   useEffect(() => {
     const check = async () => {
@@ -311,6 +313,34 @@ const Admin = () => {
     toast.success("Créneau supprimé");
   };
 
+  const adminBookForClient = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bookForClientId || !bookForSlotId) return;
+    const { error } = await supabase.from("bookings").insert({
+      user_id: bookForClientId,
+      time_slot_id: bookForSlotId,
+    });
+    if (error) {
+      toast.error("Erreur lors de la réservation");
+    } else {
+      toast.success("RDV réservé pour le client !");
+      setBookForClientId("");
+      setBookForSlotId("");
+      queryClient.invalidateQueries({ queryKey: ["admin_bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["admin_client_bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["admin_slots"] });
+    }
+  };
+
+  const cancelBooking = async (bookingId: string) => {
+    if (!confirm("Annuler ce rendez-vous ? Le créneau redeviendra disponible.")) return;
+    await supabase.from("bookings").update({ status: "cancelled" }).eq("id", bookingId);
+    queryClient.invalidateQueries({ queryKey: ["admin_bookings"] });
+    queryClient.invalidateQueries({ queryKey: ["admin_client_bookings"] });
+    queryClient.invalidateQueries({ queryKey: ["admin_slots"] });
+    toast.success("Rendez-vous annulé, créneau libéré");
+  };
+
   if (isAdmin === null) return <div className="min-h-screen bg-background flex items-center justify-center text-foreground">Chargement...</div>;
 
   return (
@@ -515,6 +545,44 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="bookings" className="space-y-4">
+            {/* Admin book for client form */}
+            <form onSubmit={adminBookForClient} className="bg-card border border-border rounded-lg p-4 flex flex-wrap gap-3 items-end">
+              <div>
+                <label className="text-muted-foreground text-xs block mb-1">Client</label>
+                <select
+                  value={bookForClientId}
+                  onChange={(e) => setBookForClientId(e.target.value)}
+                  className="h-9 rounded-md border border-border bg-background px-3 text-sm text-foreground"
+                  required
+                >
+                  <option value="">Choisir un client...</option>
+                  {clients?.map((c: any) => (
+                    <option key={c.user_id} value={c.user_id}>{c.full_name || "Sans nom"}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-muted-foreground text-xs block mb-1">Créneau disponible</label>
+                <select
+                  value={bookForSlotId}
+                  onChange={(e) => setBookForSlotId(e.target.value)}
+                  className="h-9 rounded-md border border-border bg-background px-3 text-sm text-foreground"
+                  required
+                >
+                  <option value="">Choisir un créneau...</option>
+                  {slots?.filter((s: any) => s.is_available).map((s: any) => (
+                    <option key={s.id} value={s.id}>
+                      {s.date} — {s.start_time?.toString().slice(0, 5)} à {s.end_time?.toString().slice(0, 5)}
+                      {s.appointment_types ? ` (${(s.appointment_types as any).name})` : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <Button variant="hero" size="sm" type="submit">
+                <Plus size={14} className="mr-1" /> Réserver pour le client
+              </Button>
+            </form>
+
             {bookings?.map((b) => {
               const isRescheduling = rescheduleBookingId === b.id;
               const availableSlots = slots?.filter((s: any) => s.is_available && s.id !== b.time_slot_id) || [];
@@ -545,15 +613,35 @@ const Admin = () => {
                     </div>
                     <div className="flex gap-2">
                       {b.status === "confirmed" && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="heroOutline"
+                            onClick={() => {
+                              setRescheduleBookingId(isRescheduling ? null : b.id);
+                              setRescheduleSlotId("");
+                            }}
+                          >
+                            <CalendarClock size={14} className="mr-1" /> Décaler
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="heroOutline"
+                            className="text-yellow-500 border-yellow-500/30 hover:bg-yellow-500/10"
+                            onClick={() => cancelBooking(b.id)}
+                          >
+                            <X size={14} className="mr-1" /> Annuler
+                          </Button>
+                        </>
+                      )}
+                      {b.status === "reschedule_pending" && (
                         <Button
                           size="sm"
                           variant="heroOutline"
-                          onClick={() => {
-                            setRescheduleBookingId(isRescheduling ? null : b.id);
-                            setRescheduleSlotId("");
-                          }}
+                          className="text-yellow-500 border-yellow-500/30 hover:bg-yellow-500/10"
+                          onClick={() => cancelBooking(b.id)}
                         >
-                          <CalendarClock size={14} className="mr-1" /> Décaler
+                          <X size={14} className="mr-1" /> Annuler
                         </Button>
                       )}
                       <Button
@@ -561,9 +649,8 @@ const Admin = () => {
                         variant="heroOutline"
                         className="text-destructive border-destructive/30 hover:bg-destructive/10"
                         onClick={async () => {
-                          if (!confirm("Supprimer ce rendez-vous ? Le créneau sera aussi retiré du planning.")) return;
+                          if (!confirm("Supprimer définitivement ce rendez-vous et le créneau associé ?")) return;
                           await supabase.from("bookings").delete().eq("id", b.id);
-                          // Admin cancel: remove the slot entirely from the planning
                           await supabase.from("time_slots").delete().eq("id", b.time_slot_id);
                           queryClient.invalidateQueries({ queryKey: ["admin_bookings"] });
                           queryClient.invalidateQueries({ queryKey: ["admin_client_bookings"] });
