@@ -313,6 +313,34 @@ const Admin = () => {
     toast.success("Créneau supprimé");
   };
 
+  const adminBookForClient = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bookForClientId || !bookForSlotId) return;
+    const { error } = await supabase.from("bookings").insert({
+      user_id: bookForClientId,
+      time_slot_id: bookForSlotId,
+    });
+    if (error) {
+      toast.error("Erreur lors de la réservation");
+    } else {
+      toast.success("RDV réservé pour le client !");
+      setBookForClientId("");
+      setBookForSlotId("");
+      queryClient.invalidateQueries({ queryKey: ["admin_bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["admin_client_bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["admin_slots"] });
+    }
+  };
+
+  const cancelBooking = async (bookingId: string) => {
+    if (!confirm("Annuler ce rendez-vous ? Le créneau redeviendra disponible.")) return;
+    await supabase.from("bookings").update({ status: "cancelled" }).eq("id", bookingId);
+    queryClient.invalidateQueries({ queryKey: ["admin_bookings"] });
+    queryClient.invalidateQueries({ queryKey: ["admin_client_bookings"] });
+    queryClient.invalidateQueries({ queryKey: ["admin_slots"] });
+    toast.success("Rendez-vous annulé, créneau libéré");
+  };
+
   if (isAdmin === null) return <div className="min-h-screen bg-background flex items-center justify-center text-foreground">Chargement...</div>;
 
   return (
