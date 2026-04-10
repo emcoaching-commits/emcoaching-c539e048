@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search, Users, Settings, CalendarClock, Tag, Clock } from "lucide-react";
+import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search, Users, Settings, CalendarClock, Tag, Clock, Image, Upload } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -39,6 +40,9 @@ const Admin = () => {
   const [rescheduleSlotId, setRescheduleSlotId] = useState("");
   const [bookForClientId, setBookForClientId] = useState("");
   const [bookForSlotId, setBookForSlotId] = useState("");
+  const [aboutDesc, setAboutDesc] = useState("");
+  const [aboutDescLoaded, setAboutDescLoaded] = useState(false);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
 
   useEffect(() => {
     const check = async () => {
@@ -154,14 +158,27 @@ const Admin = () => {
     enabled: isAdmin === true,
   });
 
-  // Max users setting
+  // About media
+  const { data: aboutMedia } = useQuery({
+    queryKey: ["admin_about_media"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("about_media").select("*").order("position");
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin === true,
+  });
+
+  // Max users setting + about description
   useEffect(() => {
     if (!isAdmin) return;
-    const loadMaxUsers = async () => {
-      const { data } = await supabase.from("site_settings").select("value").eq("key", "max_users").single();
-      if (data) setMaxUsers(data.value);
+    const loadSettings = async () => {
+      const { data: mu } = await supabase.from("site_settings").select("value").eq("key", "max_users").single();
+      if (mu) setMaxUsers(mu.value);
+      const { data: ad } = await supabase.from("site_settings").select("value").eq("key", "about_description").single();
+      if (ad) { setAboutDesc(ad.value); setAboutDescLoaded(true); }
     };
-    loadMaxUsers();
+    loadSettings();
   }, [isAdmin]);
 
   const updateMaxUsers = async (val: string) => {
@@ -370,6 +387,9 @@ const Admin = () => {
             <TabsTrigger value="clients">Clients ({clients?.length || 0})</TabsTrigger>
             <TabsTrigger value="messages">
               <MessageCircle size={14} className="mr-1" /> Messages
+            </TabsTrigger>
+            <TabsTrigger value="about">
+              <Image size={14} className="mr-1" /> À propos
             </TabsTrigger>
           </TabsList>
 
@@ -976,6 +996,120 @@ const Admin = () => {
                   </>
                 )}
               </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="about" className="space-y-6">
+            {/* Description editing */}
+            <div className="bg-card border border-border rounded-lg p-4 space-y-3">
+              <h3 className="text-foreground font-display text-lg">DESCRIPTION</h3>
+              <Textarea
+                value={aboutDesc}
+                onChange={(e) => setAboutDesc(e.target.value)}
+                rows={6}
+                className="bg-background border-border text-foreground"
+                placeholder="Décris-toi ici..."
+              />
+              <Button
+                variant="hero"
+                size="sm"
+                onClick={async () => {
+                  const { error } = await supabase
+                    .from("site_settings")
+                    .upsert({ key: "about_description", value: aboutDesc });
+                  if (error) toast.error("Erreur");
+                  else toast.success("Description mise à jour !");
+                }}
+              >
+                <Check size={14} className="mr-1" /> Sauvegarder
+              </Button>
+            </div>
+
+            {/* Media upload */}
+            <div className="bg-card border border-border rounded-lg p-4 space-y-3">
+              <h3 className="text-foreground font-display text-lg">PHOTOS & VIDÉOS</h3>
+              <div className="flex gap-3 items-center">
+                <label className="cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*,video/*"
+                    multiple
+                    className="hidden"
+                    onChange={async (e) => {
+                      const files = e.target.files;
+                      if (!files || files.length === 0) return;
+                      setUploadingMedia(true);
+                      const currentCount = aboutMedia?.length || 0;
+                      for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        const ext = file.name.split(".").pop();
+                        const fileName = `${Date.now()}_${i}.${ext}`;
+                        const { error: upErr } = await supabase.storage
+                          .from("about-media")
+                          .upload(fileName, file);
+                        if (upErr) {
+                          toast.error(`Erreur upload: ${file.name}`);
+                          continue;
+                        }
+                        const { data: urlData } = supabase.storage
+                          .from("about-media")
+                          .getPublicUrl(fileName);
+                        const mediaType = file.type.startsWith("video") ? "video" : "image";
+                        await supabase.from("about_media").insert({
+                          url: urlData.publicUrl,
+                          type: mediaType,
+                          position: currentCount + i,
+                        });
+                      }
+                      setUploadingMedia(false);
+                      toast.success("Média(s) ajouté(s) !");
+                      queryClient.invalidateQueries({ queryKey: ["admin_about_media"] });
+                      queryClient.invalidateQueries({ queryKey: ["about_media"] });
+                    }}
+                  />
+                  <div className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors">
+                    <Upload size={14} /> {uploadingMedia ? "Envoi..." : "Ajouter depuis la galerie"}
+                  </div>
+                </label>
+              </div>
+
+              {/* Media grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {aboutMedia?.map((m: any) => (
+                  <div key={m.id} className="relative group rounded-lg overflow-hidden border border-border aspect-square bg-muted">
+                    {m.type === "video" ? (
+                      <video src={m.url} className="w-full h-full object-cover" />
+                    ) : (
+                      <img src={m.url} alt="" className="w-full h-full object-cover" />
+                    )}
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <Button
+                        size="sm"
+                        variant="heroOutline"
+                        className="text-white border-white/30 hover:bg-white/20"
+                        onClick={async () => {
+                          // Extract file name from URL
+                          const urlParts = m.url.split("/");
+                          const fileName = urlParts[urlParts.length - 1];
+                          await supabase.storage.from("about-media").remove([fileName]);
+                          await supabase.from("about_media").delete().eq("id", m.id);
+                          queryClient.invalidateQueries({ queryKey: ["admin_about_media"] });
+                          queryClient.invalidateQueries({ queryKey: ["about_media"] });
+                          toast.success("Média supprimé");
+                        }}
+                      >
+                        <Trash2 size={14} />
+                      </Button>
+                    </div>
+                    <span className="absolute top-1 left-1 text-[10px] bg-background/80 text-foreground px-1.5 py-0.5 rounded">
+                      {m.type === "video" ? "🎬" : "📷"} #{m.position + 1}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              {(!aboutMedia || aboutMedia.length === 0) && (
+                <p className="text-muted-foreground text-center py-4">Aucun média ajouté</p>
+              )}
             </div>
           </TabsContent>
         </Tabs>

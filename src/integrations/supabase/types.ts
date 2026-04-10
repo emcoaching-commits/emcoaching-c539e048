@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      about_media: {
+        Row: {
+          created_at: string
+          id: string
+          position: number
+          type: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          position?: number
+          type?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          position?: number
+          type?: string
+          url?: string
+        }
+        Relationships: []
+      }
       appointment_types: {
         Row: {
           created_at: string
