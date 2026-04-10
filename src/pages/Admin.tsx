@@ -37,6 +37,8 @@ const Admin = () => {
   const [deletingUser, setDeletingUser] = useState<string | null>(null);
   const [rescheduleBookingId, setRescheduleBookingId] = useState<string | null>(null);
   const [rescheduleSlotId, setRescheduleSlotId] = useState("");
+  const [bookForClientId, setBookForClientId] = useState("");
+  const [bookForSlotId, setBookForSlotId] = useState("");
 
   useEffect(() => {
     const check = async () => {
