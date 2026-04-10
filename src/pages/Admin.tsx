@@ -40,6 +40,9 @@ const Admin = () => {
   const [rescheduleSlotId, setRescheduleSlotId] = useState("");
   const [bookForClientId, setBookForClientId] = useState("");
   const [bookForSlotId, setBookForSlotId] = useState("");
+  const [aboutDesc, setAboutDesc] = useState("");
+  const [aboutDescLoaded, setAboutDescLoaded] = useState(false);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
 
   useEffect(() => {
     const check = async () => {
