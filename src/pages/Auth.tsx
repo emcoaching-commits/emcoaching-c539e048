@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Camera, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [rememberMe, setRememberMe] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -57,6 +59,11 @@ const Auth = () => {
       if (error) {
         toast.error(error.message);
       } else {
+        if (!rememberMe) {
+          sessionStorage.setItem("session_only", "true");
+        } else {
+          sessionStorage.removeItem("session_only");
+        }
         toast.success("Connexion réussie !");
         navigate("/");
       }
@@ -209,6 +216,18 @@ const Auth = () => {
               minLength={6}
               required
             />
+            {isLogin && (
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="rememberMe"
+                  checked={rememberMe}
+                  onCheckedChange={(checked) => setRememberMe(checked === true)}
+                />
+                <label htmlFor="rememberMe" className="text-sm text-muted-foreground cursor-pointer select-none">
+                  Rester connecté
+                </label>
+              </div>
+            )}
             <Button variant="hero" size="lg" className="w-full" disabled={loading || (!isLogin && signupClosed)}>
               {loading ? "Chargement..." : isLogin ? "Se connecter" : "S'inscrire"}
             </Button>
