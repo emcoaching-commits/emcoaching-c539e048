@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,7 +21,19 @@ import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const App = () => {
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (sessionStorage.getItem("session_only") === "true") {
+        supabase.auth.signOut();
+        sessionStorage.removeItem("session_only");
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, []);
+
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -52,6 +66,7 @@ const App = () => (
       </a>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  );
+};
 
 export default App;
