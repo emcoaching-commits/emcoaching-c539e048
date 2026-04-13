@@ -22,7 +22,7 @@ const PlanningSection = () => {
       const dateStr = format(selectedDate, "yyyy-MM-dd");
       const { data, error } = await supabase
         .from("time_slots")
-        .select("*")
+        .select("*, appointment_types(name)")
         .eq("date", dateStr)
         .eq("is_available", true)
         .order("start_time");
