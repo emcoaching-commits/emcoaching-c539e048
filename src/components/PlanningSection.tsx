@@ -110,9 +110,14 @@ const PlanningSection = () => {
               >
                 <div className="flex items-center gap-3">
                   <Clock className="text-primary" size={18} />
-                  <span className="text-foreground font-medium">
-                    {slot.start_time.slice(0, 5)} - {slot.end_time.slice(0, 5)}
-                  </span>
+                  <div>
+                    <span className="text-foreground font-medium">
+                      {slot.start_time.slice(0, 5)} - {slot.end_time.slice(0, 5)}
+                    </span>
+                    {slot.appointment_types?.name && (
+                      <p className="text-xs text-muted-foreground">{slot.appointment_types.name}</p>
+                    )}
+                  </div>
                 </div>
                 <Button variant="hero" size="sm" onClick={() => handleBook(slot.id)}>
                   Réserver
