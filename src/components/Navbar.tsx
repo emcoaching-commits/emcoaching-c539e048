@@ -52,9 +52,7 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
       <div className="container flex items-center justify-between h-16">
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-full bg-primary/20 border-2 border-primary flex items-center justify-center">
-            <span className="font-display text-lg text-primary">E</span>
-          </div>
+          <img src="/logo.png" alt="Em' Coaching" className="h-10 w-10 rounded-full object-cover" />
           <span className="font-display text-2xl text-gradient-blue">EM' COACHING</span>
         </Link>
 
