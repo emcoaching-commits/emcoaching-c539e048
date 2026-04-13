@@ -7,11 +7,11 @@ import { toast } from "sonner";
 
 const navLinks = [
   { label: "Accueil", to: "/" },
+  { label: "Qui je suis", to: "/a-propos" },
   { label: "Services", to: "/services" },
   { label: "Tarifs", to: "/tarifs" },
   { label: "Planning", to: "/planning" },
   { label: "Avis", to: "/avis" },
-  { label: "À propos", to: "/a-propos" },
   { label: "Contact", to: "/contact" },
 ];
 
