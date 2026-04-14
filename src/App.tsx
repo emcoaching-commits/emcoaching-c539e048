@@ -12,6 +12,7 @@ import Admin from "./pages/Admin.tsx";
 import Questionnaire from "./pages/Questionnaire.tsx";
 import MonProfil from "./pages/MonProfil.tsx";
 import Services from "./pages/Services.tsx";
+import ServiceDetail from "./pages/ServiceDetail.tsx";
 import Tarifs from "./pages/Tarifs.tsx";
 import Planning from "./pages/Planning.tsx";
 import Avis from "./pages/Avis.tsx";
