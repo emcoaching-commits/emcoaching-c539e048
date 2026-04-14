@@ -169,6 +169,21 @@ const Admin = () => {
     enabled: isAdmin === true,
   });
 
+  // Services
+  const { data: adminServices } = useQuery({
+    queryKey: ["admin_services"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("services").select("*").order("position");
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin === true,
+  });
+
+  const [editingServiceId, setEditingServiceId] = useState<string | null>(null);
+  const [editService, setEditService] = useState<any>({});
+  const [uploadingServiceImg, setUploadingServiceImg] = useState(false);
+
   // Max users setting + about description
   useEffect(() => {
     if (!isAdmin) return;
