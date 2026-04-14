@@ -391,6 +391,9 @@ const Admin = () => {
             <TabsTrigger value="about">
               <Image size={14} className="mr-1" /> À propos
             </TabsTrigger>
+            <TabsTrigger value="services">
+              <Package size={14} className="mr-1" /> Services
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="notifications" className="space-y-4">
