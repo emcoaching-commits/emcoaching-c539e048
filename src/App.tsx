@@ -12,6 +12,7 @@ import Admin from "./pages/Admin.tsx";
 import Questionnaire from "./pages/Questionnaire.tsx";
 import MonProfil from "./pages/MonProfil.tsx";
 import Services from "./pages/Services.tsx";
+import ServiceDetail from "./pages/ServiceDetail.tsx";
 import Tarifs from "./pages/Tarifs.tsx";
 import Planning from "./pages/Planning.tsx";
 import Avis from "./pages/Avis.tsx";
@@ -42,6 +43,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/services" element={<Services />} />
+          <Route path="/services/:slug" element={<ServiceDetail />} />
           <Route path="/tarifs" element={<Tarifs />} />
           <Route path="/planning" element={<Planning />} />
           <Route path="/avis" element={<Avis />} />

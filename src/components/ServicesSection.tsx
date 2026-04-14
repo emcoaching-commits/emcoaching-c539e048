@@ -1,40 +1,35 @@
 import { motion } from "framer-motion";
-import { Dumbbell, Apple, Video, Heart, ClipboardList, FileSpreadsheet } from "lucide-react";
+import { Apple, Dumbbell, HeartPulse } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-const services = [
+const formules = [
   {
+    slug: "coaching",
     icon: Dumbbell,
-    title: "Coaching Individuel",
-    description: "Emma est présente à tes côtés. Séances personnalisées 100% en ligne, adaptées à tes objectifs.",
+    title: "Coaching",
+    price: "75€/mois",
+    description: "Programme sportif 100% personnalisé et en ligne, adapté à tes objectifs.",
   },
   {
+    slug: "nutrition",
     icon: Apple,
-    title: "Plan Nutritionnel",
-    description: "Conseils alimentaires sur mesure pour optimiser tes résultats et adopter de bonnes habitudes.",
+    title: "Nutrition",
+    price: "75€/mois",
+    description: "Plan nutritionnel sur mesure pour optimiser tes résultats au quotidien.",
   },
   {
-    icon: FileSpreadsheet,
-    title: "Suivi Google Sheets",
-    description: "Emma te suit via un Google Sheets partagé : exercices, performances, évolution — tout est noté pour progresser efficacement.",
-  },
-  {
-    icon: ClipboardList,
-    title: "Bilan Hebdomadaire",
-    description: "Chaque semaine, un bilan complet avec Emma pour ajuster ton programme et garder le cap.",
-  },
-  {
-    icon: Video,
-    title: "Coaching en Ligne",
-    description: "Programmes d'entraînement à distance avec suivi vidéo et ajustements en temps réel.",
-  },
-  {
-    icon: Heart,
-    title: "Suivi & Motivation",
-    description: "Accompagnement continu pour rester motivée. Programme renouvelé toutes les 6 semaines.",
+    slug: "coaching-nutrition",
+    icon: HeartPulse,
+    title: "Coaching + Nutrition",
+    price: "140€/mois",
+    tag: "POPULAIRE",
+    description: "L'accompagnement complet : sport + alimentation pour une transformation totale.",
   },
 ];
 
 const ServicesSection = () => {
+  const navigate = useNavigate();
+
   return (
     <section id="services" className="py-24 bg-gradient-dark">
       <div className="container">
@@ -46,27 +41,39 @@ const ServicesSection = () => {
           className="text-center mb-16"
         >
           <p className="text-primary font-semibold tracking-widest uppercase text-sm mb-3">Ce que je propose</p>
-          <h2 className="font-display text-5xl sm:text-6xl text-gradient-blue">MES SERVICES</h2>
+          <h2 className="font-display text-5xl sm:text-6xl text-gradient-blue">MES FORMULES</h2>
           <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
-            Un accompagnement complet et personnalisé — Emma est là, présente et impliquée dans ta transformation.
+            Choisis la formule qui te correspond — clique pour en savoir plus.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map((s, i) => (
+        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          {formules.map((f, i) => (
             <motion.div
-              key={s.title}
+              key={f.slug}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="group bg-card border border-border rounded-lg p-6 hover:border-primary/40 transition-all duration-300 hover:glow-blue"
+              onClick={() => navigate(`/services/${f.slug}`)}
+              className={`relative cursor-pointer group bg-card border rounded-xl p-8 text-center hover:border-primary/60 transition-all duration-300 hover:glow-blue hover:scale-[1.03] ${
+                f.tag ? "border-primary glow-blue" : "border-border"
+              }`}
             >
-              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                <s.icon className="text-primary" size={24} />
+              {f.tag && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-semibold px-4 py-1 rounded-full">
+                  {f.tag}
+                </span>
+              )}
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5 group-hover:bg-primary/20 transition-colors">
+                <f.icon className="text-primary" size={30} />
               </div>
-              <h3 className="font-display text-2xl mb-2 text-foreground">{s.title}</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">{s.description}</p>
+              <h3 className="font-display text-3xl text-foreground mb-2">{f.title}</h3>
+              <p className="font-display text-2xl text-gradient-blue mb-3">{f.price}</p>
+              <p className="text-muted-foreground text-sm leading-relaxed">{f.description}</p>
+              <p className="mt-5 text-primary text-sm font-semibold group-hover:underline">
+                En savoir plus →
+              </p>
             </motion.div>
           ))}
         </div>
