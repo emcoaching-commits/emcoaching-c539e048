@@ -324,6 +324,60 @@ export type Database = {
         }
         Relationships: []
       }
+      services: {
+        Row: {
+          created_at: string
+          description: string | null
+          details: string[] | null
+          icon: string | null
+          id: string
+          image_url: string | null
+          includes: string[] | null
+          intro: string | null
+          is_popular: boolean | null
+          position: number | null
+          price: string
+          slug: string
+          subtitle: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          details?: string[] | null
+          icon?: string | null
+          id?: string
+          image_url?: string | null
+          includes?: string[] | null
+          intro?: string | null
+          is_popular?: boolean | null
+          position?: number | null
+          price: string
+          slug: string
+          subtitle?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          details?: string[] | null
+          icon?: string | null
+          id?: string
+          image_url?: string | null
+          includes?: string[] | null
+          intro?: string | null
+          is_popular?: boolean | null
+          position?: number | null
+          price?: string
+          slug?: string
+          subtitle?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           key: string

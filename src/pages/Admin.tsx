@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search, Users, Settings, CalendarClock, Tag, Clock, Image, Upload } from "lucide-react";
+import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search, Users, Settings, CalendarClock, Tag, Clock, Image, Upload, Package, Edit2, Save } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -168,6 +168,21 @@ const Admin = () => {
     },
     enabled: isAdmin === true,
   });
+
+  // Services
+  const { data: adminServices } = useQuery({
+    queryKey: ["admin_services"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("services").select("*").order("position");
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin === true,
+  });
+
+  const [editingServiceId, setEditingServiceId] = useState<string | null>(null);
+  const [editService, setEditService] = useState<any>({});
+  const [uploadingServiceImg, setUploadingServiceImg] = useState(false);
 
   // Max users setting + about description
   useEffect(() => {
@@ -390,6 +405,9 @@ const Admin = () => {
             </TabsTrigger>
             <TabsTrigger value="about">
               <Image size={14} className="mr-1" /> À propos
+            </TabsTrigger>
+            <TabsTrigger value="services">
+              <Package size={14} className="mr-1" /> Services
             </TabsTrigger>
           </TabsList>
 
@@ -1111,6 +1129,145 @@ const Admin = () => {
                 <p className="text-muted-foreground text-center py-4">Aucun média ajouté</p>
               )}
             </div>
+          </TabsContent>
+
+          {/* Services tab */}
+          <TabsContent value="services" className="space-y-6">
+            <h2 className="text-foreground font-display text-xl">GESTION DES FORMULES</h2>
+            <p className="text-muted-foreground text-sm">Modifie les textes et photos de chaque formule affichée sur la page Services.</p>
+
+            {adminServices?.map((s: any) => (
+              <div key={s.id} className="bg-card border border-border rounded-lg p-6 space-y-4">
+                {editingServiceId === s.id ? (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs text-muted-foreground">Titre</label>
+                        <Input value={editService.title || ""} onChange={(e) => setEditService({ ...editService, title: e.target.value })} />
+                      </div>
+                      <div>
+                        <label className="text-xs text-muted-foreground">Prix</label>
+                        <Input value={editService.price || ""} onChange={(e) => setEditService({ ...editService, price: e.target.value })} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground">Sous-titre</label>
+                      <Input value={editService.subtitle || ""} onChange={(e) => setEditService({ ...editService, subtitle: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground">Description courte (carte)</label>
+                      <Textarea value={editService.description || ""} onChange={(e) => setEditService({ ...editService, description: e.target.value })} rows={2} />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground">Introduction (page détail)</label>
+                      <Textarea value={editService.intro || ""} onChange={(e) => setEditService({ ...editService, intro: e.target.value })} rows={3} />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground">Inclus (un par ligne)</label>
+                      <Textarea
+                        value={(editService.includes || []).join("\n")}
+                        onChange={(e) => setEditService({ ...editService, includes: e.target.value.split("\n") })}
+                        rows={4}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground">Étapes détaillées (une par ligne)</label>
+                      <Textarea
+                        value={(editService.details || []).join("\n")}
+                        onChange={(e) => setEditService({ ...editService, details: e.target.value.split("\n") })}
+                        rows={4}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground">Photo</label>
+                      <div className="flex items-center gap-3 mt-1">
+                        {editService.image_url && (
+                          <img src={editService.image_url} alt="" className="w-16 h-16 rounded object-cover" />
+                        )}
+                        <label className="cursor-pointer">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              setUploadingServiceImg(true);
+                              const fileName = `${s.slug}-${Date.now()}.${file.name.split(".").pop()}`;
+                              const { error: upErr } = await supabase.storage.from("services").upload(fileName, file);
+                              if (upErr) { toast.error("Erreur upload"); setUploadingServiceImg(false); return; }
+                              const { data: urlData } = supabase.storage.from("services").getPublicUrl(fileName);
+                              setEditService({ ...editService, image_url: urlData.publicUrl });
+                              setUploadingServiceImg(false);
+                            }}
+                          />
+                          <span className="px-3 py-1.5 bg-primary/10 text-primary rounded text-sm hover:bg-primary/20 transition-colors">
+                            {uploadingServiceImg ? "Envoi..." : "Changer la photo"}
+                          </span>
+                        </label>
+                        {editService.image_url && (
+                          <Button variant="ghost" size="sm" onClick={() => setEditService({ ...editService, image_url: null })}>
+                            <Trash2 size={14} />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="hero"
+                        size="sm"
+                        onClick={async () => {
+                          const { error } = await supabase.from("services").update({
+                            title: editService.title,
+                            price: editService.price,
+                            subtitle: editService.subtitle,
+                            description: editService.description,
+                            intro: editService.intro,
+                            includes: editService.includes?.filter((x: string) => x.trim()),
+                            details: editService.details?.filter((x: string) => x.trim()),
+                            image_url: editService.image_url,
+                          }).eq("id", s.id);
+                          if (error) toast.error("Erreur");
+                          else {
+                            toast.success("Formule mise à jour !");
+                            setEditingServiceId(null);
+                            queryClient.invalidateQueries({ queryKey: ["admin_services"] });
+                            queryClient.invalidateQueries({ queryKey: ["services"] });
+                          }
+                        }}
+                      >
+                        <Save size={14} className="mr-1" /> Enregistrer
+                      </Button>
+                      <Button variant="heroOutline" size="sm" onClick={() => setEditingServiceId(null)}>
+                        Annuler
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-start gap-4">
+                    {s.image_url && <img src={s.image_url} alt="" className="w-20 h-20 rounded-lg object-cover shrink-0" />}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-display text-2xl text-foreground">{s.title}</h3>
+                        {s.is_popular && <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">Populaire</span>}
+                      </div>
+                      <p className="text-primary font-semibold">{s.price}</p>
+                      <p className="text-muted-foreground text-sm mt-1">{s.description}</p>
+                    </div>
+                    <Button
+                      variant="heroOutline"
+                      size="sm"
+                      onClick={() => {
+                        setEditingServiceId(s.id);
+                        setEditService({ ...s });
+                      }}
+                    >
+                      <Edit2 size={14} className="mr-1" /> Modifier
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ))}
           </TabsContent>
         </Tabs>
       </div>
