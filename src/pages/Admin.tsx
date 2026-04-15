@@ -409,6 +409,9 @@ const Admin = () => {
             <TabsTrigger value="services">
               <Package size={14} className="mr-1" /> Services
             </TabsTrigger>
+            <TabsTrigger value="gcal">
+              <Calendar size={14} className="mr-1" /> Google Agenda
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="notifications" className="space-y-4">
