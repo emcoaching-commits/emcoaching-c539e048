@@ -42,7 +42,7 @@ const Admin = () => {
   const [bookForSlotId, setBookForSlotId] = useState("");
   const [aboutDesc, setAboutDesc] = useState("");
   const [aboutDescLoaded, setAboutDescLoaded] = useState(false);
-  const [uploadingMedia, setUploadingMedia] = false);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
   const [gcalConnecting, setGcalConnecting] = useState(false);
   const [gcalSyncing, setGcalSyncing] = useState(false);
 
