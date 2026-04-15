@@ -1334,6 +1334,50 @@ const Admin = () => {
               </div>
             ))}
           </TabsContent>
+
+          {/* Google Calendar */}
+          <TabsContent value="gcal" className="space-y-6">
+            <div className="bg-card border border-border rounded-xl p-6">
+              <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+                <Calendar size={20} /> Synchronisation Google Agenda
+              </h3>
+              
+              {gcalEmail ? (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Check size={16} className="text-green-500" />
+                    <span className="text-muted-foreground">
+                      Connecté à : <strong className="text-foreground">{gcalEmail}</strong>
+                    </span>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-3">
+                    <Button onClick={handleSyncGcal} disabled={gcalSyncing}>
+                      <RefreshCw size={14} className={`mr-2 ${gcalSyncing ? "animate-spin" : ""}`} />
+                      {gcalSyncing ? "Synchronisation..." : "Synchroniser maintenant"}
+                    </Button>
+                    <Button variant="outline" onClick={handleConnectGcal} disabled={gcalConnecting}>
+                      Changer de compte
+                    </Button>
+                  </div>
+                  
+                  <p className="text-xs text-muted-foreground">
+                    La synchronisation enverra tous les créneaux disponibles et réservations futures vers votre Google Agenda.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-muted-foreground text-sm">
+                    Connectez votre compte Google pour synchroniser automatiquement vos créneaux et réservations avec Google Agenda.
+                  </p>
+                  <Button onClick={handleConnectGcal} disabled={gcalConnecting}>
+                    <Calendar size={14} className="mr-2" />
+                    {gcalConnecting ? "Connexion..." : "Connecter Google Agenda"}
+                  </Button>
+                </div>
+              )}
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
     </div>
