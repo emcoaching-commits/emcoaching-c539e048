@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search, Users, Settings, CalendarClock, Tag, Clock, Image, Upload, Package, Edit2, Save } from "lucide-react";
+import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search, Users, Settings, CalendarClock, Tag, Clock, Image, Upload, Package, Edit2, Save, Calendar } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -43,6 +43,8 @@ const Admin = () => {
   const [aboutDesc, setAboutDesc] = useState("");
   const [aboutDescLoaded, setAboutDescLoaded] = useState(false);
   const [uploadingMedia, setUploadingMedia] = useState(false);
+  const [gcalConnecting, setGcalConnecting] = useState(false);
+  const [gcalSyncing, setGcalSyncing] = useState(false);
 
   useEffect(() => {
     const check = async () => {
@@ -284,6 +286,66 @@ const Admin = () => {
     setSendingMsg(false);
   };
 
+  // Google Calendar connection status
+  const { data: gcalEmail } = useQuery({
+    queryKey: ["gcal_email"],
+    queryFn: async () => {
+      const { data } = await supabase.from("site_settings").select("value").eq("key", "google_calendar_email").single();
+      return data?.value || null;
+    },
+    enabled: isAdmin === true,
+  });
+
+  // Handle gcal callback params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const gcalStatus = params.get("gcal");
+    if (gcalStatus === "success") {
+      toast.success("Google Agenda connecté avec succès !");
+      queryClient.invalidateQueries({ queryKey: ["gcal_email"] });
+      window.history.replaceState({}, "", "/admin");
+    } else if (gcalStatus === "error") {
+      toast.error("Erreur de connexion à Google Agenda : " + (params.get("reason") || "inconnue"));
+      window.history.replaceState({}, "", "/admin");
+    }
+  }, [queryClient]);
+
+  const handleConnectGcal = async () => {
+    setGcalConnecting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await supabase.functions.invoke("google-calendar-auth", {
+        body: { origin: window.location.origin },
+      });
+      if (res.data?.url) {
+        window.location.href = res.data.url;
+      } else {
+        toast.error(res.data?.error || "Erreur");
+      }
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setGcalConnecting(false);
+    }
+  };
+
+  const handleSyncGcal = async () => {
+    setGcalSyncing(true);
+    try {
+      const res = await supabase.functions.invoke("sync-google-calendar", {
+        body: { action: "sync_all" },
+      });
+      if (res.data?.success) {
+        toast.success(`${res.data.created} événement(s) synchronisé(s) !`);
+      } else {
+        toast.error(res.data?.error || "Erreur de synchronisation");
+      }
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setGcalSyncing(false);
+    }
+  };
 
     const toggleReview = async (id: string, approved: boolean) => {
     queryClient.invalidateQueries({ queryKey: ["admin_reviews"] });
@@ -408,6 +470,9 @@ const Admin = () => {
             </TabsTrigger>
             <TabsTrigger value="services">
               <Package size={14} className="mr-1" /> Services
+            </TabsTrigger>
+            <TabsTrigger value="gcal">
+              <Calendar size={14} className="mr-1" /> Google Agenda
             </TabsTrigger>
           </TabsList>
 
@@ -1268,6 +1333,50 @@ const Admin = () => {
                 )}
               </div>
             ))}
+          </TabsContent>
+
+          {/* Google Calendar */}
+          <TabsContent value="gcal" className="space-y-6">
+            <div className="bg-card border border-border rounded-xl p-6">
+              <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+                <Calendar size={20} /> Synchronisation Google Agenda
+              </h3>
+              
+              {gcalEmail ? (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Check size={16} className="text-green-500" />
+                    <span className="text-muted-foreground">
+                      Connecté à : <strong className="text-foreground">{gcalEmail}</strong>
+                    </span>
+                  </div>
+                  
+                  <div className="flex flex-wrap gap-3">
+                    <Button onClick={handleSyncGcal} disabled={gcalSyncing}>
+                      <RefreshCw size={14} className={`mr-2 ${gcalSyncing ? "animate-spin" : ""}`} />
+                      {gcalSyncing ? "Synchronisation..." : "Synchroniser maintenant"}
+                    </Button>
+                    <Button variant="outline" onClick={handleConnectGcal} disabled={gcalConnecting}>
+                      Changer de compte
+                    </Button>
+                  </div>
+                  
+                  <p className="text-xs text-muted-foreground">
+                    La synchronisation enverra tous les créneaux disponibles et réservations futures vers votre Google Agenda.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-muted-foreground text-sm">
+                    Connectez votre compte Google pour synchroniser automatiquement vos créneaux et réservations avec Google Agenda.
+                  </p>
+                  <Button onClick={handleConnectGcal} disabled={gcalConnecting}>
+                    <Calendar size={14} className="mr-2" />
+                    {gcalConnecting ? "Connexion..." : "Connecter Google Agenda"}
+                  </Button>
+                </div>
+              )}
+            </div>
           </TabsContent>
         </Tabs>
       </div>
