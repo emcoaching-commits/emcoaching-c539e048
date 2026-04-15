@@ -286,6 +286,66 @@ const Admin = () => {
     setSendingMsg(false);
   };
 
+  // Google Calendar connection status
+  const { data: gcalEmail } = useQuery({
+    queryKey: ["gcal_email"],
+    queryFn: async () => {
+      const { data } = await supabase.from("site_settings").select("value").eq("key", "google_calendar_email").single();
+      return data?.value || null;
+    },
+    enabled: isAdmin === true,
+  });
+
+  // Handle gcal callback params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const gcalStatus = params.get("gcal");
+    if (gcalStatus === "success") {
+      toast.success("Google Agenda connecté avec succès !");
+      queryClient.invalidateQueries({ queryKey: ["gcal_email"] });
+      window.history.replaceState({}, "", "/admin");
+    } else if (gcalStatus === "error") {
+      toast.error("Erreur de connexion à Google Agenda : " + (params.get("reason") || "inconnue"));
+      window.history.replaceState({}, "", "/admin");
+    }
+  }, [queryClient]);
+
+  const handleConnectGcal = async () => {
+    setGcalConnecting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await supabase.functions.invoke("google-calendar-auth", {
+        body: { origin: window.location.origin },
+      });
+      if (res.data?.url) {
+        window.location.href = res.data.url;
+      } else {
+        toast.error(res.data?.error || "Erreur");
+      }
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setGcalConnecting(false);
+    }
+  };
+
+  const handleSyncGcal = async () => {
+    setGcalSyncing(true);
+    try {
+      const res = await supabase.functions.invoke("sync-google-calendar", {
+        body: { action: "sync_all" },
+      });
+      if (res.data?.success) {
+        toast.success(`${res.data.created} événement(s) synchronisé(s) !`);
+      } else {
+        toast.error(res.data?.error || "Erreur de synchronisation");
+      }
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setGcalSyncing(false);
+    }
+  };
 
     const toggleReview = async (id: string, approved: boolean) => {
     queryClient.invalidateQueries({ queryKey: ["admin_reviews"] });
