@@ -54,9 +54,20 @@ const Admin = () => {
       if (!data || data.length === 0) { navigate("/"); toast.error("Accès refusé"); return; }
       setIsAdmin(true);
       setCurrentUserId(user.id);
+
+      // Auto-clean past slots & bookings
+      const today = new Date().toISOString().split("T")[0];
+      const { data: pastSlots } = await supabase.from("time_slots").select("id").lt("date", today);
+      const pastIds = (pastSlots || []).map((s: any) => s.id);
+      if (pastIds.length > 0) {
+        await supabase.from("bookings").delete().in("time_slot_id", pastIds);
+        await supabase.from("time_slots").delete().in("id", pastIds);
+        queryClient.invalidateQueries({ queryKey: ["admin_slots"] });
+        queryClient.invalidateQueries({ queryKey: ["admin_bookings"] });
+      }
     };
     check();
-  }, [navigate]);
+  }, [navigate, queryClient]);
 
   // Reviews
   const { data: reviews } = useQuery({
