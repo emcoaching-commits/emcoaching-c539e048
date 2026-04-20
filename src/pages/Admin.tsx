@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
+import PaypalLinksManager from "@/components/admin/PaypalLinksManager";
 
 const Admin = () => {
   const navigate = useNavigate();
