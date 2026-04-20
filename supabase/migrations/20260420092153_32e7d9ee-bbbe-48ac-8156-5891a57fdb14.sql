@@ -1,0 +1,1 @@
+ALTER TABLE public.pricing_plans ADD COLUMN IF NOT EXISTS paypal_url text;

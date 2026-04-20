@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
+import PaypalLinksManager from "@/components/admin/PaypalLinksManager";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -523,6 +524,9 @@ const Admin = () => {
             </TabsTrigger>
             <TabsTrigger value="gcal">
               <Calendar size={14} className="mr-1" /> Google Agenda
+            </TabsTrigger>
+            <TabsTrigger value="formules">
+              <Tag size={14} className="mr-1" /> Formules PayPal
             </TabsTrigger>
           </TabsList>
 
@@ -1426,6 +1430,19 @@ const Admin = () => {
                   </Button>
                 </div>
               )}
+            </div>
+          </TabsContent>
+
+          {/* Formules PayPal */}
+          <TabsContent value="formules" className="space-y-6">
+            <div className="bg-card border border-border rounded-xl p-6">
+              <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                <Tag size={20} /> Liens PayPal des formules
+              </h3>
+              <p className="text-muted-foreground text-sm mb-6">
+                Colle ici le lien d'abonnement récurrent PayPal pour chaque formule. Quand un client cliquera sur "Prendre cette formule", il sera redirigé vers ce lien.
+              </p>
+              <PaypalLinksManager />
             </div>
           </TabsContent>
         </Tabs>
