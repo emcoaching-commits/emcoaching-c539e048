@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const navLinks = [
   { label: "Accueil", to: "/" },
@@ -21,6 +22,9 @@ const Navbar = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { data: settings } = useSiteSettings();
+  const logoUrl = settings?.site_logo_url || "/logo.png";
+  const brandName = settings?.site_brand_name || "EM' COACHING";
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -52,8 +56,8 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
       <div className="container flex items-center justify-between h-16">
         <Link to="/" className="flex items-center gap-2">
-          <img src="/logo.png" alt="Em' Coaching" className="h-10 w-10 rounded-full object-cover" />
-          <span className="font-display text-2xl text-gradient-blue">EM' COACHING</span>
+          <img src={logoUrl} alt={brandName} className="h-10 w-10 rounded-full object-cover" />
+          <span className="font-display text-2xl text-gradient-blue">{brandName}</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-5">
