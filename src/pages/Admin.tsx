@@ -314,13 +314,32 @@ const Admin = () => {
     setGcalConnecting(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      const res = await supabase.functions.invoke("google-calendar-auth", {
-        body: { origin: window.location.origin },
+      if (!session?.access_token) {
+        toast.error("Session admin expirée, reconnectez-vous.");
+        return;
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/google-calendar-auth`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+        body: JSON.stringify({ origin: window.location.origin }),
       });
-      if (res.data?.url) {
-        window.location.href = res.data.url;
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        toast.error(data?.error || "Accès Google Agenda refusé");
+        return;
+      }
+
+      if (data?.url) {
+        window.location.href = data.url;
       } else {
-        toast.error(res.data?.error || "Erreur");
+        toast.error("Lien Google Agenda introuvable");
       }
     } catch (e: any) {
       toast.error(e.message);
@@ -332,13 +351,33 @@ const Admin = () => {
   const handleSyncGcal = async () => {
     setGcalSyncing(true);
     try {
-      const res = await supabase.functions.invoke("sync-google-calendar", {
-        body: { action: "sync_all" },
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast.error("Session admin expirée, reconnectez-vous.");
+        return;
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sync-google-calendar`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+        body: JSON.stringify({ action: "sync_all" }),
       });
-      if (res.data?.success) {
-        toast.success(`${res.data.created} événement(s) synchronisé(s) !`);
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        toast.error(data?.error || "Erreur de synchronisation");
+        return;
+      }
+
+      if (data?.success) {
+        toast.success(`${data.created} événement(s) synchronisé(s) !`);
       } else {
-        toast.error(res.data?.error || "Erreur de synchronisation");
+        toast.error(data?.error || "Erreur de synchronisation");
       }
     } catch (e: any) {
       toast.error(e.message);
