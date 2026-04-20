@@ -92,9 +92,20 @@ const PricingSection = () => {
                   variant={plan.is_popular ? "hero" : "heroOutline"}
                   size="lg"
                   className="w-full"
-                  onClick={() => navigate("/auth")}
+                  onClick={async () => {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (!user) {
+                      navigate("/auth");
+                      return;
+                    }
+                    if ((plan as any).paypal_url) {
+                      window.open((plan as any).paypal_url, "_blank");
+                    } else {
+                      navigate("/auth");
+                    }
+                  }}
                 >
-                  Choisir cette formule
+                  Prendre cette formule
                 </Button>
               </motion.div>
             );
