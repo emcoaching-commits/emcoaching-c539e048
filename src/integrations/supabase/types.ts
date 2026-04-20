@@ -179,6 +179,7 @@ export type Database = {
           id: string
           is_popular: boolean | null
           name: string
+          paypal_url: string | null
           price: number
           sessions_count: number
         }
@@ -189,6 +190,7 @@ export type Database = {
           id?: string
           is_popular?: boolean | null
           name: string
+          paypal_url?: string | null
           price: number
           sessions_count?: number
         }
@@ -199,6 +201,7 @@ export type Database = {
           id?: string
           is_popular?: boolean | null
           name?: string
+          paypal_url?: string | null
           price?: number
           sessions_count?: number
         }
