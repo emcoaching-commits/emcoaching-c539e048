@@ -2,3 +2,6 @@ project_id = "gsjdinlrcbugkngvtpou"
 
 [functions.google-calendar-callback]
 verify_jwt = false
+
+[functions.sync-booking-to-calendar]
+verify_jwt = false
