@@ -1449,6 +1449,19 @@ const Admin = () => {
               <PaypalLinksManager />
             </div>
           </TabsContent>
+
+          {/* Accueil & Logo */}
+          <TabsContent value="home" className="space-y-6">
+            <div className="bg-card border border-border rounded-xl p-6">
+              <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                <Image size={20} /> Page d'accueil & Logo
+              </h3>
+              <p className="text-muted-foreground text-sm mb-6">
+                Modifie les textes de la page d'accueil, le nom de la marque et les logos.
+              </p>
+              <HomeContentManager />
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
     </div>
