@@ -12,6 +12,7 @@ import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import PaypalLinksManager from "@/components/admin/PaypalLinksManager";
+import HomeContentManager from "@/components/admin/HomeContentManager";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -527,6 +528,9 @@ const Admin = () => {
             </TabsTrigger>
             <TabsTrigger value="formules">
               <Tag size={14} className="mr-1" /> Formules PayPal
+            </TabsTrigger>
+            <TabsTrigger value="home">
+              <Image size={14} className="mr-1" /> Accueil & Logo
             </TabsTrigger>
           </TabsList>
 
