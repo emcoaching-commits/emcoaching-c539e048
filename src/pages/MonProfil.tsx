@@ -10,7 +10,6 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Sparkles as SparklesIcon } from "lucide-react";
 
 const MonProfil = () => {
   const navigate = useNavigate();
@@ -40,6 +39,8 @@ const MonProfil = () => {
   const [rescheduleBookingId, setRescheduleBookingId] = useState<string | null>(null);
   const [rescheduleSlotId, setRescheduleSlotId] = useState("");
   const [availableSlots, setAvailableSlots] = useState<any[]>([]);
+  const [assignedPlan, setAssignedPlan] = useState<any>(null);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
   const msgBottomRef = useRef<HTMLDivElement>(null);
   const messagerieRef = useRef<HTMLDivElement>(null);
 
