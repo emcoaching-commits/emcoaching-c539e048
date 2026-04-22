@@ -195,6 +195,17 @@ const Admin = () => {
     enabled: isAdmin === true,
   });
 
+  // Pricing plans (pour assigner formule à un client)
+  const { data: pricingPlans } = useQuery({
+    queryKey: ["admin_pricing_plans"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("pricing_plans").select("*").order("price");
+      if (error) throw error;
+      return data;
+    },
+    enabled: isAdmin === true,
+  });
+
   const [editingServiceId, setEditingServiceId] = useState<string | null>(null);
   const [editService, setEditService] = useState<any>({});
   const [uploadingServiceImg, setUploadingServiceImg] = useState(false);
@@ -521,7 +532,7 @@ const Admin = () => {
               <Image size={14} className="mr-1" /> À propos
             </TabsTrigger>
             <TabsTrigger value="services">
-              <Package size={14} className="mr-1" /> Services
+              <Package size={14} className="mr-1" /> Formules
             </TabsTrigger>
             <TabsTrigger value="gcal">
               <Calendar size={14} className="mr-1" /> Google Agenda
