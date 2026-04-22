@@ -9,6 +9,7 @@ import { ClipboardList, User, MapPin, Phone, Ruler, Weight, Calendar, ArrowLeft,
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const MonProfil = () => {
   const navigate = useNavigate();
@@ -38,6 +39,8 @@ const MonProfil = () => {
   const [rescheduleBookingId, setRescheduleBookingId] = useState<string | null>(null);
   const [rescheduleSlotId, setRescheduleSlotId] = useState("");
   const [availableSlots, setAvailableSlots] = useState<any[]>([]);
+  const [assignedPlan, setAssignedPlan] = useState<any>(null);
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
   const msgBottomRef = useRef<HTMLDivElement>(null);
   const messagerieRef = useRef<HTMLDivElement>(null);
 
@@ -71,6 +74,25 @@ const MonProfil = () => {
         if (data.avatar_url) {
           const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(data.avatar_url, 3600);
           if (signed?.signedUrl) setAvatarSignedUrl(signed.signedUrl);
+        }
+        // Load assigned plan + pop-up logic
+        if ((data as any).assigned_plan_id) {
+          const { data: plan } = await supabase
+            .from("pricing_plans")
+            .select("*")
+            .eq("id", (data as any).assigned_plan_id)
+            .single();
+          if (plan) setAssignedPlan(plan);
+        }
+        // Pop-up bienvenue : visible 7 jours après activation, sauf si fermé manuellement
+        const activatedAt = (data as any).subscription_activated_at;
+        const dismissed = (data as any).welcome_popup_dismissed;
+        if (activatedAt && !dismissed) {
+          const ageMs = Date.now() - new Date(activatedAt).getTime();
+          const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+          if (ageMs <= sevenDaysMs) {
+            setShowWelcomePopup(true);
+          }
         }
       } else {
         setEditing(true);
@@ -188,6 +210,13 @@ const MonProfil = () => {
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const dismissWelcomePopup = async () => {
+    setShowWelcomePopup(false);
+    if (userId) {
+      await supabase.from("profiles").update({ welcome_popup_dismissed: true }).eq("user_id", userId);
+    }
+  };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -342,9 +371,16 @@ const MonProfil = () => {
               <div className="flex items-center gap-3 mb-2">
                 <div className={`w-3 h-3 rounded-full ${profile?.has_active_subscription ? "bg-green-500 animate-pulse" : "bg-muted-foreground"}`} />
                 <span className="text-foreground font-medium text-sm">
-                  {profile?.has_active_subscription ? "Abonnement actif" : "Pas d'abonnement"}
+                  {profile?.has_active_subscription
+                    ? assignedPlan ? `Formule : ${assignedPlan.name}` : "Abonnement actif"
+                    : "Pas d'abonnement"}
                 </span>
               </div>
+              {profile?.has_active_subscription && assignedPlan && (
+                <p className="text-muted-foreground text-xs mt-1">
+                  {assignedPlan.price}€ — {assignedPlan.description || ""}
+                </p>
+              )}
               {!profile?.has_active_subscription && (
                 <p className="text-muted-foreground text-xs">Contacte Emma pour souscrire à une formule.</p>
               )}
@@ -929,6 +965,42 @@ const MonProfil = () => {
           </motion.div>
         </div>
       </div>
+
+      {/* Pop-up de bienvenue (7 jours après activation par Emma) */}
+      <Dialog open={showWelcomePopup} onOpenChange={(open) => { if (!open) dismissWelcomePopup(); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display text-2xl text-gradient-blue flex items-center gap-2">
+              <Sparkles size={22} className="text-primary" /> Bienvenue {firstName ? firstName : ""} !
+            </DialogTitle>
+            <DialogDescription className="text-foreground text-sm pt-2 leading-relaxed">
+              {assignedPlan && (
+                <span className="block mb-3 font-medium text-primary">
+                  Ta formule : {assignedPlan.name} ({assignedPlan.price}€)
+                </span>
+              )}
+              Emma va te contacter le plus rapidement possible. En attendant, prends quelques minutes pour remplir ton{" "}
+              <Link to="/questionnaire" className="text-primary font-semibold underline hover:opacity-80">
+                questionnaire de découverte
+              </Link>{" "}
+              soigneusement — ça aidera Emma à te préparer un programme parfait pour toi 💪
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col sm:flex-row gap-2 pt-2">
+            <Button
+              variant="hero"
+              size="lg"
+              className="flex-1"
+              onClick={() => { dismissWelcomePopup(); navigate("/questionnaire"); }}
+            >
+              <ClipboardList size={18} className="mr-2" /> Remplir le questionnaire
+            </Button>
+            <Button variant="heroOutline" size="lg" onClick={dismissWelcomePopup}>
+              Plus tard
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
