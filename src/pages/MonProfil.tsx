@@ -75,6 +75,25 @@ const MonProfil = () => {
           const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(data.avatar_url, 3600);
           if (signed?.signedUrl) setAvatarSignedUrl(signed.signedUrl);
         }
+        // Load assigned plan + pop-up logic
+        if ((data as any).assigned_plan_id) {
+          const { data: plan } = await supabase
+            .from("pricing_plans")
+            .select("*")
+            .eq("id", (data as any).assigned_plan_id)
+            .single();
+          if (plan) setAssignedPlan(plan);
+        }
+        // Pop-up bienvenue : visible 7 jours après activation, sauf si fermé manuellement
+        const activatedAt = (data as any).subscription_activated_at;
+        const dismissed = (data as any).welcome_popup_dismissed;
+        if (activatedAt && !dismissed) {
+          const ageMs = Date.now() - new Date(activatedAt).getTime();
+          const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+          if (ageMs <= sevenDaysMs) {
+            setShowWelcomePopup(true);
+          }
+        }
       } else {
         setEditing(true);
       }
