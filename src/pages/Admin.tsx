@@ -926,17 +926,35 @@ const Admin = () => {
                     {c.full_name || "Sans nom"} — Inscrit le {format(new Date(c.created_at), "dd/MM/yyyy")}
                   </p>
                   <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant={c.has_active_subscription ? "hero" : "heroOutline"}
-                      onClick={async () => {
-                        await supabase.from("profiles").update({ has_active_subscription: !c.has_active_subscription }).eq("id", c.id);
+                    <select
+                      className="h-9 rounded-md border border-border bg-background text-foreground text-xs px-2"
+                      value={c.assigned_plan_id || ""}
+                      onChange={async (e) => {
+                        const planId = e.target.value || null;
+                        const updates: any = {
+                          assigned_plan_id: planId,
+                          has_active_subscription: !!planId,
+                        };
+                        // Si on assigne une formule (et qu'aucune date n'existe), on déclenche le pop-up
+                        if (planId && !c.subscription_activated_at) {
+                          updates.subscription_activated_at = new Date().toISOString();
+                          updates.welcome_popup_dismissed = false;
+                        }
+                        // Si on retire la formule, on remet à zéro
+                        if (!planId) {
+                          updates.subscription_activated_at = null;
+                        }
+                        const { error } = await supabase.from("profiles").update(updates).eq("id", c.id);
+                        if (error) { toast.error("Erreur"); return; }
                         queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
-                        toast.success(c.has_active_subscription ? "Abonnement désactivé" : "Abonnement activé");
+                        toast.success(planId ? "Formule attribuée ✅" : "Formule retirée");
                       }}
                     >
-                      {c.has_active_subscription ? "✅ Abonné" : "❌ Non abonné"}
-                    </Button>
+                      <option value="">❌ Aucune formule</option>
+                      {pricingPlans?.map((p: any) => (
+                        <option key={p.id} value={p.id}>✅ {p.name} — {p.price}€</option>
+                      ))}
+                    </select>
                     <Button
                       size="sm"
                       variant="heroOutline"
