@@ -211,6 +211,13 @@ const MonProfil = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const dismissWelcomePopup = async () => {
+    setShowWelcomePopup(false);
+    if (userId) {
+      await supabase.from("profiles").update({ welcome_popup_dismissed: true }).eq("user_id", userId);
+    }
+  };
+
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !userId) return;
@@ -364,9 +371,16 @@ const MonProfil = () => {
               <div className="flex items-center gap-3 mb-2">
                 <div className={`w-3 h-3 rounded-full ${profile?.has_active_subscription ? "bg-green-500 animate-pulse" : "bg-muted-foreground"}`} />
                 <span className="text-foreground font-medium text-sm">
-                  {profile?.has_active_subscription ? "Abonnement actif" : "Pas d'abonnement"}
+                  {profile?.has_active_subscription
+                    ? assignedPlan ? `Formule : ${assignedPlan.name}` : "Abonnement actif"
+                    : "Pas d'abonnement"}
                 </span>
               </div>
+              {profile?.has_active_subscription && assignedPlan && (
+                <p className="text-muted-foreground text-xs mt-1">
+                  {assignedPlan.price}€ — {assignedPlan.description || ""}
+                </p>
+              )}
               {!profile?.has_active_subscription && (
                 <p className="text-muted-foreground text-xs">Contacte Emma pour souscrire à une formule.</p>
               )}
