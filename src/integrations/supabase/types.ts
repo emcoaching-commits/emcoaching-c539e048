@@ -210,6 +210,7 @@ export type Database = {
       profiles: {
         Row: {
           age: number | null
+          assigned_plan_id: string | null
           avatar_url: string | null
           city: string | null
           created_at: string
@@ -221,13 +222,16 @@ export type Database = {
           id: string
           next_payment_date: string | null
           phone: string | null
+          subscription_activated_at: string | null
           subscription_start_date: string | null
           updated_at: string
           user_id: string
           weight: number | null
+          welcome_popup_dismissed: boolean
         }
         Insert: {
           age?: number | null
+          assigned_plan_id?: string | null
           avatar_url?: string | null
           city?: string | null
           created_at?: string
@@ -239,13 +243,16 @@ export type Database = {
           id?: string
           next_payment_date?: string | null
           phone?: string | null
+          subscription_activated_at?: string | null
           subscription_start_date?: string | null
           updated_at?: string
           user_id: string
           weight?: number | null
+          welcome_popup_dismissed?: boolean
         }
         Update: {
           age?: number | null
+          assigned_plan_id?: string | null
           avatar_url?: string | null
           city?: string | null
           created_at?: string
@@ -257,12 +264,22 @@ export type Database = {
           id?: string
           next_payment_date?: string | null
           phone?: string | null
+          subscription_activated_at?: string | null
           subscription_start_date?: string | null
           updated_at?: string
           user_id?: string
           weight?: number | null
+          welcome_popup_dismissed?: boolean
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_assigned_plan_id_fkey"
+            columns: ["assigned_plan_id"]
+            isOneToOne: false
+            referencedRelation: "pricing_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       questionnaire_responses: {
         Row: {
