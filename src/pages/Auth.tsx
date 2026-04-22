@@ -87,7 +87,12 @@ const Auth = () => {
         if (data.user && avatarFile) {
           await uploadAvatar(data.user.id);
         }
-        toast.success("Inscription réussie ! Vérifie ton email pour confirmer.");
+        // Auto-login après inscription (auto-confirm activé)
+        if (!data.session) {
+          await supabase.auth.signInWithPassword({ email, password });
+        }
+        toast.success("Inscription réussie ! Bienvenue 💪");
+        navigate("/mon-profil");
       }
     }
     setLoading(false);
@@ -213,7 +218,7 @@ const Auth = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="bg-background border-border"
-              minLength={6}
+              minLength={4}
               required
             />
             {isLogin && (
