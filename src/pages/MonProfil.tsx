@@ -965,6 +965,42 @@ const MonProfil = () => {
           </motion.div>
         </div>
       </div>
+
+      {/* Pop-up de bienvenue (7 jours après activation par Emma) */}
+      <Dialog open={showWelcomePopup} onOpenChange={(open) => { if (!open) dismissWelcomePopup(); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display text-2xl text-gradient-blue flex items-center gap-2">
+              <Sparkles size={22} className="text-primary" /> Bienvenue {firstName ? firstName : ""} !
+            </DialogTitle>
+            <DialogDescription className="text-foreground text-sm pt-2 leading-relaxed">
+              {assignedPlan && (
+                <span className="block mb-3 font-medium text-primary">
+                  Ta formule : {assignedPlan.name} ({assignedPlan.price}€)
+                </span>
+              )}
+              Emma va te contacter le plus rapidement possible. En attendant, prends quelques minutes pour remplir ton{" "}
+              <Link to="/questionnaire" className="text-primary font-semibold underline hover:opacity-80">
+                questionnaire de découverte
+              </Link>{" "}
+              soigneusement — ça aidera Emma à te préparer un programme parfait pour toi 💪
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col sm:flex-row gap-2 pt-2">
+            <Button
+              variant="hero"
+              size="lg"
+              className="flex-1"
+              onClick={() => { dismissWelcomePopup(); navigate("/questionnaire"); }}
+            >
+              <ClipboardList size={18} className="mr-2" /> Remplir le questionnaire
+            </Button>
+            <Button variant="heroOutline" size="lg" onClick={dismissWelcomePopup}>
+              Plus tard
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
