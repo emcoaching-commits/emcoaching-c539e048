@@ -4,6 +4,7 @@ import { Check, RefreshCw } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const sessionDetails: Record<string, string> = {
   "Nutrition": "Plan nutritionnel 100% en ligne",
@@ -93,15 +94,10 @@ const PricingSection = () => {
                   size="lg"
                   className="w-full"
                   onClick={async () => {
-                    const { data: { user } } = await supabase.auth.getUser();
-                    if (!user) {
-                      navigate("/auth");
-                      return;
-                    }
                     if ((plan as any).paypal_url) {
-                      window.open((plan as any).paypal_url, "_blank");
+                      window.open((plan as any).paypal_url, "_blank", "noopener,noreferrer");
                     } else {
-                      navigate("/auth");
+                      toast.error("Lien de paiement indisponible. Contacte Emma.");
                     }
                   }}
                 >

@@ -9,7 +9,7 @@ import { useSiteSettings } from "@/hooks/useSiteSettings";
 const navLinks = [
   { label: "Accueil", to: "/" },
   { label: "Qui je suis", to: "/a-propos" },
-  { label: "Services", to: "/services" },
+  { label: "Formules", to: "/services" },
   { label: "Tarifs", to: "/tarifs" },
   { label: "Planning", to: "/planning" },
   { label: "Avis", to: "/avis" },
