@@ -35,7 +35,7 @@ const ServiceDetail = () => {
         <Navbar />
         <div className="pt-32 text-center container">
           <h1 className="font-display text-4xl text-foreground mb-4">Service introuvable</h1>
-          <Button variant="hero" onClick={() => navigate("/services")}>Retour aux services</Button>
+          <Button variant="hero" onClick={() => navigate("/services")}>Retour aux formules</Button>
         </div>
         <Footer />
       </div>
@@ -48,7 +48,7 @@ const ServiceDetail = () => {
       <div className="pt-24 pb-16">
         <div className="container max-w-3xl">
           <Button variant="ghost" className="mb-8 text-muted-foreground hover:text-foreground" onClick={() => navigate("/services")}>
-            <ArrowLeft size={16} className="mr-2" /> Retour aux services
+            <ArrowLeft size={16} className="mr-2" /> Retour aux formules
           </Button>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
