@@ -9,6 +9,8 @@ import { ClipboardList, User, MapPin, Phone, Ruler, Weight, Calendar, ArrowLeft,
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Sparkles as SparklesIcon } from "lucide-react";
 
 const MonProfil = () => {
   const navigate = useNavigate();
