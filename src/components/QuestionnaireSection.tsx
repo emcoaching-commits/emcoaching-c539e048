@@ -1,8 +1,10 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ClipboardList, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const QuestionnaireSection = () => {
+  const navigate = useNavigate();
   return (
     <section id="questionnaire" className="py-24 bg-gradient-dark">
       <div className="container max-w-3xl">
@@ -33,7 +35,7 @@ const QuestionnaireSection = () => {
               variant="hero"
               size="lg"
               className="text-lg px-8 py-6"
-              onClick={() => window.open("https://forms.gle/uDqAWm3HbfXEgees7", "_blank")}
+              onClick={() => navigate("/questionnaire")}
             >
               Remplir le questionnaire <ChevronRight size={18} className="ml-1" />
             </Button>
