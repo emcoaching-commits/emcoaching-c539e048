@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const ReviewsSection = () => {
   const [rating, setRating] = useState(5);
@@ -14,16 +15,45 @@ const ReviewsSection = () => {
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
+  // Affiche uniquement les avis "mis en avant" par Emma (max 6, grille 2x3)
   const { data: reviews } = useQuery({
-    queryKey: ["reviews"],
+    queryKey: ["featured_reviews"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("reviews")
-        .select("*, profiles(full_name)")
+        .select("*")
+        .eq("is_featured", true)
+        .eq("is_approved", true)
         .order("created_at", { ascending: false })
         .limit(6);
       if (error) throw error;
-      return data;
+      // Récupère noms + avatars en une fois
+      const userIds = [...new Set((data || []).map((r: any) => r.user_id))];
+      let profMap: Record<string, { full_name: string | null; avatar_url: string | null }> = {};
+      if (userIds.length > 0) {
+        const { data: profs } = await supabase
+          .from("profiles")
+          .select("user_id, full_name, avatar_url")
+          .in("user_id", userIds);
+        profMap = Object.fromEntries(
+          (profs || []).map((p: any) => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url }]),
+        );
+      }
+      // Avatars privés -> URL signée
+      const enriched = await Promise.all(
+        (data || []).map(async (r: any) => {
+          const prof = profMap[r.user_id];
+          let signedAvatar: string | null = null;
+          if (prof?.avatar_url) {
+            const { data: s } = await supabase.storage
+              .from("avatars")
+              .createSignedUrl(prof.avatar_url, 3600);
+            signedAvatar = s?.signedUrl || null;
+          }
+          return { ...r, full_name: prof?.full_name || "Cliente", avatar_signed_url: signedAvatar };
+        }),
+      );
+      return enriched;
     },
   });
 
@@ -65,34 +95,56 @@ const ReviewsSection = () => {
           <h2 className="font-display text-5xl sm:text-6xl text-gradient-blue">AVIS CLIENTS</h2>
         </motion.div>
 
-        {/* Reviews grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
-          {reviews?.map((review, i) => (
-            <motion.div
-              key={review.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.1 }}
-              className="bg-card border border-border rounded-lg p-6"
-            >
-              <div className="flex gap-1 mb-3">
-                {Array.from({ length: 5 }).map((_, idx) => (
-                  <Star
-                    key={idx}
-                    size={16}
-                    className={idx < review.rating ? "text-primary fill-primary" : "text-muted-foreground"}
-                  />
-                ))}
-              </div>
-              <p className="text-muted-foreground text-sm leading-relaxed mb-4">"{review.comment}"</p>
-              <p className="text-foreground text-sm font-medium">
-                {(review.profiles as any)?.full_name || "Client"}
-              </p>
-            </motion.div>
-          ))}
+        {/* Reviews grid : 2 lignes × 3 colonnes (max 6) */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16 max-w-6xl mx-auto">
+          {reviews?.map((review: any, i: number) => {
+            const initials = review.full_name
+              ?.split(" ")
+              .map((n: string) => n[0])
+              .join("")
+              .toUpperCase()
+              .slice(0, 2) || "?";
+            return (
+              <motion.div
+                key={review.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
+                className="bg-card border border-border rounded-lg p-6 flex flex-col"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <Avatar className="w-12 h-12">
+                    {review.avatar_signed_url && (
+                      <AvatarImage src={review.avatar_signed_url} alt={review.full_name} />
+                    )}
+                    <AvatarFallback className="bg-primary/20 text-primary font-semibold">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <p className="text-foreground text-sm font-medium">{review.full_name}</p>
+                    <div className="flex gap-0.5 mt-1">
+                      {Array.from({ length: 5 }).map((_, idx) => (
+                        <Star
+                          key={idx}
+                          size={14}
+                          className={idx < review.rating ? "text-primary fill-primary" : "text-muted-foreground"}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-muted-foreground text-sm leading-relaxed italic">
+                  «&nbsp;{review.comment}&nbsp;»
+                </p>
+              </motion.div>
+            );
+          })}
           {(!reviews || reviews.length === 0) && (
-            <p className="text-muted-foreground col-span-full text-center">Aucun avis pour le moment. Sois le premier !</p>
+            <p className="text-muted-foreground col-span-full text-center">
+              Les premiers avis arrivent bientôt !
+            </p>
           )}
         </div>
 
