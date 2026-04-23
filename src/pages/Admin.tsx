@@ -11,8 +11,9 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import PaypalLinksManager from "@/components/admin/PaypalLinksManager";
 import HomeContentManager from "@/components/admin/HomeContentManager";
+import PricingPlansManager from "@/components/admin/PricingPlansManager";
+import RecurringSlotsForm from "@/components/admin/RecurringSlotsForm";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -600,8 +601,41 @@ const Admin = () => {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <Button size="sm" variant={r.is_approved ? "heroOutline" : "hero"} onClick={() => toggleReview(r.id, !r.is_approved)}>
+                  <label className="flex items-center gap-1 text-xs text-foreground cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={!!(r as any).is_featured}
+                      onChange={async (e) => {
+                        await supabase.from("reviews").update({ is_featured: e.target.checked }).eq("id", r.id);
+                        queryClient.invalidateQueries({ queryKey: ["admin_reviews"] });
+                        queryClient.invalidateQueries({ queryKey: ["featured_reviews"] });
+                        toast.success(e.target.checked ? "Avis affiché en page d'accueil" : "Avis retiré de la page d'accueil");
+                      }}
+                    />
+                    Page d'accueil
+                  </label>
+                  <Button
+                    size="sm"
+                    variant={r.is_approved ? "heroOutline" : "hero"}
+                    onClick={async () => {
+                      await supabase.from("reviews").update({ is_approved: !r.is_approved }).eq("id", r.id);
+                      queryClient.invalidateQueries({ queryKey: ["admin_reviews"] });
+                      toast.success(!r.is_approved ? "Avis approuvé" : "Avis masqué");
+                    }}
+                  >
                     {r.is_approved ? <X size={14} /> : <Check size={14} />}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={async () => {
+                      if (!confirm("Supprimer cet avis ?")) return;
+                      await supabase.from("reviews").delete().eq("id", r.id);
+                      queryClient.invalidateQueries({ queryKey: ["admin_reviews"] });
+                      toast.success("Avis supprimé");
+                    }}
+                  >
+                    <Trash2 size={14} className="text-destructive" />
                   </Button>
                 </div>
               </div>
@@ -643,6 +677,7 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="slots" className="space-y-4">
+            <RecurringSlotsForm appointmentTypes={appointmentTypes} />
             <form onSubmit={addSlot} className="bg-card border border-border rounded-lg p-4 flex flex-wrap gap-3 items-end">
               <div>
                 <label className="text-muted-foreground text-xs block mb-1">Type de RDV</label>
@@ -1425,10 +1460,6 @@ const Admin = () => {
           {/* Google Calendar */}
           <TabsContent value="gcal" className="space-y-6">
             <div className="bg-card border border-border rounded-xl p-6">
-              <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-                <Calendar size={20} /> Synchronisation Google Agenda
-              </h3>
-              
               {gcalEmail ? (
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-sm">
@@ -1470,12 +1501,12 @@ const Admin = () => {
           <TabsContent value="formules" className="space-y-6">
             <div className="bg-card border border-border rounded-xl p-6">
               <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
-                <Tag size={20} /> Liens PayPal des formules
+                <Tag size={20} /> Tarifs & formules
               </h3>
               <p className="text-muted-foreground text-sm mb-6">
-                Colle ici le lien d'abonnement récurrent PayPal pour chaque formule. Quand un client cliquera sur "Prendre cette formule", il sera redirigé vers ce lien.
+                Modifie le contenu, le prix, l'image de fond, le lien PayPal et la mise en avant de chaque formule.
               </p>
-              <PaypalLinksManager />
+              <PricingPlansManager />
             </div>
           </TabsContent>
 
