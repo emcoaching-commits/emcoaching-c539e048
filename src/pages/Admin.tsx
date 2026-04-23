@@ -11,7 +11,6 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import PaypalLinksManager from "@/components/admin/PaypalLinksManager";
 import HomeContentManager from "@/components/admin/HomeContentManager";
 import PricingPlansManager from "@/components/admin/PricingPlansManager";
 import RecurringSlotsForm from "@/components/admin/RecurringSlotsForm";
