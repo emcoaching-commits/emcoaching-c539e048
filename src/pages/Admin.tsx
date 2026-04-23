@@ -13,6 +13,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import PaypalLinksManager from "@/components/admin/PaypalLinksManager";
 import HomeContentManager from "@/components/admin/HomeContentManager";
+import PricingPlansManager from "@/components/admin/PricingPlansManager";
+import RecurringSlotsForm from "@/components/admin/RecurringSlotsForm";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -600,8 +602,41 @@ const Admin = () => {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <Button size="sm" variant={r.is_approved ? "heroOutline" : "hero"} onClick={() => toggleReview(r.id, !r.is_approved)}>
+                  <label className="flex items-center gap-1 text-xs text-foreground cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={!!(r as any).is_featured}
+                      onChange={async (e) => {
+                        await supabase.from("reviews").update({ is_featured: e.target.checked }).eq("id", r.id);
+                        queryClient.invalidateQueries({ queryKey: ["admin_reviews"] });
+                        queryClient.invalidateQueries({ queryKey: ["featured_reviews"] });
+                        toast.success(e.target.checked ? "Avis affiché en page d'accueil" : "Avis retiré de la page d'accueil");
+                      }}
+                    />
+                    Page d'accueil
+                  </label>
+                  <Button
+                    size="sm"
+                    variant={r.is_approved ? "heroOutline" : "hero"}
+                    onClick={async () => {
+                      await supabase.from("reviews").update({ is_approved: !r.is_approved }).eq("id", r.id);
+                      queryClient.invalidateQueries({ queryKey: ["admin_reviews"] });
+                      toast.success(!r.is_approved ? "Avis approuvé" : "Avis masqué");
+                    }}
+                  >
                     {r.is_approved ? <X size={14} /> : <Check size={14} />}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={async () => {
+                      if (!confirm("Supprimer cet avis ?")) return;
+                      await supabase.from("reviews").delete().eq("id", r.id);
+                      queryClient.invalidateQueries({ queryKey: ["admin_reviews"] });
+                      toast.success("Avis supprimé");
+                    }}
+                  >
+                    <Trash2 size={14} className="text-destructive" />
                   </Button>
                 </div>
               </div>
