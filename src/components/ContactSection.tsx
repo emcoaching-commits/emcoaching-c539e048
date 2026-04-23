@@ -37,26 +37,15 @@ const ContactSection = () => {
           content: composed,
         });
         if (error) throw error;
+        toast.success("Message envoyé à Emma ! Elle te répondra rapidement 💪");
+        setFirstName(""); setEmailAddr(""); setSubject(""); setBody("");
       } else {
-        // Visiteur non connecté : on enregistre en notification admin
-        const { error } = await supabase.functions.invoke("contact-message", {
-          body: {
-            from_name: firstName.trim(),
-            from_email: emailAddr.trim(),
-            subject: subject.trim(),
-            content: composed,
-            admin_id: adminId,
-          },
-        });
-        if (error) {
-          // Fallback : ouvrir le client mail
-          window.location.href = `mailto:emmaberlin2611@gmail.com?subject=${encodeURIComponent(subject || "Contact site")}&body=${encodeURIComponent(composed)}`;
-          return;
-        }
+        // Visiteur non connecté : on ouvre son client mail prérempli
+        window.location.href = `mailto:emmaberlin2611@gmail.com?subject=${encodeURIComponent(
+          subject.trim() || "Contact site",
+        )}&body=${encodeURIComponent(composed)}`;
+        toast.info("Connecte-toi pour un échange instantané dans la messagerie !");
       }
-
-      toast.success("Message envoyé à Emma ! Elle te répondra rapidement 💪");
-      setFirstName(""); setEmailAddr(""); setSubject(""); setBody("");
     } catch (err: any) {
       toast.error(err.message || "Erreur lors de l'envoi.");
     } finally {

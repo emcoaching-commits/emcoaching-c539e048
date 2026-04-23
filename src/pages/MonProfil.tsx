@@ -23,10 +23,8 @@ const MonProfil = () => {
   const [form, setForm] = useState({
     full_name: "",
     phone: "",
-    age: "",
+    birth_date: "",
     city: "",
-    weight: "",
-    height: "",
     gender: "",
   });
 
@@ -63,13 +61,11 @@ const MonProfil = () => {
         setForm({
           full_name: data.full_name || "",
           phone: data.phone || "",
-          age: data.age?.toString() || "",
+          birth_date: (data as any).birth_date || "",
           city: data.city || "",
-          weight: data.weight?.toString() || "",
-          height: data.height?.toString() || "",
           gender: data.gender || "",
         });
-        if (!data.full_name || !data.age || !data.city) setEditing(true);
+        if (!data.full_name || !(data as any).birth_date || !data.city) setEditing(true);
         // Load signed avatar URL
         if (data.avatar_url) {
           const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(data.avatar_url, 3600);
