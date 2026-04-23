@@ -1,10 +1,58 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Instagram, Mail, Phone, MessageCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const ContactSection = () => {
+  const [firstName, setFirstName] = useState("");
+  const [emailAddr, setEmailAddr] = useState("");
+  const [subject, setSubject] = useState("");
+  const [body, setBody] = useState("");
+  const [sending, setSending] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!firstName.trim() || !emailAddr.trim() || !body.trim()) {
+      toast.error("Merci de remplir au moins prénom, email et message.");
+      return;
+    }
+    setSending(true);
+    try {
+      // Récupère l'admin (Emma) via la fonction sécurisée
+      const { data: adminId, error: adminErr } = await supabase.rpc("get_admin_id");
+      if (adminErr || !adminId) throw new Error("Impossible de joindre Emma pour le moment.");
+
+      const { data: { user } } = await supabase.auth.getUser();
+      const composed = `📩 NOUVEAU MESSAGE DE CONTACT\n\nDe : ${firstName.trim()}\nEmail : ${emailAddr.trim()}\nSujet : ${subject.trim() || "—"}\n\n${body.trim()}`;
+
+      if (user) {
+        // Visiteur connecté : envoi standard via la table messages
+        const { error } = await supabase.from("messages").insert({
+          sender_id: user.id,
+          receiver_id: adminId,
+          content: composed,
+        });
+        if (error) throw error;
+        toast.success("Message envoyé à Emma ! Elle te répondra rapidement 💪");
+        setFirstName(""); setEmailAddr(""); setSubject(""); setBody("");
+      } else {
+        // Visiteur non connecté : on ouvre son client mail prérempli
+        window.location.href = `mailto:emmaberlin2611@gmail.com?subject=${encodeURIComponent(
+          subject.trim() || "Contact site",
+        )}&body=${encodeURIComponent(composed)}`;
+        toast.info("Connecte-toi pour un échange instantané dans la messagerie !");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Erreur lors de l'envoi.");
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <section id="contact" className="py-24 bg-gradient-dark">
       <div className="container">
@@ -26,16 +74,44 @@ const ContactSection = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
             className="space-y-4"
-            onSubmit={(e) => e.preventDefault()}
+            onSubmit={handleSubmit}
           >
             <div className="grid sm:grid-cols-2 gap-4">
-              <Input placeholder="Prénom" className="bg-card border-border" />
-              <Input placeholder="Email" type="email" className="bg-card border-border" />
+              <Input
+                placeholder="Prénom"
+                className="bg-card border-border"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                maxLength={50}
+                required
+              />
+              <Input
+                placeholder="Email"
+                type="email"
+                className="bg-card border-border"
+                value={emailAddr}
+                onChange={(e) => setEmailAddr(e.target.value)}
+                maxLength={100}
+                required
+              />
             </div>
-            <Input placeholder="Sujet" className="bg-card border-border" />
-            <Textarea placeholder="Ton message..." className="bg-card border-border min-h-[140px]" />
-            <Button variant="hero" size="lg" className="w-full py-6">
-              Envoyer le message
+            <Input
+              placeholder="Sujet"
+              className="bg-card border-border"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              maxLength={150}
+            />
+            <Textarea
+              placeholder="Ton message..."
+              className="bg-card border-border min-h-[140px]"
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              maxLength={2000}
+              required
+            />
+            <Button variant="hero" size="lg" className="w-full py-6" disabled={sending} type="submit">
+              {sending ? "Envoi..." : "Envoyer le message"}
             </Button>
           </motion.form>
 

@@ -173,6 +173,7 @@ export type Database = {
       }
       pricing_plans: {
         Row: {
+          background_image_url: string | null
           created_at: string
           description: string | null
           features: string[] | null
@@ -184,6 +185,7 @@ export type Database = {
           sessions_count: number
         }
         Insert: {
+          background_image_url?: string | null
           created_at?: string
           description?: string | null
           features?: string[] | null
@@ -195,6 +197,7 @@ export type Database = {
           sessions_count?: number
         }
         Update: {
+          background_image_url?: string | null
           created_at?: string
           description?: string | null
           features?: string[] | null
@@ -212,6 +215,7 @@ export type Database = {
           age: number | null
           assigned_plan_id: string | null
           avatar_url: string | null
+          birth_date: string | null
           city: string | null
           created_at: string
           full_name: string | null
@@ -233,6 +237,7 @@ export type Database = {
           age?: number | null
           assigned_plan_id?: string | null
           avatar_url?: string | null
+          birth_date?: string | null
           city?: string | null
           created_at?: string
           full_name?: string | null
@@ -254,6 +259,7 @@ export type Database = {
           age?: number | null
           assigned_plan_id?: string | null
           avatar_url?: string | null
+          birth_date?: string | null
           city?: string | null
           created_at?: string
           full_name?: string | null
@@ -323,6 +329,7 @@ export type Database = {
           created_at: string
           id: string
           is_approved: boolean | null
+          is_featured: boolean
           rating: number
           user_id: string
         }
@@ -331,6 +338,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_approved?: boolean | null
+          is_featured?: boolean
           rating: number
           user_id: string
         }
@@ -339,6 +347,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_approved?: boolean | null
+          is_featured?: boolean
           rating?: number
           user_id?: string
         }

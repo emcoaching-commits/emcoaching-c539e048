@@ -15,6 +15,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
+  const [birthDate, setBirthDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [signupClosed, setSignupClosed] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -73,6 +74,22 @@ const Auth = () => {
         setLoading(false);
         return;
       }
+      // Vérifie l'âge minimum (15 ans)
+      if (!birthDate) {
+        toast.error("Merci de renseigner ta date de naissance.");
+        setLoading(false);
+        return;
+      }
+      const dob = new Date(birthDate);
+      const today = new Date();
+      let age = today.getFullYear() - dob.getFullYear();
+      const m = today.getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+      if (isNaN(dob.getTime()) || age < 15) {
+        toast.error("Tu dois avoir au moins 15 ans pour t'inscrire.");
+        setLoading(false);
+        return;
+      }
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -86,6 +103,10 @@ const Auth = () => {
       } else {
         if (data.user && avatarFile) {
           await uploadAvatar(data.user.id);
+        }
+        // Stocke la date de naissance dans le profil
+        if (data.user) {
+          await supabase.from("profiles").update({ birth_date: birthDate }).eq("user_id", data.user.id);
         }
         // Auto-login après inscription (auto-confirm activé)
         if (!data.session) {
@@ -202,6 +223,19 @@ const Auth = () => {
                   className="bg-background border-border"
                   required
                 />
+                <div>
+                  <label className="text-muted-foreground text-xs block mb-1">
+                    Date de naissance <span className="text-foreground">— minimum 15 ans pour s'inscrire</span>
+                  </label>
+                  <Input
+                    type="date"
+                    value={birthDate}
+                    onChange={(e) => setBirthDate(e.target.value)}
+                    className="bg-background border-border"
+                    max={new Date().toISOString().split("T")[0]}
+                    required
+                  />
+                </div>
               </>
             )}
             <Input
