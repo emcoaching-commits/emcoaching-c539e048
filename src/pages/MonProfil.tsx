@@ -164,10 +164,8 @@ const MonProfil = () => {
     const updateData = {
       full_name: form.full_name || null,
       phone: form.phone || null,
-      age: form.age ? parseInt(form.age) : null,
+      birth_date: form.birth_date || null,
       city: form.city || null,
-      weight: form.weight ? parseFloat(form.weight) : null,
-      height: form.height ? parseFloat(form.height) : null,
       gender: form.gender || null,
     };
     const { error } = await supabase.from("profiles").update(updateData).eq("user_id", user.id);
@@ -277,8 +275,8 @@ const MonProfil = () => {
     ? form.full_name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
     : "?";
 
-  const completionPercent = [form.full_name, form.phone, form.age, form.city, form.weight, form.height, form.gender]
-    .filter(Boolean).length / 7 * 100;
+  const completionPercent = [form.full_name, form.phone, form.birth_date, form.city, form.gender]
+    .filter(Boolean).length / 5 * 100;
 
   if (loading) {
     return (
@@ -461,26 +459,18 @@ const MonProfil = () => {
               <p className="text-muted-foreground text-xs mt-2">{Math.round(completionPercent)}% — {completionPercent < 100 ? "Continue à remplir tes infos !" : "Parfait ! 🎉"}</p>
             </motion.div>
 
-            {/* Quick stats */}
-            {(form.weight || form.height) && (
+            {/* Quick stats : date de naissance */}
+            {form.birth_date && (
               <motion.div
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="bg-card border border-border rounded-xl p-5 grid grid-cols-2 gap-4"
+                className="bg-card border border-border rounded-xl p-5"
               >
-                {form.weight && (
-                  <div>
-                    <p className="text-muted-foreground text-xs mb-1">Poids</p>
-                    <p className="text-foreground font-display text-2xl">{form.weight}<span className="text-muted-foreground text-sm ml-1">kg</span></p>
-                  </div>
-                )}
-                {form.height && (
-                  <div>
-                    <p className="text-muted-foreground text-xs mb-1">Taille</p>
-                    <p className="text-foreground font-display text-2xl">{form.height}<span className="text-muted-foreground text-sm ml-1">cm</span></p>
-                  </div>
-                )}
+                <p className="text-muted-foreground text-xs mb-1">Date de naissance</p>
+                <p className="text-foreground font-display text-2xl">
+                  {new Date(form.birth_date).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
+                </p>
               </motion.div>
             )}
 
@@ -774,22 +764,18 @@ const MonProfil = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="text-muted-foreground text-xs mb-1.5 block flex items-center gap-1.5"><Calendar size={12} /> Âge</label>
-                      <Input type="number" placeholder="25" value={form.age} onChange={(e) => setForm({ ...form, age: e.target.value })} className="bg-background border-border" />
+                      <label className="text-muted-foreground text-xs mb-1.5 block flex items-center gap-1.5"><Calendar size={12} /> Date de naissance</label>
+                      <Input
+                        type="date"
+                        value={form.birth_date}
+                        max={new Date().toISOString().split("T")[0]}
+                        onChange={(e) => setForm({ ...form, birth_date: e.target.value })}
+                        className="bg-background border-border"
+                      />
                     </div>
                     <div>
                       <label className="text-muted-foreground text-xs mb-1.5 block flex items-center gap-1.5"><MapPin size={12} /> Ville</label>
                       <Input placeholder="Paris" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className="bg-background border-border" />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-muted-foreground text-xs mb-1.5 block flex items-center gap-1.5"><Weight size={12} /> Poids (kg)</label>
-                      <Input type="number" placeholder="70" step="0.1" value={form.weight} onChange={(e) => setForm({ ...form, weight: e.target.value })} className="bg-background border-border" />
-                    </div>
-                    <div>
-                      <label className="text-muted-foreground text-xs mb-1.5 block flex items-center gap-1.5"><Ruler size={12} /> Taille (cm)</label>
-                      <Input type="number" placeholder="175" value={form.height} onChange={(e) => setForm({ ...form, height: e.target.value })} className="bg-background border-border" />
                     </div>
                   </div>
                   <div>
@@ -829,10 +815,8 @@ const MonProfil = () => {
                   {[
                     { icon: User, label: "Nom", value: form.full_name },
                     { icon: Phone, label: "Téléphone", value: form.phone },
-                    { icon: Calendar, label: "Âge", value: form.age ? `${form.age} ans` : "" },
+                    { icon: Calendar, label: "Date de naissance", value: form.birth_date ? new Date(form.birth_date).toLocaleDateString("fr-FR") : "" },
                     { icon: MapPin, label: "Ville", value: form.city },
-                    { icon: Weight, label: "Poids", value: form.weight ? `${form.weight} kg` : "" },
-                    { icon: Ruler, label: "Taille", value: form.height ? `${form.height} cm` : "" },
                   ].map(({ icon: Icon, label, value }) => (
                     <div key={label} className="flex items-center gap-3 py-2 border-b border-border/50 last:border-0">
                       <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
