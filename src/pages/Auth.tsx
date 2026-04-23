@@ -223,6 +223,19 @@ const Auth = () => {
                   className="bg-background border-border"
                   required
                 />
+                <div>
+                  <label className="text-muted-foreground text-xs block mb-1">
+                    Date de naissance <span className="text-foreground">— minimum 15 ans pour s'inscrire</span>
+                  </label>
+                  <Input
+                    type="date"
+                    value={birthDate}
+                    onChange={(e) => setBirthDate(e.target.value)}
+                    className="bg-background border-border"
+                    max={new Date().toISOString().split("T")[0]}
+                    required
+                  />
+                </div>
               </>
             )}
             <Input
