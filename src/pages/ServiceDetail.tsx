@@ -99,7 +99,6 @@ const ServiceDetail = () => {
               <Button variant="hero" size="lg" onClick={() => navigate("/auth")} className="text-lg px-10">
                 Commencer maintenant
               </Button>
-              <p className="text-muted-foreground text-sm mt-3">Programme renouvelé toutes les 6 semaines</p>
             </div>
           </motion.div>
         </div>

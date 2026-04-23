@@ -1,9 +1,8 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Check, RefreshCw } from "lucide-react";
+import { Check } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const sessionDetails: Record<string, string> = {
@@ -13,7 +12,6 @@ const sessionDetails: Record<string, string> = {
 };
 
 const PricingSection = () => {
-  const navigate = useNavigate();
   const { data: plans } = useQuery({
     queryKey: ["pricing_plans"],
     queryFn: async () => {
@@ -34,26 +32,16 @@ const PricingSection = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-6"
+          className="text-center mb-12"
         >
           <p className="text-primary font-semibold tracking-widest uppercase text-sm mb-3">Investis en toi</p>
           <h2 className="font-display text-5xl sm:text-6xl text-gradient-blue">MES FORMULES</h2>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="flex items-center justify-center gap-2 text-muted-foreground text-sm mb-12"
-        >
-          <RefreshCw size={16} className="text-primary" />
-          <span>Programme renouvelé toutes les <strong className="text-foreground">6 semaines</strong> pour des résultats continus</span>
-        </motion.div>
-
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {plans?.map((plan, i) => {
-            const monthlyPrice = Math.round(plan.price / 1);
             const detail = sessionDetails[plan.name] || "";
+            const bgUrl = (plan as any).background_image_url as string | null;
             return (
               <motion.div
                 key={plan.id}
@@ -61,16 +49,36 @@ const PricingSection = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className={`relative bg-card border rounded-lg p-8 flex flex-col ${
+                className={`relative overflow-hidden bg-card border rounded-lg p-8 flex flex-col ${
                   plan.is_popular ? "border-primary glow-blue scale-105" : "border-border"
                 }`}
               >
+                {bgUrl && (
+                  <>
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 z-0 bg-cover bg-center"
+                      style={{ backgroundImage: `url(${bgUrl})` }}
+                    />
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute inset-0 z-0"
+                      style={{
+                        background:
+                          "linear-gradient(to bottom, transparent 0%, transparent 35%, hsl(var(--card) / 0.85) 70%, hsl(var(--card)) 100%)",
+                      }}
+                    />
+                  </>
+                )}
+                <div className="relative z-10 flex flex-col flex-1">
                 {plan.is_popular && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-semibold px-4 py-1 rounded-full">
+                  <span className="absolute -top-0 left-1/2 -translate-x-1/2 -mt-11 bg-primary text-primary-foreground text-xs font-semibold px-4 py-1 rounded-full z-20">
                     POPULAIRE
                   </span>
                 )}
-                <h3 className="font-display text-3xl text-foreground mb-1">{plan.name}</h3>
+                {/* Spacer pour laisser apparaître l'image en haut quand elle est présente */}
+                {bgUrl && <div className="h-32 sm:h-40" />}
+                <h3 className="font-display text-3xl text-foreground mb-1 drop-shadow-sm">{plan.name}</h3>
                 <p className="text-muted-foreground text-sm mb-4">{plan.description}</p>
                 <p className="font-display text-5xl text-gradient-blue mb-0">
                   {plan.price}€
@@ -103,6 +111,7 @@ const PricingSection = () => {
                 >
                   Prendre cette formule
                 </Button>
+                </div>
               </motion.div>
             );
           })}
