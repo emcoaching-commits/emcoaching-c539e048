@@ -20,6 +20,8 @@ const Admin = () => {
   const queryClient = useQueryClient();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("notifications");
+  const [activeGroup, setActiveGroup] = useState<string>("activite");
 
   // New slot form
   const [slotDate, setSlotDate] = useState("");
