@@ -20,6 +20,8 @@ const Admin = () => {
   const queryClient = useQueryClient();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("notifications");
+  const [activeGroup, setActiveGroup] = useState<string>("activite");
 
   // New slot form
   const [slotDate, setSlotDate] = useState("");
@@ -511,40 +513,86 @@ const Admin = () => {
           <h1 className="font-display text-4xl text-gradient-blue">ADMIN</h1>
         </div>
 
-        <Tabs defaultValue="notifications">
-          <TabsList className="bg-card border border-border mb-6 flex-wrap">
-            <TabsTrigger value="notifications" className="relative">
-              <Bell size={14} className="mr-1" /> Activité
-              {unreadCount > 0 && (
-                <span className="ml-1 bg-destructive text-destructive-foreground text-[10px] px-1.5 py-0.5 rounded-full">{unreadCount}</span>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="reviews">Avis ({reviews?.length || 0})</TabsTrigger>
-            <TabsTrigger value="types">
-              <Tag size={14} className="mr-1" /> Types RDV
-            </TabsTrigger>
-            <TabsTrigger value="slots">Créneaux ({slots?.length || 0})</TabsTrigger>
-            <TabsTrigger value="bookings">Réservations ({bookings?.length || 0})</TabsTrigger>
-            <TabsTrigger value="clients">Clients ({clients?.length || 0})</TabsTrigger>
-            <TabsTrigger value="messages">
-              <MessageCircle size={14} className="mr-1" /> Messages
-            </TabsTrigger>
-            <TabsTrigger value="about">
-              <Image size={14} className="mr-1" /> À propos
-            </TabsTrigger>
-            <TabsTrigger value="services">
-              <Package size={14} className="mr-1" /> Formules
-            </TabsTrigger>
-            <TabsTrigger value="gcal">
-              <Calendar size={14} className="mr-1" /> Google Agenda
-            </TabsTrigger>
-            <TabsTrigger value="formules">
-              <Tag size={14} className="mr-1" /> Formules PayPal
-            </TabsTrigger>
-            <TabsTrigger value="home">
-              <Image size={14} className="mr-1" /> Accueil & Logo
-            </TabsTrigger>
-          </TabsList>
+        {(() => {
+          const groups: { id: string; label: string; icon: any; tabs: { value: string; label: string; badge?: number }[] }[] = [
+            {
+              id: "activite",
+              label: "Activité",
+              icon: Bell,
+              tabs: [
+                { value: "notifications", label: "Notifications", badge: unreadCount },
+                { value: "messages", label: "Messages" },
+              ],
+            },
+            {
+              id: "clients",
+              label: "Clients",
+              icon: Users,
+              tabs: [
+                { value: "clients", label: `Clients (${clients?.length || 0})` },
+                { value: "reviews", label: `Avis (${reviews?.length || 0})` },
+              ],
+            },
+            {
+              id: "planning",
+              label: "Planning",
+              icon: CalendarClock,
+              tabs: [
+                { value: "types", label: "Types RDV" },
+                { value: "slots", label: `Créneaux (${slots?.length || 0})` },
+                { value: "bookings", label: `Réservations (${bookings?.length || 0})` },
+                { value: "gcal", label: "Google Agenda" },
+              ],
+            },
+            {
+              id: "contenu",
+              label: "Contenu",
+              icon: Image,
+              tabs: [
+                { value: "home", label: "Accueil & Logo" },
+                { value: "about", label: "À propos" },
+                { value: "services", label: "Services" },
+                { value: "formules", label: "Formules" },
+              ],
+            },
+          ];
+          const currentGroup = groups.find((g) => g.id === activeGroup) || groups[0];
+          return (
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {groups.map((g) => {
+                  const GIcon = g.icon;
+                  const isActive = g.id === activeGroup;
+                  return (
+                    <button
+                      key={g.id}
+                      onClick={() => {
+                        setActiveGroup(g.id);
+                        setActiveTab(g.tabs[0].value);
+                      }}
+                      className={`px-4 py-2 rounded-lg border text-sm font-semibold inline-flex items-center gap-2 transition-colors ${
+                        isActive
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-card text-muted-foreground border-border hover:text-foreground"
+                      }`}
+                    >
+                      <GIcon size={14} /> {g.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <TabsList className="bg-card border border-border mb-6 flex-wrap">
+                {currentGroup.tabs.map((t) => (
+                  <TabsTrigger key={t.value} value={t.value} className="relative">
+                    {t.label}
+                    {t.badge && t.badge > 0 ? (
+                      <span className="ml-1 bg-destructive text-destructive-foreground text-[10px] px-1.5 py-0.5 rounded-full">
+                        {t.badge}
+                      </span>
+                    ) : null}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
 
           <TabsContent value="notifications" className="space-y-4">
             <div className="flex items-center justify-between mb-2">
@@ -1522,7 +1570,9 @@ const Admin = () => {
               <HomeContentManager />
             </div>
           </TabsContent>
-        </Tabs>
+            </Tabs>
+          );
+        })()}
       </div>
     </div>
   );
