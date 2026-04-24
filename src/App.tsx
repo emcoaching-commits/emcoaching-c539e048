@@ -11,9 +11,8 @@ import Auth from "./pages/Auth.tsx";
 import Admin from "./pages/Admin.tsx";
 import Questionnaire from "./pages/Questionnaire.tsx";
 import MonProfil from "./pages/MonProfil.tsx";
-import Services from "./pages/Services.tsx";
-import ServiceDetail from "./pages/ServiceDetail.tsx";
 import FormuleDetail from "./pages/FormuleDetail.tsx";
+import Services from "./pages/Services.tsx";
 import Tarifs from "./pages/Tarifs.tsx";
 import Planning from "./pages/Planning.tsx";
 import Avis from "./pages/Avis.tsx";
@@ -44,7 +43,6 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/services" element={<Services />} />
-          <Route path="/services/:slug" element={<ServiceDetail />} />
           <Route path="/formules/:id" element={<FormuleDetail />} />
           <Route path="/tarifs" element={<Tarifs />} />
           <Route path="/planning" element={<Planning />} />
