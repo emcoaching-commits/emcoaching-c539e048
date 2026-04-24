@@ -94,17 +94,45 @@ const FormuleDetail = () => {
               </div>
             )}
 
-            {plan.features && plan.features.length > 0 && (
+            {(plan as any).long_description && (
+              <div className="bg-card border border-border rounded-xl p-8 mb-8">
+                <p className="text-foreground leading-relaxed text-base whitespace-pre-line">
+                  {(plan as any).long_description}
+                </p>
+              </div>
+            )}
+
+            {((plan as any).includes?.length > 0 || (plan.features && plan.features.length > 0)) && (
               <>
                 <h2 className="font-display text-3xl text-foreground mb-4">Ce qui est inclus</h2>
                 <ul className="space-y-3 mb-10">
-                  {plan.features.map((item: string) => (
+                  {(((plan as any).includes?.length > 0 ? (plan as any).includes : plan.features) as string[]).map((item: string) => (
                     <li key={item} className="flex items-start gap-3 text-muted-foreground">
                       <Check className="text-primary shrink-0 mt-0.5" size={18} />
                       <span>{item}</span>
                     </li>
                   ))}
                 </ul>
+              </>
+            )}
+
+            {(plan as any).details?.length > 0 && (
+              <>
+                <h2 className="font-display text-3xl text-foreground mb-4">Comment ça fonctionne</h2>
+                <div className="space-y-4 mb-10">
+                  {((plan as any).details as string[]).map((step: string, i: number) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: i * 0.1 }}
+                      className="flex gap-4"
+                    >
+                      <span className="font-display text-2xl text-primary shrink-0 w-8">{i + 1}.</span>
+                      <p className="text-muted-foreground leading-relaxed">{step}</p>
+                    </motion.div>
+                  ))}
+                </div>
               </>
             )}
 
