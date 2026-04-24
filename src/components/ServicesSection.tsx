@@ -3,11 +3,12 @@ import { Apple, Dumbbell, HeartPulse } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const iconMap: Record<string, any> = { Dumbbell, Apple, HeartPulse };
 
 const ServicesSection = () => {
+  const navigate = useNavigate();
   // On affiche directement les FORMULES (pricing_plans) avec leurs liens PayPal,
   // pour que "Choisir cette formule" redirige vers le bon lien PayPal en bas.
   const { data: plans } = useQuery({
@@ -90,15 +91,9 @@ const ServicesSection = () => {
                     variant={plan.is_popular ? "hero" : "heroOutline"}
                     size="lg"
                     className="w-full mt-auto"
-                    onClick={() => {
-                      if (plan.paypal_url) {
-                        window.open(plan.paypal_url, "_blank", "noopener,noreferrer");
-                      } else {
-                        toast.error("Lien de paiement indisponible. Contacte Emma.");
-                      }
-                    }}
+                    onClick={() => navigate(`/formules/${plan.id}`)}
                   >
-                    Choisir cette formule
+                    En savoir plus
                   </Button>
                 </div>
               </motion.div>
