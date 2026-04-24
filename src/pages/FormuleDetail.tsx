@@ -26,6 +26,20 @@ const FormuleDetail = () => {
     enabled: !!id,
   });
 
+  const { data: media } = useQuery({
+    queryKey: ["pricing_plan_media", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("pricing_plan_media")
+        .select("*")
+        .eq("pricing_plan_id", id!)
+        .order("position");
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!id,
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
@@ -131,6 +145,23 @@ const FormuleDetail = () => {
                       <span className="font-display text-2xl text-primary shrink-0 w-8">{i + 1}.</span>
                       <p className="text-muted-foreground leading-relaxed">{step}</p>
                     </motion.div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {media && media.length > 0 && (
+              <>
+                <h2 className="font-display text-3xl text-foreground mb-4">En images</h2>
+                <div className="grid grid-cols-2 gap-4 mb-10">
+                  {media.map((m: any) => (
+                    <div key={m.id} className="rounded-xl overflow-hidden border border-border aspect-square bg-muted">
+                      {m.type === "video" ? (
+                        <video src={m.url} controls className="w-full h-full object-cover" />
+                      ) : (
+                        <img src={m.url} alt="" className="w-full h-full object-cover" />
+                      )}
+                    </div>
                   ))}
                 </div>
               </>

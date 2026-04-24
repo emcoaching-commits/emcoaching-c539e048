@@ -5,7 +5,117 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Save, Trash2, Plus, Star, Edit2, Image as ImageIcon } from "lucide-react";
+import { Save, Trash2, Plus, Star, Edit2, Image as ImageIcon, Film } from "lucide-react";
+
+const PlanMediaManager = ({ planId }: { planId: string }) => {
+  const queryClient = useQueryClient();
+  const [uploading, setUploading] = useState(false);
+
+  const { data: media } = useQuery({
+    queryKey: ["plan_media", planId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("pricing_plan_media")
+        .select("*")
+        .eq("pricing_plan_id", planId)
+        .order("position");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const refresh = () => {
+    queryClient.invalidateQueries({ queryKey: ["plan_media", planId] });
+  };
+
+  const handleUpload = async (file: File) => {
+    if ((media?.length || 0) >= 4) {
+      toast.error("Maximum 4 médias par formule");
+      return;
+    }
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const fileName = `media-${planId}-${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage
+      .from("pricing-backgrounds")
+      .upload(fileName, file);
+    if (upErr) {
+      toast.error("Erreur upload : " + upErr.message);
+      setUploading(false);
+      return;
+    }
+    const { data: urlData } = supabase.storage
+      .from("pricing-backgrounds")
+      .getPublicUrl(fileName);
+    const type = file.type.startsWith("video") ? "video" : "image";
+    const { error: insErr } = await supabase.from("pricing_plan_media").insert({
+      pricing_plan_id: planId,
+      url: urlData.publicUrl,
+      type,
+      position: media?.length || 0,
+    });
+    if (insErr) toast.error(insErr.message);
+    else {
+      toast.success("Média ajouté");
+      refresh();
+    }
+    setUploading(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    const { error } = await supabase.from("pricing_plan_media").delete().eq("id", id);
+    if (error) toast.error(error.message);
+    else {
+      toast.success("Média supprimé");
+      refresh();
+    }
+  };
+
+  const count = media?.length || 0;
+
+  return (
+    <div>
+      <label className="text-xs text-muted-foreground">
+        Galerie « En savoir plus » ({count}/4 photos ou vidéos)
+      </label>
+      <div className="flex flex-wrap items-center gap-2 mt-2">
+        {media?.map((m: any) => (
+          <div key={m.id} className="relative w-20 h-20 rounded border border-border overflow-hidden bg-muted">
+            {m.type === "video" ? (
+              <video src={m.url} className="w-full h-full object-cover" />
+            ) : (
+              <img src={m.url} alt="" className="w-full h-full object-cover" />
+            )}
+            <button
+              type="button"
+              onClick={() => handleDelete(m.id)}
+              className="absolute top-0 right-0 bg-destructive text-destructive-foreground p-0.5 rounded-bl text-[10px]"
+              aria-label="Supprimer"
+            >
+              <Trash2 size={12} />
+            </button>
+            <span className="absolute bottom-0 left-0 bg-background/80 text-foreground text-[10px] px-1">
+              {m.type === "video" ? <Film size={10} /> : <ImageIcon size={10} />}
+            </span>
+          </div>
+        ))}
+        {count < 4 && (
+          <label className="cursor-pointer">
+            <input
+              type="file"
+              accept="image/*,video/*"
+              className="hidden"
+              onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])}
+            />
+            <span className="px-3 py-1.5 bg-primary/10 text-primary rounded text-sm hover:bg-primary/20 transition-colors inline-flex items-center gap-1">
+              <Plus size={14} /> {uploading ? "Envoi..." : "Ajouter"}
+            </span>
+          </label>
+        )}
+      </div>
+    </div>
+  );
+};
 
 const PricingPlansManager = () => {
   const queryClient = useQueryClient();
@@ -165,6 +275,7 @@ const PricingPlansManager = () => {
                   placeholder="Ex: Premier échange pour cerner tes objectifs"
                 />
               </div>
+              <PlanMediaManager planId={draft.id} />
               <div>
                 <label className="text-xs text-muted-foreground">Lien PayPal</label>
                 <Input type="url" value={draft.paypal_url || ""} onChange={(e) => setDraft({ ...draft, paypal_url: e.target.value })} placeholder="https://www.paypal.com/..." />
