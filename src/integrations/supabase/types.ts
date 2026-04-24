@@ -176,9 +176,12 @@ export type Database = {
           background_image_url: string | null
           created_at: string
           description: string | null
+          details: string[] | null
           features: string[] | null
           id: string
+          includes: string[] | null
           is_popular: boolean | null
+          long_description: string | null
           name: string
           paypal_url: string | null
           price: number
@@ -188,9 +191,12 @@ export type Database = {
           background_image_url?: string | null
           created_at?: string
           description?: string | null
+          details?: string[] | null
           features?: string[] | null
           id?: string
+          includes?: string[] | null
           is_popular?: boolean | null
+          long_description?: string | null
           name: string
           paypal_url?: string | null
           price: number
@@ -200,9 +206,12 @@ export type Database = {
           background_image_url?: string | null
           created_at?: string
           description?: string | null
+          details?: string[] | null
           features?: string[] | null
           id?: string
+          includes?: string[] | null
           is_popular?: boolean | null
+          long_description?: string | null
           name?: string
           paypal_url?: string | null
           price?: number

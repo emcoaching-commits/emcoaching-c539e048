@@ -41,6 +41,9 @@ const PricingPlansManager = () => {
         price: parseFloat(draft.price) || 0,
         description: draft.description,
         features: (draft.features || []).filter((f: string) => f.trim()),
+        long_description: draft.long_description || null,
+        includes: (draft.includes || []).filter((f: string) => f.trim()),
+        details: (draft.details || []).filter((f: string) => f.trim()),
         is_popular: !!draft.is_popular,
         background_image_url: draft.background_image_url || null,
         paypal_url: draft.paypal_url || null,
@@ -130,6 +133,36 @@ const PricingPlansManager = () => {
                   rows={5}
                   value={(draft.features || []).join("\n")}
                   onChange={(e) => setDraft({ ...draft, features: e.target.value.split("\n") })}
+                />
+              </div>
+              <div className="border-t border-border pt-3 mt-3">
+                <p className="text-xs uppercase tracking-wider text-primary font-semibold mb-2">Page « En savoir plus »</p>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">Description longue (texte d'introduction de la page détail)</label>
+                <Textarea
+                  rows={4}
+                  value={draft.long_description || ""}
+                  onChange={(e) => setDraft({ ...draft, long_description: e.target.value })}
+                  placeholder="Présente la formule en détail..."
+                />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">Ce qui est inclus (un par ligne)</label>
+                <Textarea
+                  rows={5}
+                  value={(draft.includes || []).join("\n")}
+                  onChange={(e) => setDraft({ ...draft, includes: e.target.value.split("\n") })}
+                  placeholder="Ex: Suivi nutritionnel personnalisé"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">Comment ça fonctionne — étapes (une par ligne)</label>
+                <Textarea
+                  rows={5}
+                  value={(draft.details || []).join("\n")}
+                  onChange={(e) => setDraft({ ...draft, details: e.target.value.split("\n") })}
+                  placeholder="Ex: Premier échange pour cerner tes objectifs"
                 />
               </div>
               <div>
