@@ -171,6 +171,41 @@ export type Database = {
         }
         Relationships: []
       }
+      pricing_plan_media: {
+        Row: {
+          created_at: string
+          id: string
+          position: number
+          pricing_plan_id: string
+          type: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          position?: number
+          pricing_plan_id: string
+          type?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          position?: number
+          pricing_plan_id?: string
+          type?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pricing_plan_media_pricing_plan_id_fkey"
+            columns: ["pricing_plan_id"]
+            isOneToOne: false
+            referencedRelation: "pricing_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pricing_plans: {
         Row: {
           background_image_url: string | null
