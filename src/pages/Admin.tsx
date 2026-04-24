@@ -1570,7 +1570,9 @@ const Admin = () => {
               <HomeContentManager />
             </div>
           </TabsContent>
-        </Tabs>
+            </Tabs>
+          );
+        })()}
       </div>
     </div>
   );
