@@ -551,7 +551,6 @@ const Admin = () => {
               tabs: [
                 { value: "home", label: "Accueil & Logo" },
                 { value: "about", label: "À propos" },
-                { value: "services", label: "Services" },
                 { value: "formules", label: "Formules" },
               ],
             },
