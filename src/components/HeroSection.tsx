@@ -37,7 +37,7 @@ const HeroSection = () => {
           <motion.img
             src={heroLogo}
             alt="Em' Coaching"
-            className="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 rounded-full object-cover shadow-2xl"
+            className="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 rounded-3xl object-cover shadow-2xl"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
