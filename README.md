@@ -7,7 +7,7 @@ Site web officiel d'**Em' Coaching**, plateforme de coaching sportif personnalis
 ---
 
 ## ✨ Fonctionnalités
-
+ 
 - 🏠 **Page d'accueil** dynamique avec présentation du coach
 - 💪 **Formules de coaching** personnalisables (présentiel, en ligne, accompagnement)
 - 📅 **Planning** avec réservation de créneaux
