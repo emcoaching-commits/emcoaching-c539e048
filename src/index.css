@@ -15,7 +15,7 @@
     --popover: 40 30% 99%;
     --popover-foreground: 220 40% 12%;
 
-    --primary: 217 91% 60%;
+    --primary: 217 91% 50%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 217 30% 95%;
@@ -24,7 +24,7 @@
     --muted: 217 25% 96%;
     --muted-foreground: 220 15% 45%;
 
-    --accent: 200 100% 50%;
+    --accent: 200 100% 42%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
@@ -32,20 +32,20 @@
 
     --border: 217 30% 88%;
     --input: 217 30% 88%;
-    --ring: 217 91% 60%;
+    --ring: 217 91% 50%;
 
     --radius: 0.75rem;
 
-    --glow: 217 91% 60%;
+    --glow: 217 91% 50%;
 
     --sidebar-background: 217 30% 97%;
     --sidebar-foreground: 220 40% 12%;
-    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary: 217 91% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 217 30% 92%;
     --sidebar-accent-foreground: 220 40% 12%;
     --sidebar-border: 217 30% 88%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-ring: 217 91% 50%;
 
     font-family: 'Outfit', sans-serif;
   }
@@ -69,11 +69,11 @@
 @layer utilities {
   .text-gradient-blue {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(135deg, hsl(217, 91%, 60%), hsl(200, 100%, 50%));
+    background-image: linear-gradient(135deg, hsl(217, 91%, 50%), hsl(200, 100%, 42%));
   }
 
   .glow-blue {
-    box-shadow: 0 10px 40px -10px hsl(217 91% 60% / 0.35);
+    box-shadow: 0 10px 40px -10px hsl(217 91% 50% / 0.35);
   }
 
   .bg-gradient-dark {
