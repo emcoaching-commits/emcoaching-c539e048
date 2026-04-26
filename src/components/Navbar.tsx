@@ -5,6 +5,7 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { assetWithBase } from "@/lib/app-paths";
 
 const navLinks = [
   { label: "Accueil", to: "/" },
@@ -23,7 +24,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { data: settings } = useSiteSettings();
-  const logoUrl = settings?.site_logo_url || "/logo.png";
+  const logoUrl = settings?.site_logo_url || assetWithBase("logo.png");
   const brandName = settings?.site_brand_name || "EM' COACHING";
 
   useEffect(() => {

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Save, Upload } from "lucide-react";
+import { assetWithBase } from "@/lib/app-paths";
 
 const KEYS = [
   "hero_kicker",
@@ -43,8 +44,8 @@ const HomeContentManager = () => {
       hero_title_line2: "TON CORPS",
       hero_title_line3: "TON MINDSET",
       hero_description: "Coaching personnalisé, suivi sur Google Sheets, bilans hebdomadaires. Emma est là, présente à chaque étape.",
-      site_logo_url: "/logo.png",
-      hero_logo_url: "/hero-logo.png",
+      site_logo_url: assetWithBase("logo.png"),
+      hero_logo_url: assetWithBase("hero-logo.png"),
       site_brand_name: "EM' COACHING",
     };
     for (const s of settings || []) {

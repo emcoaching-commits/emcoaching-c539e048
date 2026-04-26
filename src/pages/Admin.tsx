@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import HomeContentManager from "@/components/admin/HomeContentManager";
 import PricingPlansManager from "@/components/admin/PricingPlansManager";
 import RecurringSlotsForm from "@/components/admin/RecurringSlotsForm";
+import { withAppBase } from "@/lib/app-paths";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -330,10 +331,10 @@ const Admin = () => {
     if (gcalStatus === "success") {
       toast.success("Google Agenda connecté avec succès !");
       queryClient.invalidateQueries({ queryKey: ["gcal_email"] });
-      window.history.replaceState({}, "", "/admin");
+      window.history.replaceState({}, "", withAppBase("/admin"));
     } else if (gcalStatus === "error") {
       toast.error("Erreur de connexion à Google Agenda : " + (params.get("reason") || "inconnue"));
-      window.history.replaceState({}, "", "/admin");
+      window.history.replaceState({}, "", withAppBase("/admin"));
     }
   }, [queryClient]);
 

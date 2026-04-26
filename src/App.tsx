@@ -19,6 +19,7 @@ import Avis from "./pages/Avis.tsx";
 import APropos from "./pages/APropos.tsx";
 import Contact from "./pages/Contact.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import { getAppBase } from "@/lib/app-paths";
 
 const queryClient = new QueryClient();
 
@@ -39,7 +40,7 @@ const App = () => {
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter basename={import.meta.env.BASE_URL}>
+        <BrowserRouter basename={getAppBase()}>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/services" element={<Services />} />
