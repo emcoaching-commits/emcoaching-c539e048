@@ -5,6 +5,7 @@ import { ArrowRight, LogIn, UserPlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { assetWithBase } from "@/lib/app-paths";
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const HeroSection = () => {
   const line2 = settings?.hero_title_line2 || "TON CORPS";
   const line3 = settings?.hero_title_line3 || "TON MINDSET";
   const description = settings?.hero_description || "Coaching personnalisé, suivi sur Google Sheets, bilans hebdomadaires. Emma est là, présente à chaque étape.";
-  const heroLogo = settings?.hero_logo_url || "/hero-logo.png";
+  const heroLogo = settings?.hero_logo_url || assetWithBase("hero-logo.png");
 
   return (
     <section id="accueil" className="relative min-h-screen flex items-center overflow-hidden bg-background">
