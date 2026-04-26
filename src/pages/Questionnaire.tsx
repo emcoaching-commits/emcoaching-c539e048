@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -101,7 +101,7 @@ const Questionnaire = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-lg">
-        <a href="/" className="font-display text-4xl text-gradient-blue block text-center mb-4">EMMA FIT</a>
+        <Link to="/" className="font-display text-4xl text-gradient-blue block text-center mb-4">EMMA FIT</Link>
         <p className="text-muted-foreground text-center mb-8">
           {isUpdate
             ? "Tu peux modifier tes réponses à tout moment !"
