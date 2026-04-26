@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Camera, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Link } from "react-router-dom";
 
 const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -134,9 +135,9 @@ const Auth = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <a href="/" className="font-display text-4xl text-gradient-blue block text-center mb-8">
+        <Link to="/" className="font-display text-4xl text-gradient-blue block text-center mb-8">
           EM' COACHING
-        </a>
+        </Link>
         <div className="bg-card border border-border rounded-lg p-8">
           <h2 className="font-display text-3xl text-center mb-6 text-foreground">
             {isLogin ? "CONNEXION" : "INSCRIPTION"}
