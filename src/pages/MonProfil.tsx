@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { ClipboardList, User, MapPin, Phone, Ruler, Weight, Calendar, ArrowLeft, Sparkles, Save, ChevronRight, Send, MessageCircle, Headphones, Camera, Star, FileSpreadsheet, CalendarCheck, Check, X, CalendarPlus, CalendarClock } from "lucide-react";
+import { ClipboardList, User, MapPin, Phone, Ruler, Weight, Calendar, ArrowLeft, Sparkles, Save, ChevronRight, Send, MessageCircle, Headphones, Camera, Star, FileSpreadsheet, CalendarCheck, Check, X, CalendarPlus, CalendarClock, BellRing, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -974,6 +974,65 @@ const MonProfil = () => {
             <Button variant="heroOutline" size="lg" onClick={dismissWelcomePopup}>
               Plus tard
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Pop-up rappel paiement — non fermable, reste actif tant qu'Emma n'a pas confirmé */}
+      <Dialog open={!!profile?.payment_reminder_active} onOpenChange={() => { /* non fermable côté client */ }}>
+        <DialogContent
+          className="max-w-md border-primary/40"
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
+          <DialogHeader>
+            <DialogTitle className="font-display text-2xl text-gradient-blue flex items-center gap-2">
+              <BellRing size={22} className="text-primary" /> Rappel paiement
+            </DialogTitle>
+            <DialogDescription className="text-foreground text-sm pt-2 leading-relaxed">
+              Hello {firstName || ""} 👋 — c'est bientôt l'heure de renouveler ton
+              abonnement à <span className="text-primary font-semibold">Em' Coaching</span>.
+              {profile?.next_payment_date && (
+                <span className="block mt-3 text-foreground">
+                  📅 Prochain paiement prévu le{" "}
+                  <span className="text-primary font-semibold">
+                    {new Date(profile.next_payment_date).toLocaleDateString("fr-FR", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </span>
+                </span>
+              )}
+              <span className="block mt-3 text-muted-foreground text-xs">
+                Ce rappel disparaîtra automatiquement dès qu'Emma aura confirmé la
+                réception de ton paiement.
+              </span>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-2 pt-2">
+            {assignedPlan?.paypal_url && (
+              <Button
+                variant="hero"
+                size="lg"
+                className="w-full"
+                onClick={() => window.open(assignedPlan.paypal_url, "_blank", "noopener,noreferrer")}
+              >
+                <CreditCard size={18} className="mr-2" /> Payer maintenant
+              </Button>
+            )}
+            {adminId && (
+              <Button
+                variant="heroOutline"
+                size="lg"
+                className="w-full"
+                onClick={() => {
+                  messagerieRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+              >
+                <MessageCircle size={18} className="mr-2" /> Contacter Emma
+              </Button>
+            )}
           </div>
         </DialogContent>
       </Dialog>
