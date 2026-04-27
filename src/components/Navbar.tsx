@@ -11,7 +11,6 @@ const navLinks = [
   { label: "Accueil", to: "/" },
   { label: "Qui je suis", to: "/a-propos" },
   { label: "Formules", to: "/services" },
-  { label: "Tarifs", to: "/tarifs" },
   { label: "Planning", to: "/planning" },
   { label: "Avis", to: "/avis" },
   { label: "Contact", to: "/contact" },

@@ -1,12 +1,12 @@
 import Navbar from "@/components/Navbar";
-import PricingSection from "@/components/PricingSection";
+import ServicesSection from "@/components/ServicesSection";
 import Footer from "@/components/Footer";
 
 const Tarifs = () => (
   <div className="min-h-screen bg-background">
     <Navbar />
     <div className="pt-16">
-      <PricingSection />
+      <ServicesSection />
     </div>
     <Footer />
   </div>
