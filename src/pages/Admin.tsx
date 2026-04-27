@@ -1136,6 +1136,41 @@ const Admin = () => {
                   </div>
                 </div>
 
+                {/* Rappel paiement + accès Google Agenda du client */}
+                <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-border/40">
+                  <label className="inline-flex items-center gap-2 text-xs cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-border accent-primary"
+                      defaultChecked={!!c.payment_reminder_active}
+                      onChange={async (e) => {
+                        await supabase
+                          .from("profiles")
+                          .update({ payment_reminder_active: e.target.checked })
+                          .eq("id", c.id);
+                        queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                        toast.success(
+                          e.target.checked
+                            ? "Rappel de paiement activé pour ce client"
+                            : "Rappel de paiement désactivé"
+                        );
+                      }}
+                    />
+                    <BellRing size={12} className="text-primary" />
+                    <span className="text-foreground font-medium">
+                      Activer le rappel de paiement (popup côté client)
+                    </span>
+                  </label>
+                  <Button
+                    variant="heroOutline"
+                    size="sm"
+                    className="h-7 text-xs ml-auto"
+                    onClick={() => window.open("https://calendar.google.com/calendar/u/0/r", "_blank", "noopener,noreferrer")}
+                  >
+                    <Calendar size={12} className="mr-1" /> Ouvrir Google Agenda
+                  </Button>
+                </div>
+
                 {/* Client bookings */}
                 {(() => {
                   const userBookings = clientBookings?.filter((b: any) => b.user_id === c.user_id) || [];
