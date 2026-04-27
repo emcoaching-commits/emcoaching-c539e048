@@ -114,6 +114,42 @@ export type Database = {
           },
         ]
       }
+      custom_links: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          position: number
+          title: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          position?: number
+          title: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          position?: number
+          title?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
@@ -269,6 +305,7 @@ export type Database = {
           height: number | null
           id: string
           next_payment_date: string | null
+          payment_reminder_active: boolean
           phone: string | null
           subscription_activated_at: string | null
           subscription_start_date: string | null
@@ -291,6 +328,7 @@ export type Database = {
           height?: number | null
           id?: string
           next_payment_date?: string | null
+          payment_reminder_active?: boolean
           phone?: string | null
           subscription_activated_at?: string | null
           subscription_start_date?: string | null
@@ -313,6 +351,7 @@ export type Database = {
           height?: number | null
           id?: string
           next_payment_date?: string | null
+          payment_reminder_active?: boolean
           phone?: string | null
           subscription_activated_at?: string | null
           subscription_start_date?: string | null
