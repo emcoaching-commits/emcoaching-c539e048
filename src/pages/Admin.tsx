@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search, Users, Settings, CalendarClock, Tag, Clock, Image, Upload, Package, Edit2, Save, Calendar } from "lucide-react";
+import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search, Users, Settings, CalendarClock, Tag, Clock, Image, Upload, Package, Edit2, Save, Calendar, Link2, BellRing } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import HomeContentManager from "@/components/admin/HomeContentManager";
 import PricingPlansManager from "@/components/admin/PricingPlansManager";
 import RecurringSlotsForm from "@/components/admin/RecurringSlotsForm";
+import CustomLinksManager from "@/components/admin/CustomLinksManager";
 import { withAppBase } from "@/lib/app-paths";
 
 const Admin = () => {
@@ -553,6 +554,14 @@ const Admin = () => {
                 { value: "home", label: "Accueil & Logo" },
                 { value: "about", label: "À propos" },
                 { value: "formules", label: "Formules" },
+              ],
+            },
+            {
+              id: "management",
+              label: "Management",
+              icon: Link2,
+              tabs: [
+                { value: "links", label: "Liens utiles" },
               ],
             },
           ];
@@ -1127,6 +1136,41 @@ const Admin = () => {
                   </div>
                 </div>
 
+                {/* Rappel paiement + accès Google Agenda du client */}
+                <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-border/40">
+                  <label className="inline-flex items-center gap-2 text-xs cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-border accent-primary"
+                      defaultChecked={!!c.payment_reminder_active}
+                      onChange={async (e) => {
+                        await supabase
+                          .from("profiles")
+                          .update({ payment_reminder_active: e.target.checked })
+                          .eq("id", c.id);
+                        queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                        toast.success(
+                          e.target.checked
+                            ? "Rappel de paiement activé pour ce client"
+                            : "Rappel de paiement désactivé"
+                        );
+                      }}
+                    />
+                    <BellRing size={12} className="text-primary" />
+                    <span className="text-foreground font-medium">
+                      Activer le rappel de paiement (popup côté client)
+                    </span>
+                  </label>
+                  <Button
+                    variant="heroOutline"
+                    size="sm"
+                    className="h-7 text-xs ml-auto"
+                    onClick={() => window.open("https://calendar.google.com/calendar/u/0/r", "_blank", "noopener,noreferrer")}
+                  >
+                    <Calendar size={12} className="mr-1" /> Ouvrir Google Agenda
+                  </Button>
+                </div>
+
                 {/* Client bookings */}
                 {(() => {
                   const userBookings = clientBookings?.filter((b: any) => b.user_id === c.user_id) || [];
@@ -1431,6 +1475,20 @@ const Admin = () => {
                 Modifie les textes de la page d'accueil, le nom de la marque et les logos.
               </p>
               <HomeContentManager />
+            </div>
+          </TabsContent>
+
+          {/* Management — liens utiles */}
+          <TabsContent value="links" className="space-y-6">
+            <div className="bg-card border border-border rounded-xl p-6">
+              <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                <Link2 size={20} /> Liens utiles
+              </h3>
+              <p className="text-muted-foreground text-sm mb-6">
+                Tous tes liens essentiels au même endroit : Google Sheets, Forms, PayPal,
+                Docs, Loom… Ajoutes-en autant que tu veux.
+              </p>
+              <CustomLinksManager />
             </div>
           </TabsContent>
             </Tabs>
