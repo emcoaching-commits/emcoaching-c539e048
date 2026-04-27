@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import HomeContentManager from "@/components/admin/HomeContentManager";
 import PricingPlansManager from "@/components/admin/PricingPlansManager";
 import RecurringSlotsForm from "@/components/admin/RecurringSlotsForm";
+import CustomLinksManager from "@/components/admin/CustomLinksManager";
 import { withAppBase } from "@/lib/app-paths";
 
 const Admin = () => {
@@ -553,6 +554,14 @@ const Admin = () => {
                 { value: "home", label: "Accueil & Logo" },
                 { value: "about", label: "À propos" },
                 { value: "formules", label: "Formules" },
+              ],
+            },
+            {
+              id: "management",
+              label: "Management",
+              icon: Link2,
+              tabs: [
+                { value: "links", label: "Liens utiles" },
               ],
             },
           ];
