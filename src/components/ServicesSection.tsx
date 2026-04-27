@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const iconMap: Record<string, any> = { Dumbbell, Apple, HeartPulse };
 
@@ -40,7 +41,7 @@ const ServicesSection = () => {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto pt-6">
           {plans?.map((plan: any, i: number) => {
             const Icon = iconMap["Dumbbell"];
             const bgUrl = plan.background_image_url as string | null;
@@ -51,10 +52,16 @@ const ServicesSection = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
-                className={`relative overflow-hidden group bg-card border rounded-xl p-8 text-center transition-all duration-300 ${
+                className={`relative group bg-card border rounded-xl p-8 text-center transition-all duration-300 ${
                   plan.is_popular ? "border-primary glow-blue" : "border-border"
                 }`}
               >
+                {plan.is_popular && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-bold px-4 py-1 rounded-full z-30 shadow-lg shadow-primary/40 whitespace-nowrap">
+                    ⭐ POPULAIRE
+                  </span>
+                )}
+                <div className="absolute inset-0 overflow-hidden rounded-xl">
                 {bgUrl && (
                   <>
                     <div
@@ -72,11 +79,7 @@ const ServicesSection = () => {
                     />
                   </>
                 )}
-                {plan.is_popular && (
-                  <span className="absolute top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-semibold px-4 py-1 rounded-full z-20">
-                    POPULAIRE
-                  </span>
-                )}
+                </div>
                 <div className="relative z-10 flex flex-col h-full">
                   {bgUrl && <div className="h-32 sm:h-40" />}
                   {!bgUrl && (
@@ -87,14 +90,30 @@ const ServicesSection = () => {
                   <h3 className="font-display text-3xl text-foreground mb-2">{plan.name}</h3>
                   <p className="font-display text-2xl text-gradient-blue mb-3">{plan.price}€</p>
                   <p className="text-muted-foreground text-sm leading-relaxed mb-6 flex-1">{plan.description}</p>
-                  <Button
-                    variant={plan.is_popular ? "hero" : "heroOutline"}
-                    size="lg"
-                    className="w-full mt-auto"
-                    onClick={() => navigate(`/formules/${plan.id}`)}
-                  >
-                    En savoir plus
-                  </Button>
+                  <div className="flex flex-col gap-2 mt-auto">
+                    <Button
+                      variant="heroOutline"
+                      size="lg"
+                      className="w-full"
+                      onClick={() => navigate(`/formules/${plan.id}`)}
+                    >
+                      En savoir plus
+                    </Button>
+                    <Button
+                      variant={plan.is_popular ? "hero" : "default"}
+                      size="lg"
+                      className="w-full"
+                      onClick={() => {
+                        if (plan.paypal_url) {
+                          window.open(plan.paypal_url, "_blank", "noopener,noreferrer");
+                        } else {
+                          toast.error("Lien de paiement indisponible. Contacte Emma.");
+                        }
+                      }}
+                    >
+                      Choisir cette formule
+                    </Button>
+                  </div>
                 </div>
               </motion.div>
             );
