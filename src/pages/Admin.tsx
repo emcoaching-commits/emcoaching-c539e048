@@ -1442,6 +1442,20 @@ const Admin = () => {
               <HomeContentManager />
             </div>
           </TabsContent>
+
+          {/* Management — liens utiles */}
+          <TabsContent value="links" className="space-y-6">
+            <div className="bg-card border border-border rounded-xl p-6">
+              <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                <Link2 size={20} /> Liens utiles
+              </h3>
+              <p className="text-muted-foreground text-sm mb-6">
+                Tous tes liens essentiels au même endroit : Google Sheets, Forms, PayPal,
+                Docs, Loom… Ajoutes-en autant que tu veux.
+              </p>
+              <CustomLinksManager />
+            </div>
+          </TabsContent>
             </Tabs>
           );
         })()}
