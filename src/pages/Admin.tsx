@@ -62,6 +62,14 @@ const Admin = () => {
       setIsAdmin(true);
       setCurrentUserId(user.id);
 
+      // Lit ?tab=management depuis l'URL pour ouvrir directement le bon onglet
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get("tab");
+      if (tabParam === "management") {
+        setActiveGroup("management");
+        setActiveTab("links");
+      }
+
       // Auto-clean past slots & bookings
       const today = new Date().toISOString().split("T")[0];
       const { data: pastSlots } = await supabase.from("time_slots").select("id").lt("date", today);
