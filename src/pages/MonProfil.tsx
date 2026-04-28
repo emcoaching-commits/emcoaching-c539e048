@@ -39,6 +39,7 @@ const MonProfil = () => {
   const [availableSlots, setAvailableSlots] = useState<any[]>([]);
   const [assignedPlan, setAssignedPlan] = useState<any>(null);
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+  const [bilanUrl, setBilanUrl] = useState<string | null>(null);
   const msgBottomRef = useRef<HTMLDivElement>(null);
   const messagerieRef = useRef<HTMLDivElement>(null);
 
@@ -104,6 +105,16 @@ const MonProfil = () => {
 
       // Mark as read
       await supabase.from("messages").update({ is_read: true }).eq("receiver_id", user.id).eq("is_read", false);
+
+      // Lien "Bilan semaine" (custom_links category = 'bilan_semaine')
+      const { data: bilan } = await supabase
+        .from("custom_links")
+        .select("url")
+        .eq("category", "bilan_semaine")
+        .order("position")
+        .limit(1)
+        .maybeSingle();
+      if (bilan?.url) setBilanUrl(bilan.url);
 
       // Load bookings with time slot info
       const { data: bookingsData } = await supabase
