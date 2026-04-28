@@ -751,6 +751,33 @@ const MonProfil = () => {
               </motion.div>
             )}
 
+            {/* Bilan de la semaine — uniquement si abonnement actif et lien défini */}
+            {profile?.has_active_subscription && bilanUrl && (
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.27 }}
+                className="relative overflow-hidden rounded-xl border border-purple-500/40 bg-gradient-to-r from-purple-500/15 via-purple-500/5 to-card p-6"
+              >
+                <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center shrink-0">
+                    <ClipboardList size={24} className="text-purple-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-foreground font-display text-xl mb-1">BILAN DE LA SEMAINE</h3>
+                    <p className="text-muted-foreground text-sm">Fais ton bilan hebdomadaire pour qu'Emma adapte ton suivi 🟣</p>
+                  </div>
+                  <Button
+                    size="lg"
+                    className="shrink-0 bg-purple-500 hover:bg-purple-600 text-white"
+                    onClick={() => window.open(bilanUrl, "_blank")}
+                  >
+                    Faire mon bilan <ChevronRight size={16} className="ml-1" />
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
             {/* Profile card */}
             <motion.div
               initial={{ y: 20, opacity: 0 }}
