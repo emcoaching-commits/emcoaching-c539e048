@@ -354,25 +354,33 @@ const MonProfil = () => {
               transition={{ delay: 0.2 }}
               className={`rounded-xl p-5 border ${
                 profile?.has_active_subscription
-                  ? "bg-green-500/10 border-green-500/30"
+                  ? "bg-gradient-to-br from-green-500/15 to-green-500/5 border-green-500/40 shadow-lg shadow-green-500/10"
                   : "bg-card border-border"
               }`}
             >
               <div className="flex items-center gap-3 mb-2">
                 <div className={`w-3 h-3 rounded-full ${profile?.has_active_subscription ? "bg-green-500 animate-pulse" : "bg-muted-foreground"}`} />
-                <span className="text-foreground font-medium text-sm">
-                  {profile?.has_active_subscription
-                    ? assignedPlan ? `Formule : ${assignedPlan.name}` : "Abonnement actif"
-                    : "Pas d'abonnement"}
+                <span className="text-muted-foreground text-xs uppercase tracking-wider font-semibold">
+                  {profile?.has_active_subscription ? "Abonnement actif" : "Statut"}
                 </span>
               </div>
-              {profile?.has_active_subscription && assignedPlan && (
-                <p className="text-muted-foreground text-xs mt-1">
-                  {assignedPlan.price}€ — {assignedPlan.description || ""}
-                </p>
-              )}
-              {!profile?.has_active_subscription && (
-                <p className="text-muted-foreground text-xs">Contacte Emma pour souscrire à une formule.</p>
+              {profile?.has_active_subscription ? (
+                assignedPlan ? (
+                  <>
+                    <p className="font-display text-2xl text-foreground leading-tight">{assignedPlan.name}</p>
+                    <p className="text-primary font-display text-xl mt-1">{assignedPlan.price}€</p>
+                    {assignedPlan.description && (
+                      <p className="text-muted-foreground text-xs mt-2">{assignedPlan.description}</p>
+                    )}
+                  </>
+                ) : (
+                  <p className="font-display text-xl text-foreground">Formule active</p>
+                )
+              ) : (
+                <>
+                  <p className="text-foreground font-medium">Pas d'abonnement</p>
+                  <p className="text-muted-foreground text-xs mt-1">Contacte Emma pour souscrire à une formule.</p>
+                </>
               )}
             </motion.div>
 
