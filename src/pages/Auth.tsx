@@ -121,15 +121,26 @@ const Auth = () => {
   };
 
   const handleGoogleLogin = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast.error("Erreur lors de la connexion Google");
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        console.error("Google OAuth error:", result.error);
+        toast.error("Erreur Google : " + (result.error.message || "réessaie"));
+        return;
+      }
+      if (result.redirected) {
+        // Le navigateur va être redirigé vers Google — on attend
+        return;
+      }
+      // Tokens reçus directement (cas rare)
+      toast.success("Connexion réussie !");
+      navigate("/");
+    } catch (e: any) {
+      console.error("Google OAuth exception:", e);
+      toast.error("Connexion Google indisponible : " + (e?.message || "réessaie plus tard"));
     }
-    if (result.redirected) return;
-    toast.success("Connexion réussie !");
-    navigate("/");
   };
 
   return (
