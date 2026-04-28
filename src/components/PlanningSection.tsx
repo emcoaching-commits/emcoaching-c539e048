@@ -39,6 +39,13 @@ const PlanningSection = () => {
       navigate("/auth");
       return;
     }
+    // Vérifie le téléphone (obligatoire pour Emma)
+    const { data: profile } = await supabase.from("profiles").select("phone").eq("user_id", user.id).maybeSingle();
+    if (!profile?.phone || profile.phone.trim().length < 6) {
+      toast.error("Ton numéro de téléphone est obligatoire pour réserver. Renseigne-le dans ton profil.");
+      navigate("/mon-profil");
+      return;
+    }
     const { error } = await supabase.from("bookings").insert({
       user_id: user.id,
       time_slot_id: slotId,
@@ -50,6 +57,12 @@ const PlanningSection = () => {
       await supabase.from("time_slots").update({ is_available: false }).eq("id", slotId);
       toast.success("Créneau réservé avec succès !");
       queryClient.invalidateQueries({ queryKey: ["time_slots"] });
+      // Notifie Emma par email (best-effort)
+      try {
+        await supabase.functions.invoke("notify-booking", {
+          body: { booking_slot_id: slotId, user_id: user.id },
+        });
+      } catch (_) { /* silencieux */ }
     }
   };
 
