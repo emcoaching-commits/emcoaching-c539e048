@@ -39,6 +39,7 @@ const MonProfil = () => {
   const [availableSlots, setAvailableSlots] = useState<any[]>([]);
   const [assignedPlan, setAssignedPlan] = useState<any>(null);
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+  const [bilanUrl, setBilanUrl] = useState<string | null>(null);
   const msgBottomRef = useRef<HTMLDivElement>(null);
   const messagerieRef = useRef<HTMLDivElement>(null);
 
@@ -104,6 +105,16 @@ const MonProfil = () => {
 
       // Mark as read
       await supabase.from("messages").update({ is_read: true }).eq("receiver_id", user.id).eq("is_read", false);
+
+      // Lien "Bilan semaine" (custom_links category = 'bilan_semaine')
+      const { data: bilan } = await supabase
+        .from("custom_links")
+        .select("url")
+        .eq("category", "bilan_semaine")
+        .order("position")
+        .limit(1)
+        .maybeSingle();
+      if (bilan?.url) setBilanUrl(bilan.url);
 
       // Load bookings with time slot info
       const { data: bookingsData } = await supabase
@@ -354,25 +365,33 @@ const MonProfil = () => {
               transition={{ delay: 0.2 }}
               className={`rounded-xl p-5 border ${
                 profile?.has_active_subscription
-                  ? "bg-green-500/10 border-green-500/30"
+                  ? "bg-gradient-to-br from-green-500/15 to-green-500/5 border-green-500/40 shadow-lg shadow-green-500/10"
                   : "bg-card border-border"
               }`}
             >
               <div className="flex items-center gap-3 mb-2">
                 <div className={`w-3 h-3 rounded-full ${profile?.has_active_subscription ? "bg-green-500 animate-pulse" : "bg-muted-foreground"}`} />
-                <span className="text-foreground font-medium text-sm">
-                  {profile?.has_active_subscription
-                    ? assignedPlan ? `Formule : ${assignedPlan.name}` : "Abonnement actif"
-                    : "Pas d'abonnement"}
+                <span className="text-muted-foreground text-xs uppercase tracking-wider font-semibold">
+                  {profile?.has_active_subscription ? "Abonnement actif" : "Statut"}
                 </span>
               </div>
-              {profile?.has_active_subscription && assignedPlan && (
-                <p className="text-muted-foreground text-xs mt-1">
-                  {assignedPlan.price}€ — {assignedPlan.description || ""}
-                </p>
-              )}
-              {!profile?.has_active_subscription && (
-                <p className="text-muted-foreground text-xs">Contacte Emma pour souscrire à une formule.</p>
+              {profile?.has_active_subscription ? (
+                assignedPlan ? (
+                  <>
+                    <p className="font-display text-2xl text-foreground leading-tight">{assignedPlan.name}</p>
+                    <p className="text-primary font-display text-xl mt-1">{assignedPlan.price}€</p>
+                    {assignedPlan.description && (
+                      <p className="text-muted-foreground text-xs mt-2">{assignedPlan.description}</p>
+                    )}
+                  </>
+                ) : (
+                  <p className="font-display text-xl text-foreground">Formule active</p>
+                )
+              ) : (
+                <>
+                  <p className="text-foreground font-medium">Pas d'abonnement</p>
+                  <p className="text-muted-foreground text-xs mt-1">Contacte Emma pour souscrire à une formule.</p>
+                </>
               )}
             </motion.div>
 
@@ -727,6 +746,33 @@ const MonProfil = () => {
                     onClick={() => window.open(profile.google_sheet_url, "_blank")}
                   >
                     Ouvrir <ChevronRight size={16} className="ml-1" />
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Bilan de la semaine — uniquement si abonnement actif et lien défini */}
+            {profile?.has_active_subscription && bilanUrl && (
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.27 }}
+                className="relative overflow-hidden rounded-xl border border-purple-500/40 bg-gradient-to-r from-purple-500/15 via-purple-500/5 to-card p-6"
+              >
+                <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center shrink-0">
+                    <ClipboardList size={24} className="text-purple-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-foreground font-display text-xl mb-1">BILAN DE LA SEMAINE</h3>
+                    <p className="text-muted-foreground text-sm">Fais ton bilan hebdomadaire pour qu'Emma adapte ton suivi 🟣</p>
+                  </div>
+                  <Button
+                    size="lg"
+                    className="shrink-0 bg-purple-500 hover:bg-purple-600 text-white"
+                    onClick={() => window.open(bilanUrl, "_blank")}
+                  >
+                    Faire mon bilan <ChevronRight size={16} className="ml-1" />
                   </Button>
                 </div>
               </motion.div>

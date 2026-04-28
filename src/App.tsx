@@ -18,6 +18,9 @@ import Planning from "./pages/Planning.tsx";
 import Avis from "./pages/Avis.tsx";
 import APropos from "./pages/APropos.tsx";
 import Contact from "./pages/Contact.tsx";
+import MentionsLegales from "./pages/MentionsLegales.tsx";
+import CGV from "./pages/CGV.tsx";
+import Confidentialite from "./pages/Confidentialite.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { getAppBase } from "@/lib/app-paths";
 
@@ -54,6 +57,9 @@ const App = () => {
           <Route path="/admin" element={<Admin />} />
           <Route path="/questionnaire" element={<Questionnaire />} />
           <Route path="/mon-profil" element={<MonProfil />} />
+          <Route path="/mentions-legales" element={<MentionsLegales />} />
+          <Route path="/cgv" element={<CGV />} />
+          <Route path="/confidentialite" element={<Confidentialite />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

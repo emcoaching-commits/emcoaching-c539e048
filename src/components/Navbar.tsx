@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, LogIn, LogOut, Shield, UserPlus, User } from "lucide-react";
+import { Menu, X, LogIn, LogOut, Shield, UserPlus, User, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -73,9 +73,14 @@ const Navbar = () => {
             </Link>
           ))}
           {isAdmin && (
-            <Button variant="heroOutline" size="sm" onClick={() => navigate("/admin")}>
-              <Shield size={16} className="mr-1" /> Admin
-            </Button>
+            <>
+              <Button variant="heroOutline" size="sm" onClick={() => navigate("/admin")}>
+                <Shield size={16} className="mr-1" /> Admin
+              </Button>
+              <Button variant="heroOutline" size="sm" onClick={() => navigate("/admin?tab=management")}>
+                <Briefcase size={16} className="mr-1" /> Management
+              </Button>
+            </>
           )}
           {user ? (
             <>
@@ -135,9 +140,14 @@ const Navbar = () => {
               </Link>
             ))}
             {isAdmin && (
-              <Button variant="heroOutline" size="lg" onClick={() => { navigate("/admin"); setOpen(false); }}>
-                <Shield size={16} className="mr-1" /> Admin
-              </Button>
+              <>
+                <Button variant="heroOutline" size="lg" onClick={() => { navigate("/admin"); setOpen(false); }}>
+                  <Shield size={16} className="mr-1" /> Admin
+                </Button>
+                <Button variant="heroOutline" size="lg" onClick={() => { navigate("/admin?tab=management"); setOpen(false); }}>
+                  <Briefcase size={16} className="mr-1" /> Management
+                </Button>
+              </>
             )}
             {user ? (
               <>
