@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { ClipboardList, User, MapPin, Phone, Ruler, Weight, Calendar, ArrowLeft, Sparkles, Save, ChevronRight, Send, MessageCircle, Headphones, Camera, Star, FileSpreadsheet, CalendarCheck, Check, X, CalendarPlus, CalendarClock, BellRing, CreditCard } from "lucide-react";
+import { ClipboardList, User, MapPin, Phone, Ruler, Weight, Calendar, ArrowLeft, Sparkles, Save, ChevronRight, Send, MessageCircle, Headphones, Camera, Star, FileSpreadsheet, FormInput, CalendarCheck, Check, X, CalendarPlus, CalendarClock, BellRing, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -744,6 +744,34 @@ const MonProfil = () => {
                     size="lg"
                     className="shrink-0 border-green-500 text-green-500 hover:bg-green-500/10"
                     onClick={() => window.open(profile.google_sheet_url, "_blank")}
+                  >
+                    Ouvrir <ChevronRight size={16} className="ml-1" />
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Google Form link */}
+            {profile?.google_form_url && (
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.26 }}
+                className="relative overflow-hidden rounded-xl border border-blue-500/30 bg-gradient-to-r from-blue-500/10 via-blue-500/5 to-card p-6"
+              >
+                <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center shrink-0">
+                    <FormInput size={24} className="text-blue-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-foreground font-display text-xl mb-1">TON FORMULAIRE</h3>
+                    <p className="text-muted-foreground text-sm">Remplis le formulaire envoyé par Emma ✍️</p>
+                  </div>
+                  <Button
+                    variant="heroOutline"
+                    size="lg"
+                    className="shrink-0 border-blue-500 text-blue-500 hover:bg-blue-500/10"
+                    onClick={() => window.open(profile.google_form_url, "_blank")}
                   >
                     Ouvrir <ChevronRight size={16} className="ml-1" />
                   </Button>

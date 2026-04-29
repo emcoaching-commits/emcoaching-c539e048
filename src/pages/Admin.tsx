@@ -1142,6 +1142,14 @@ const Admin = () => {
                       toast.success("Mis à jour");
                     }} />
                   </div>
+                  <div>
+                    <label className="text-muted-foreground text-xs">📝 Google Form</label>
+                    <Input type="url" placeholder="https://docs.google.com/forms/..." className="h-7 text-xs bg-background border-border" defaultValue={(c as any).google_form_url || ""} onBlur={async (e) => {
+                      await supabase.from("profiles").update({ google_form_url: e.target.value || null } as any).eq("id", c.id);
+                      queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                      toast.success("Mis à jour");
+                    }} />
+                  </div>
                 </div>
 
                 {/* Rappel paiement + accès Google Agenda du client */}
