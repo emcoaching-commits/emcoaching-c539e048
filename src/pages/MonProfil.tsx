@@ -724,6 +724,45 @@ const MonProfil = () => {
               </motion.div>
             )}
 
+            {/* Bandeau permanent rappel paiement */}
+            {profile?.payment_reminder_active && (
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="relative overflow-hidden rounded-xl border border-orange-500/40 bg-gradient-to-r from-orange-500/15 via-orange-500/5 to-card p-6"
+              >
+                <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center shrink-0">
+                    <BellRing size={24} className="text-orange-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-foreground font-display text-xl mb-1">RAPPEL PAIEMENT</h3>
+                    <p className="text-muted-foreground text-sm">
+                      C'est bientôt l'heure de renouveler ton abonnement à Em' Coaching.
+                      {profile?.next_payment_date && (
+                        <> Prochain paiement prévu le{" "}
+                          <span className="text-orange-500 font-semibold">
+                            {new Date(profile.next_payment_date).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })}
+                          </span>.
+                        </>
+                      )}
+                    </p>
+                  </div>
+                  {assignedPlan?.paypal_url && (
+                    <Button
+                      variant="heroOutline"
+                      size="lg"
+                      className="shrink-0 border-orange-500 text-orange-500 hover:bg-orange-500/10"
+                      onClick={() => window.open(assignedPlan.paypal_url, "_blank", "noopener,noreferrer")}
+                    >
+                      <CreditCard size={16} className="mr-2" /> Payer
+                    </Button>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
             {/* Google Sheet link */}
             {profile?.google_sheet_url && (
               <motion.div
