@@ -1092,13 +1092,12 @@ const MonProfil = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Pop-up rappel paiement — non fermable, reste actif tant qu'Emma n'a pas confirmé */}
-      <Dialog open={!!profile?.payment_reminder_active} onOpenChange={() => { /* non fermable côté client */ }}>
-        <DialogContent
-          className="max-w-md border-primary/40"
-          onPointerDownOutside={(e) => e.preventDefault()}
-          onEscapeKeyDown={(e) => e.preventDefault()}
-        >
+      {/* Pop-up rappel paiement — fermable ; le bandeau reste sur le profil */}
+      <Dialog
+        open={!!profile?.payment_reminder_active && !reminderDialogDismissed}
+        onOpenChange={(open) => { if (!open) setReminderDialogDismissed(true); }}
+      >
+        <DialogContent className="max-w-md border-primary/40">
           <DialogHeader>
             <DialogTitle className="font-display text-2xl text-gradient-blue flex items-center gap-2">
               <BellRing size={22} className="text-primary" /> Rappel paiement
