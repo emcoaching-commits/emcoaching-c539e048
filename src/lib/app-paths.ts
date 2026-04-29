@@ -1,4 +1,4 @@
-const REPO_BASE_SEGMENT = "/emcoaching-827ede2d";
+const REPO_BASE_SEGMENT = "/emcoaching-c539e048";
 
 export const getAppBase = () => {
   if (typeof window === "undefined") {
