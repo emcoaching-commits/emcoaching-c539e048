@@ -18,6 +18,21 @@ const KEYS = [
   "site_logo_url",
   "hero_logo_url",
   "site_brand_name",
+  // Marketing highlights (page d'accueil)
+  "marketing_accroche",
+  "marketing_stat1_value",
+  "marketing_stat1_label",
+  "marketing_stat2_value",
+  "marketing_stat2_label",
+  "marketing_stat3_value",
+  "marketing_stat3_label",
+  "marketing_stat4_value",
+  "marketing_stat4_label",
+  "marketing_result1",
+  "marketing_result2",
+  "marketing_result3",
+  "marketing_cta_text",
+  "marketing_cta_button",
 ];
 
 const HomeContentManager = () => {
@@ -47,6 +62,20 @@ const HomeContentManager = () => {
       site_logo_url: assetWithBase("logo.png"),
       hero_logo_url: assetWithBase("hero-logo.png"),
       site_brand_name: "EM' COACHING",
+      marketing_accroche: "Tu manques de motivation, de résultats, de cadre ? Emma t'accompagne pas à pas avec un programme 100% personnalisé.",
+      marketing_stat1_value: "+150",
+      marketing_stat1_label: "Clientes accompagnées",
+      marketing_stat2_value: "5 ans",
+      marketing_stat2_label: "D'expérience coaching",
+      marketing_stat3_value: "98%",
+      marketing_stat3_label: "De clientes satisfaites",
+      marketing_stat4_value: "6 sem.",
+      marketing_stat4_label: "Pour voir les premiers résultats",
+      marketing_result1: "« J'ai perdu 8 kg en 3 mois sans frustration. »",
+      marketing_result2: "« Mon corps a complètement changé, et surtout ma confiance. »",
+      marketing_result3: "« Le suivi quotidien fait toute la différence. »",
+      marketing_cta_text: "Prête à transformer ton corps et ton mindset ?",
+      marketing_cta_button: "Rejoindre le coaching",
     };
     for (const s of settings || []) {
       init[s.key] = s.value || "";
@@ -203,6 +232,77 @@ const HomeContentManager = () => {
             value={values.hero_description || ""}
             onChange={(e) => setValues({ ...values, hero_description: e.target.value })}
           />
+        </div>
+      </div>
+
+      {/* Section marketing : accroche, chiffres, résultats, CTA */}
+      <div className="border border-border rounded-lg p-4 bg-background/50 space-y-4">
+        <h4 className="font-display text-lg text-foreground">Section marketing (chiffres & résultats)</h4>
+
+        <div className="space-y-2">
+          <Label>Phrase d'accroche</Label>
+          <Textarea
+            rows={2}
+            value={values.marketing_accroche || ""}
+            onChange={(e) => setValues({ ...values, marketing_accroche: e.target.value })}
+          />
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-3">
+          {[1, 2, 3, 4].map((n) => (
+            <div key={n} className="border border-border/50 rounded p-3 space-y-2">
+              <Label className="text-xs">Chiffre #{n}</Label>
+              <Input
+                placeholder="Valeur (ex: +150)"
+                value={values[`marketing_stat${n}_value`] || ""}
+                onChange={(e) => setValues({ ...values, [`marketing_stat${n}_value`]: e.target.value })}
+              />
+              <Input
+                placeholder="Label (ex: Clientes accompagnées)"
+                value={values[`marketing_stat${n}_label`] || ""}
+                onChange={(e) => setValues({ ...values, [`marketing_stat${n}_label`]: e.target.value })}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="space-y-2">
+          <Label>Témoignage / résultat 1</Label>
+          <Input
+            value={values.marketing_result1 || ""}
+            onChange={(e) => setValues({ ...values, marketing_result1: e.target.value })}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Témoignage / résultat 2</Label>
+          <Input
+            value={values.marketing_result2 || ""}
+            onChange={(e) => setValues({ ...values, marketing_result2: e.target.value })}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Témoignage / résultat 3</Label>
+          <Input
+            value={values.marketing_result3 || ""}
+            onChange={(e) => setValues({ ...values, marketing_result3: e.target.value })}
+          />
+        </div>
+
+        <div className="grid sm:grid-cols-2 gap-3">
+          <div className="space-y-2">
+            <Label>Phrase CTA finale</Label>
+            <Input
+              value={values.marketing_cta_text || ""}
+              onChange={(e) => setValues({ ...values, marketing_cta_text: e.target.value })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Texte du bouton CTA</Label>
+            <Input
+              value={values.marketing_cta_button || ""}
+              onChange={(e) => setValues({ ...values, marketing_cta_button: e.target.value })}
+            />
+          </div>
         </div>
       </div>
 

@@ -5,6 +5,10 @@ import ReviewsSection from "@/components/ReviewsSection";
 import Footer from "@/components/Footer";
 import { Apple, Utensils, Dumbbell } from "lucide-react";
 import { motion } from "framer-motion";
+import PricingPreview from "@/components/PricingPreview";
+import ServicesSection from "@/components/ServicesSection";
+import MarketingHighlights from "@/components/MarketingHighlights";
+import { useIsActiveSubscriber } from "@/hooks/useIsActiveSubscriber";
 
 const PillarsRow = () => {
   const pillars = [
@@ -41,15 +45,23 @@ const PillarsRow = () => {
   );
 };
 
-const Index = () => (
-  <div className="min-h-screen bg-background">
-    <Navbar />
-    <HeroSection />
-    <PillarsRow />
-    <QuestionnaireSection />
-    <ReviewsSection />
-    <Footer />
-  </div>
-);
+const Index = () => {
+  const { isActive } = useIsActiveSubscriber();
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <HeroSection />
+      {/* Aperçu compact des formules — masqué si client déjà abonné */}
+      {!isActive && <PricingPreview />}
+      <PillarsRow />
+      <MarketingHighlights />
+      {/* Section formules détaillée — masquée si client déjà abonné */}
+      {!isActive && <ServicesSection />}
+      <QuestionnaireSection />
+      <ReviewsSection />
+      <Footer />
+    </div>
+  );
+};
 
 export default Index;
