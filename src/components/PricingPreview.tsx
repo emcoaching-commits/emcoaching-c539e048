@@ -83,13 +83,10 @@ const PricingPreview = () => {
 
         <div className="text-center mt-6">
           <button
-            onClick={() => {
-              const el = document.getElementById("services");
-              el?.scrollIntoView({ behavior: "smooth" });
-            }}
+            onClick={() => navigate("/tarifs")}
             className="text-primary text-sm font-medium hover:underline"
           >
-            Voir le détail des formules ↓
+            Voir le détail des formules
           </button>
         </div>
       </div>
