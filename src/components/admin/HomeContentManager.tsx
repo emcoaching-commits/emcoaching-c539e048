@@ -18,6 +18,7 @@ const KEYS = [
   "site_logo_url",
   "hero_logo_url",
   "site_brand_name",
+  "favicon_url",
   // Marketing highlights (page d'accueil)
   "marketing_accroche",
   "marketing_stat1_value",
@@ -38,7 +39,7 @@ const KEYS = [
 const HomeContentManager = () => {
   const queryClient = useQueryClient();
   const [values, setValues] = useState<Record<string, string>>({});
-  const [uploadingLogo, setUploadingLogo] = useState<"site" | "hero" | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState<"site" | "hero" | "favicon" | null>(null);
 
   const { data: settings } = useQuery({
     queryKey: ["site_settings_home"],
@@ -108,7 +109,7 @@ const HomeContentManager = () => {
     }
   };
 
-  const handleLogoUpload = async (file: File, which: "site" | "hero") => {
+  const handleLogoUpload = async (file: File, which: "site" | "hero" | "favicon") => {
     setUploadingLogo(which);
     try {
       const ext = file.name.split(".").pop();
@@ -116,10 +117,11 @@ const HomeContentManager = () => {
       const { error: upErr } = await supabase.storage.from("about-media").upload(path, file, { upsert: true });
       if (upErr) throw upErr;
       const { data: pub } = supabase.storage.from("about-media").getPublicUrl(path);
-      const key = which === "site" ? "site_logo_url" : "hero_logo_url";
+      const key =
+        which === "site" ? "site_logo_url" : which === "hero" ? "hero_logo_url" : "favicon_url";
       setValues({ ...values, [key]: pub.publicUrl });
       await supabase.from("site_settings").upsert({ key, value: pub.publicUrl }, { onConflict: "key" });
-      toast.success("Logo mis à jour !");
+      toast.success(which === "favicon" ? "Favicon mis à jour !" : "Logo mis à jour !");
       queryClient.invalidateQueries({ queryKey: ["site_settings_home"] });
       queryClient.invalidateQueries({ queryKey: ["site_settings_public"] });
     } catch (e: any) {
@@ -177,6 +179,27 @@ const HomeContentManager = () => {
               <Save size={14} className="mr-1" /> Enregistrer URL
             </Button>
           </div>
+        </div>
+
+        {/* Favicon */}
+        <div className="space-y-2 pt-4 border-t border-border/50">
+          <Label>Favicon (icône onglet navigateur)</Label>
+          <p className="text-xs text-muted-foreground">
+            Image carrée recommandée (.png, .ico). 32×32 ou 64×64 pixels suffisent.
+          </p>
+          {values.favicon_url && (
+            <img
+              src={values.favicon_url}
+              alt="favicon"
+              className="w-12 h-12 rounded border border-border bg-background object-contain p-1"
+            />
+          )}
+          <Input
+            type="file"
+            accept="image/*,.ico"
+            disabled={uploadingLogo === "favicon"}
+            onChange={(e) => e.target.files?.[0] && handleLogoUpload(e.target.files[0], "favicon")}
+          />
         </div>
       </div>
 
