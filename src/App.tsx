@@ -23,6 +23,7 @@ import CGV from "./pages/CGV.tsx";
 import Confidentialite from "./pages/Confidentialite.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { getAppBase } from "@/lib/app-paths";
+import FaviconLoader from "@/components/FaviconLoader";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => {
   return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <FaviconLoader />
       <Toaster />
       <Sonner />
         <BrowserRouter basename={getAppBase()}>
