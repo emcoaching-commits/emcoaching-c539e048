@@ -1106,7 +1106,7 @@ const MonProfil = () => {
 
       {/* Pop-up rappel paiement — fermable ; le bandeau reste sur le profil */}
       <Dialog
-        open={!!profile?.payment_reminder_active && !reminderDialogDismissed}
+        open={isReminderDue && !reminderDialogDismissed}
         onOpenChange={(open) => { if (!open) setReminderDialogDismissed(true); }}
       >
         <DialogContent className="max-w-md border-primary/40">
