@@ -44,6 +44,18 @@ const MonProfil = () => {
   const msgBottomRef = useRef<HTMLDivElement>(null);
   const messagerieRef = useRef<HTMLDivElement>(null);
 
+  // Le rappel n'apparaît qu'à partir de 7 jours avant la date de prochain paiement
+  // ET tant que l'admin n'a pas confirmé la réception du paiement (payment_reminder_active).
+  const isReminderDue = (() => {
+    if (!profile?.payment_reminder_active) return false;
+    if (!profile?.next_payment_date) return false;
+    const next = new Date(profile.next_payment_date);
+    const now = new Date();
+    const diffDays = (next.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+    // Visible entre J-7 et la date du paiement (inclus, +1 jour de tolérance)
+    return diffDays <= 7 && diffDays >= -1;
+  })();
+
   useEffect(() => {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -724,8 +736,8 @@ const MonProfil = () => {
               </motion.div>
             )}
 
-            {/* Bandeau permanent rappel paiement */}
-            {profile?.payment_reminder_active && (
+            {/* Bandeau rappel paiement — visible seulement dans la fenêtre de 7 jours avant la date */}
+            {isReminderDue && (
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
@@ -1094,7 +1106,7 @@ const MonProfil = () => {
 
       {/* Pop-up rappel paiement — fermable ; le bandeau reste sur le profil */}
       <Dialog
-        open={!!profile?.payment_reminder_active && !reminderDialogDismissed}
+        open={isReminderDue && !reminderDialogDismissed}
         onOpenChange={(open) => { if (!open) setReminderDialogDismissed(true); }}
       >
         <DialogContent className="max-w-md border-primary/40">

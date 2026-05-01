@@ -247,16 +247,37 @@ const Admin = () => {
     if (!confirm(`Supprimer définitivement ${name || "ce client"} et toutes ses données ? Cette action est irréversible.`)) return;
     setDeletingUser(userId);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const res = await supabase.functions.invoke("delete-user", {
-        body: { user_id: userId },
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+      if (!accessToken) {
+        toast.error("Session expirée. Reconnecte-toi.");
+        setDeletingUser(null);
+        return;
+      }
+
+      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/delete-user`;
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        },
+        body: JSON.stringify({ user_id: userId }),
       });
-      if (res.error) throw res.error;
+
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        const msg = payload?.error || payload?.details || `Erreur ${response.status}`;
+        throw new Error(msg);
+      }
+
       toast.success(`${name || "Client"} supprimé`);
       queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
       queryClient.invalidateQueries({ queryKey: ["admin_messages"] });
     } catch (err: any) {
-      toast.error("Erreur : " + (err.message || "Impossible de supprimer"));
+      console.error("Delete client error:", err);
+      toast.error("Erreur : " + (err?.message || "Impossible de supprimer"));
     }
     setDeletingUser(null);
   };
@@ -1177,6 +1198,32 @@ const Admin = () => {
                       Activer le rappel de paiement (popup côté client)
                     </span>
                   </label>
+                  <Button
+                    size="sm"
+                    variant="heroOutline"
+                    className="h-7 text-xs border-green-500/40 text-green-500 hover:bg-green-500/10"
+                    onClick={async () => {
+                      // Avancer la prochaine date de paiement de 1 mois et désactiver le rappel
+                      const base = c.next_payment_date
+                        ? new Date(c.next_payment_date)
+                        : new Date();
+                      const next = new Date(base);
+                      next.setMonth(next.getMonth() + 1);
+                      const iso = next.toISOString().slice(0, 10);
+                      const { error } = await supabase
+                        .from("profiles")
+                        .update({
+                          payment_reminder_active: false,
+                          next_payment_date: iso,
+                        })
+                        .eq("id", c.id);
+                      if (error) { toast.error("Erreur"); return; }
+                      queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                      toast.success(`Paiement validé ✅ — prochain le ${iso}`);
+                    }}
+                  >
+                    ✅ Marquer comme payé (mois suivant)
+                  </Button>
                   <Button
                     variant="heroOutline"
                     size="sm"
