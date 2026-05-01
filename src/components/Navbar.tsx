@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { assetWithBase } from "@/lib/app-paths";
+import { useIsActiveSubscriber } from "@/hooks/useIsActiveSubscriber";
 
 const navLinks = [
   { label: "Accueil", to: "/" },
@@ -25,6 +26,8 @@ const Navbar = () => {
   const { data: settings } = useSiteSettings();
   const logoUrl = settings?.site_logo_url || assetWithBase("logo.png");
   const brandName = settings?.site_brand_name || "EM' COACHING";
+  const { isActive: isSubscriber } = useIsActiveSubscriber();
+  const visibleLinks = navLinks.filter((l) => !(isSubscriber && l.to === "/services"));
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -61,7 +64,7 @@ const Navbar = () => {
         </Link>
 
         <div className="hidden md:flex items-center gap-5">
-          {navLinks.map((l) => (
+          {visibleLinks.map((l) => (
             <Link
               key={l.label}
               to={l.to}
@@ -127,7 +130,7 @@ const Navbar = () => {
       {open && (
         <div className="md:hidden bg-background border-b border-border py-4">
           <div className="container flex flex-col gap-4">
-            {navLinks.map((l) => (
+            {visibleLinks.map((l) => (
               <Link
                 key={l.label}
                 to={l.to}
