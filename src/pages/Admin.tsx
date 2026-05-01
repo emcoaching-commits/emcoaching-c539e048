@@ -1199,6 +1199,32 @@ const Admin = () => {
                     </span>
                   </label>
                   <Button
+                    size="sm"
+                    variant="heroOutline"
+                    className="h-7 text-xs border-green-500/40 text-green-500 hover:bg-green-500/10"
+                    onClick={async () => {
+                      // Avancer la prochaine date de paiement de 1 mois et désactiver le rappel
+                      const base = c.next_payment_date
+                        ? new Date(c.next_payment_date)
+                        : new Date();
+                      const next = new Date(base);
+                      next.setMonth(next.getMonth() + 1);
+                      const iso = next.toISOString().slice(0, 10);
+                      const { error } = await supabase
+                        .from("profiles")
+                        .update({
+                          payment_reminder_active: false,
+                          next_payment_date: iso,
+                        })
+                        .eq("id", c.id);
+                      if (error) { toast.error("Erreur"); return; }
+                      queryClient.invalidateQueries({ queryKey: ["admin_clients"] });
+                      toast.success(`Paiement validé ✅ — prochain le ${iso}`);
+                    }}
+                  >
+                    ✅ Marquer comme payé (mois suivant)
+                  </Button>
+                  <Button
                     variant="heroOutline"
                     size="sm"
                     className="h-7 text-xs ml-auto"
