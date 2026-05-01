@@ -736,8 +736,8 @@ const MonProfil = () => {
               </motion.div>
             )}
 
-            {/* Bandeau permanent rappel paiement */}
-            {profile?.payment_reminder_active && (
+            {/* Bandeau rappel paiement — visible seulement dans la fenêtre de 7 jours avant la date */}
+            {isReminderDue && (
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
