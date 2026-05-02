@@ -905,6 +905,27 @@ const Admin = () => {
                       )}
                     </div>
                     <div className="flex gap-2">
+                      {(b.time_slots as any)?.date && (
+                        <Button
+                          size="sm"
+                          variant="heroOutline"
+                          title="Ajouter à Google Agenda"
+                          onClick={() => {
+                            const ts: any = b.time_slots;
+                            const clientName = (b as any).profiles?.full_name || "Client";
+                            const phone = (b as any).profiles?.phone ? `\nTél : ${(b as any).profiles.phone}` : "";
+                            const dateStr = ts.date.replace(/-/g, "");
+                            const startStr = ts.start_time.toString().slice(0, 5).replace(":", "") + "00";
+                            const endStr = ts.end_time.toString().slice(0, 5).replace(":", "") + "00";
+                            const title = `RDV ${clientName} — Em' Coaching`;
+                            const details = `Rendez-vous coaching avec ${clientName}${phone}`;
+                            const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${dateStr}T${startStr}/${dateStr}T${endStr}&details=${encodeURIComponent(details)}&ctz=Europe/Paris`;
+                            window.open(url, "_blank", "noopener,noreferrer");
+                          }}
+                        >
+                          <Calendar size={14} className="mr-1" /> Agenda
+                        </Button>
+                      )}
                       {b.status === "confirmed" && (
                         <>
                           <Button
