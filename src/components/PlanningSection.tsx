@@ -15,6 +15,15 @@ const PlanningSection = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  const { data: currentUser, isLoading: userLoading } = useQuery({
+    queryKey: ["current_user"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      return user;
+    },
+  });
+  const isLoggedIn = !!currentUser;
+
   const { data: slots } = useQuery({
     queryKey: ["time_slots", selectedDate?.toISOString()],
     queryFn: async () => {
@@ -84,6 +93,19 @@ const PlanningSection = () => {
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          {!userLoading && !isLoggedIn && (
+            <div className="md:col-span-2 bg-primary/10 border border-primary/30 rounded-lg p-4 text-center">
+              <p className="text-foreground text-sm">
+                🔒 Tu dois être connecté pour réserver un créneau.{" "}
+                <button
+                  onClick={() => navigate("/auth")}
+                  className="text-primary font-semibold underline hover:text-primary/80"
+                >
+                  Se connecter / Créer un compte
+                </button>
+              </p>
+            </div>
+          )}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -132,8 +154,14 @@ const PlanningSection = () => {
                     )}
                   </div>
                 </div>
-                <Button variant="hero" size="sm" onClick={() => handleBook(slot.id)}>
-                  Réserver
+                <Button
+                  variant="hero"
+                  size="sm"
+                  onClick={() => handleBook(slot.id)}
+                  disabled={!isLoggedIn}
+                  title={!isLoggedIn ? "Connecte-toi pour réserver" : undefined}
+                >
+                  {isLoggedIn ? "Réserver" : "🔒 Connexion requise"}
                 </Button>
               </div>
             ))}
