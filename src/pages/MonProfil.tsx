@@ -816,8 +816,8 @@ const MonProfil = () => {
                     <FormInput size={24} className="text-purple-500" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-foreground font-display text-xl mb-1">TON FORMULAIRE</h3>
-                    <p className="text-muted-foreground text-sm">Remplis le formulaire envoyé par Emma ✍️</p>
+                    <h3 className="text-foreground font-display text-xl mb-1">BILAN DE LA SEMAINE</h3>
+                    <p className="text-muted-foreground text-sm">Remplis ton bilan de la semaine ✍️</p>
                   </div>
                   <Button
                     variant="heroOutline"
