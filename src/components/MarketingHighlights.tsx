@@ -46,8 +46,9 @@ const MarketingHighlights = () => {
   ];
 
   return (
-    <section className="py-20 bg-background">
-      <div className="container">
+    <section className="relative py-24 overflow-hidden">
+      <div className="blob bg-primary/10 w-[500px] h-[500px] top-10 -right-40" />
+      <div className="container relative z-10">
         {/* Accroche problème/solution */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -74,12 +75,12 @@ const MarketingHighlights = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.08 }}
-                className="bg-card border border-border rounded-xl p-5 text-center"
+                className="group bg-card/70 backdrop-blur-sm border border-border rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_15px_45px_-15px_hsl(var(--primary)/0.35)]"
               >
-                <div className="w-12 h-12 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-3">
-                  <Icon className="text-primary" size={22} />
+                <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/20 flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110">
+                  <Icon className="text-primary" size={24} />
                 </div>
-                <p className="font-display text-3xl text-gradient-blue mb-1">{stat.value}</p>
+                <p className="font-display text-3xl sm:text-4xl text-gradient-blue mb-1">{stat.value}</p>
                 <p className="text-muted-foreground text-xs leading-tight">{stat.label}</p>
               </motion.div>
             );
@@ -95,7 +96,7 @@ const MarketingHighlights = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
-              className="bg-card/50 border-l-4 border-primary rounded-r-lg p-5"
+              className="bg-card/70 backdrop-blur-sm border-l-4 border-primary rounded-r-xl p-5 shadow-sm hover:shadow-md transition-shadow"
             >
               <p className="text-foreground italic text-sm leading-relaxed">{r}</p>
             </motion.div>
