@@ -300,6 +300,7 @@ export type Database = {
           created_at: string
           full_name: string | null
           gender: string | null
+          google_form_url: string | null
           google_sheet_url: string | null
           has_active_subscription: boolean
           height: number | null
@@ -323,6 +324,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           gender?: string | null
+          google_form_url?: string | null
           google_sheet_url?: string | null
           has_active_subscription?: boolean
           height?: number | null
@@ -346,6 +348,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           gender?: string | null
+          google_form_url?: string | null
           google_sheet_url?: string | null
           has_active_subscription?: boolean
           height?: number | null
