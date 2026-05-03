@@ -822,7 +822,7 @@ const MonProfil = () => {
                   <Button
                     variant="heroOutline"
                     size="lg"
-                    className="shrink-0 border-blue-500 text-blue-500 hover:bg-blue-500/10"
+                    className="shrink-0 border-purple-500 text-purple-500 hover:bg-purple-500/10"
                     onClick={() => window.open(profile.google_form_url, "_blank")}
                   >
                     Ouvrir <ChevronRight size={16} className="ml-1" />
