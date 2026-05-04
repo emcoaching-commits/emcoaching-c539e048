@@ -63,20 +63,30 @@ const PricingPreview = () => {
               )}
               <h3 className="font-display text-xl text-foreground mb-1">{plan.name}</h3>
               <p className="font-display text-3xl text-gradient-blue mb-3">{plan.price}€</p>
-              <Button
-                variant={plan.is_popular ? "hero" : "heroOutline"}
-                size="sm"
-                className="w-full"
-                onClick={() => {
-                  if (plan.paypal_url) {
-                    window.open(plan.paypal_url, "_blank", "noopener,noreferrer");
-                  } else {
-                    navigate(`/formules/${plan.id}`);
-                  }
-                }}
-              >
-                Choisir <ArrowRight size={14} />
-              </Button>
+              <div className="flex flex-col gap-2 w-full mt-auto">
+                <Button
+                  variant="heroOutline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => navigate(`/formules/${plan.id}`)}
+                >
+                  En savoir plus
+                </Button>
+                <Button
+                  variant={plan.is_popular ? "hero" : "default"}
+                  size="sm"
+                  className="w-full"
+                  onClick={() => {
+                    if (plan.paypal_url) {
+                      window.open(plan.paypal_url, "_blank", "noopener,noreferrer");
+                    } else {
+                      toast.error("Lien de paiement indisponible. Contacte Emma.");
+                    }
+                  }}
+                >
+                  Choisir <ArrowRight size={14} />
+                </Button>
+              </div>
             </motion.div>
           ))}
         </div>
