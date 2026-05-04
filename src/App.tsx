@@ -24,6 +24,7 @@ import Confidentialite from "./pages/Confidentialite.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { getAppBase } from "@/lib/app-paths";
 import FaviconLoader from "@/components/FaviconLoader";
+import ThemeLoader from "@/components/ThemeLoader";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => {
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <FaviconLoader />
+      <ThemeLoader />
       <Toaster />
       <Sonner />
         <BrowserRouter basename={getAppBase()}>
