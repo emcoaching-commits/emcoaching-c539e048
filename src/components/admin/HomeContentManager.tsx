@@ -362,6 +362,108 @@ const HomeContentManager = () => {
         </div>
       </div>
 
+      {/* Section 3 piliers */}
+      <div className="border border-border rounded-lg p-4 bg-background/50 space-y-3">
+        <h4 className="font-display text-lg text-foreground">Section "3 piliers"</h4>
+        <div className="grid sm:grid-cols-2 gap-3">
+          <div className="space-y-2">
+            <Label>Petit titre (kicker)</Label>
+            <Input value={values.pillars_kicker || ""} onChange={(e) => setValues({ ...values, pillars_kicker: e.target.value })} />
+          </div>
+          <div className="space-y-2">
+            <Label>Titre principal</Label>
+            <Input value={values.pillars_title || ""} onChange={(e) => setValues({ ...values, pillars_title: e.target.value })} />
+          </div>
+        </div>
+        <div className="grid sm:grid-cols-3 gap-3">
+          {[1, 2, 3].map((n) => (
+            <div key={n} className="border border-border/50 rounded p-3 space-y-2">
+              <Label className="text-xs">Pilier #{n}</Label>
+              <Input placeholder="Titre" value={values[`pillar${n}_label`] || ""} onChange={(e) => setValues({ ...values, [`pillar${n}_label`]: e.target.value })} />
+              <Input placeholder="Description" value={values[`pillar${n}_desc`] || ""} onChange={(e) => setValues({ ...values, [`pillar${n}_desc`]: e.target.value })} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Section questionnaire */}
+      <div className="border border-border rounded-lg p-4 bg-background/50 space-y-3">
+        <h4 className="font-display text-lg text-foreground">Section Questionnaire</h4>
+        <div className="grid sm:grid-cols-2 gap-3">
+          <div className="space-y-2">
+            <Label>Petit titre</Label>
+            <Input value={values.quest_kicker || ""} onChange={(e) => setValues({ ...values, quest_kicker: e.target.value })} />
+          </div>
+          <div className="space-y-2">
+            <Label>Titre</Label>
+            <Input value={values.quest_title || ""} onChange={(e) => setValues({ ...values, quest_title: e.target.value })} />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label>Description</Label>
+          <Textarea rows={3} value={values.quest_desc || ""} onChange={(e) => setValues({ ...values, quest_desc: e.target.value })} />
+        </div>
+        <div className="space-y-2">
+          <Label>Texte du bouton</Label>
+          <Input value={values.quest_button || ""} onChange={(e) => setValues({ ...values, quest_button: e.target.value })} />
+        </div>
+      </div>
+
+      {/* Footer & Contact */}
+      <div className="border border-border rounded-lg p-4 bg-background/50 space-y-3">
+        <h4 className="font-display text-lg text-foreground">Footer & coordonnées</h4>
+        <div className="grid sm:grid-cols-2 gap-3">
+          <div className="space-y-2">
+            <Label>Marque (footer)</Label>
+            <Input value={values.footer_brand || ""} onChange={(e) => setValues({ ...values, footer_brand: e.target.value })} />
+          </div>
+          <div className="space-y-2">
+            <Label>Copyright</Label>
+            <Input value={values.footer_copyright || ""} onChange={(e) => setValues({ ...values, footer_copyright: e.target.value })} />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label>Crédit (petit texte)</Label>
+          <Input value={values.footer_credit || ""} onChange={(e) => setValues({ ...values, footer_credit: e.target.value })} />
+        </div>
+        <div className="grid sm:grid-cols-3 gap-3 pt-3 border-t border-border/50">
+          <div className="space-y-2">
+            <Label>Téléphone (affiché)</Label>
+            <Input value={values.contact_phone || ""} onChange={(e) => setValues({ ...values, contact_phone: e.target.value })} />
+          </div>
+          <div className="space-y-2">
+            <Label>Téléphone (format intl, ex: +33670619628)</Label>
+            <Input value={values.contact_phone_intl || ""} onChange={(e) => setValues({ ...values, contact_phone_intl: e.target.value })} />
+          </div>
+          <div className="space-y-2">
+            <Label>Email contact</Label>
+            <Input value={values.contact_email || ""} onChange={(e) => setValues({ ...values, contact_email: e.target.value })} />
+          </div>
+        </div>
+      </div>
+
+      {/* Couleurs du thème */}
+      <div className="border border-border rounded-lg p-4 bg-background/50 space-y-3">
+        <h4 className="font-display text-lg text-foreground">Couleurs du thème</h4>
+        <p className="text-xs text-muted-foreground">Format HSL : <code>"H S% L%"</code> — ex: <code>217 91% 50%</code>. Astuce : utilise un convertisseur HEX→HSL.</p>
+        <div className="grid sm:grid-cols-2 gap-3">
+          {[
+            { k: "theme_primary", l: "Primaire (bleu boutons/liens)" },
+            { k: "theme_accent", l: "Accent" },
+            { k: "theme_background", l: "Fond" },
+            { k: "theme_foreground", l: "Texte principal" },
+          ].map((c) => (
+            <div key={c.k} className="space-y-2">
+              <Label>{c.l}</Label>
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 rounded border border-border" style={{ background: `hsl(${values[c.k] || "0 0% 50%"})` }} />
+                <Input value={values[c.k] || ""} onChange={(e) => setValues({ ...values, [c.k]: e.target.value })} placeholder="217 91% 50%" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <Button onClick={handleSaveAll} size="lg" className="w-full">
         <Save size={16} className="mr-2" /> Tout enregistrer
       </Button>
