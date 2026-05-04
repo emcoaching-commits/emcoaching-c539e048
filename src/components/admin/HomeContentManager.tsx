@@ -34,6 +34,20 @@ const KEYS = [
   "marketing_result3",
   "marketing_cta_text",
   "marketing_cta_button",
+  // Section 3 piliers
+  "pillars_kicker",
+  "pillars_title",
+  "pillar1_label", "pillar1_desc",
+  "pillar2_label", "pillar2_desc",
+  "pillar3_label", "pillar3_desc",
+  // Section questionnaire
+  "quest_kicker", "quest_title", "quest_desc", "quest_button",
+  // Footer
+  "footer_brand", "footer_copyright", "footer_credit",
+  // Contact (téléphone affiché + lien tel)
+  "contact_phone", "contact_phone_intl", "contact_email",
+  // Thème (HSL "H S% L%")
+  "theme_primary", "theme_accent", "theme_background", "theme_foreground",
 ];
 
 const HomeContentManager = () => {
