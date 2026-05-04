@@ -8,21 +8,25 @@ import { motion } from "framer-motion";
 import PricingPreview from "@/components/PricingPreview";
 import MarketingHighlights from "@/components/MarketingHighlights";
 import { useIsActiveSubscriber } from "@/hooks/useIsActiveSubscriber";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const PillarsRow = () => {
+  const { data: s } = useSiteSettings();
   const pillars = [
-    { icon: Apple, label: "Nutrition", desc: "Plans adaptés à tes objectifs" },
-    { icon: Utensils, label: "Alimentation", desc: "Habitudes durables, plaisir intact" },
-    { icon: Dumbbell, label: "Sport", desc: "Programmes progressifs & efficaces" },
+    { icon: Apple, label: s?.pillar1_label || "Nutrition", desc: s?.pillar1_desc || "Plans adaptés à tes objectifs" },
+    { icon: Utensils, label: s?.pillar2_label || "Alimentation", desc: s?.pillar2_desc || "Habitudes durables, plaisir intact" },
+    { icon: Dumbbell, label: s?.pillar3_label || "Sport", desc: s?.pillar3_desc || "Programmes progressifs & efficaces" },
   ];
+  const kicker = s?.pillars_kicker || "Mes 3 piliers";
+  const title = s?.pillars_title || "UNE APPROCHE COMPLÈTE";
   return (
     <section className="relative py-20 overflow-hidden">
       <div className="blob bg-primary/10 w-[420px] h-[420px] -top-32 -left-32" />
       <div className="blob bg-accent/10 w-[380px] h-[380px] -bottom-32 -right-32" />
       <div className="container relative z-10">
         <div className="text-center mb-12">
-          <p className="text-primary font-semibold tracking-[0.2em] uppercase text-xs mb-3">Mes 3 piliers</p>
-          <h2 className="font-display text-3xl sm:text-4xl text-gradient-blue">UNE APPROCHE COMPLÈTE</h2>
+          <p className="text-primary font-semibold tracking-[0.2em] uppercase text-xs mb-3">{kicker}</p>
+          <h2 className="font-display text-3xl sm:text-4xl text-gradient-blue">{title}</h2>
         </div>
         <div className="grid sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {pillars.map((p, i) => {

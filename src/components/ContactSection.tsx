@@ -6,8 +6,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Instagram, Mail, Phone, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const ContactSection = () => {
+  const { data: s } = useSiteSettings();
+  const phoneDisplay = s?.contact_phone || "06 70 61 96 28";
+  const phoneIntl = (s?.contact_phone_intl || "+33670619628").replace(/^\+/, "");
+  const emailContact = s?.contact_email || "emmaberlin2611@gmail.com";
   const [firstName, setFirstName] = useState("");
   const [emailAddr, setEmailAddr] = useState("");
   const [subject, setSubject] = useState("");
@@ -128,7 +133,7 @@ const ContactSection = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Email</p>
-                <a href="mailto:emmaberlin2611@gmail.com" className="text-foreground font-medium hover:text-primary transition-colors">emmaberlin2611@gmail.com</a>
+                <a href={`mailto:${emailContact}`} className="text-foreground font-medium hover:text-primary transition-colors">{emailContact}</a>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -137,7 +142,7 @@ const ContactSection = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Téléphone</p>
-                <p className="text-foreground font-medium">06 70 61 96 28</p>
+                <p className="text-foreground font-medium">{phoneDisplay}</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -146,7 +151,7 @@ const ContactSection = () => {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">WhatsApp</p>
-                <a href="https://wa.me/33670619628" target="_blank" rel="noopener noreferrer" className="text-foreground font-medium hover:text-primary transition-colors">06 70 61 96 28</a>
+                <a href={`https://wa.me/${phoneIntl}`} target="_blank" rel="noopener noreferrer" className="text-foreground font-medium hover:text-primary transition-colors">{phoneDisplay}</a>
               </div>
             </div>
             <div className="flex items-center gap-4">
