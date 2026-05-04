@@ -2,9 +2,15 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ClipboardList, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const QuestionnaireSection = () => {
   const navigate = useNavigate();
+  const { data: s } = useSiteSettings();
+  const kicker = s?.quest_kicker || "Questionnaire de découverte";
+  const title = s?.quest_title || "APPRENDS-MOI À TE CONNAÎTRE";
+  const desc = s?.quest_desc || "Grâce à ce questionnaire, je vais apprendre à te connaître pour mieux t'aider et adapter au mieux ton suivi personnalisé.";
+  const btn = s?.quest_button || "Remplir le questionnaire";
   return (
     <section id="questionnaire" className="py-24 bg-gradient-dark">
       <div className="container max-w-3xl">
@@ -24,11 +30,9 @@ const QuestionnaireSection = () => {
             </div>
 
             <div>
-              <p className="text-primary font-semibold tracking-widest uppercase text-sm mb-3">Questionnaire de découverte</p>
-              <h2 className="font-display text-4xl sm:text-5xl text-gradient-blue mb-4">APPRENDS-MOI À TE CONNAÎTRE</h2>
-              <p className="text-muted-foreground max-w-lg mx-auto">
-                Grâce à ce questionnaire, je vais apprendre à te connaître pour mieux t'aider et adapter au mieux ton suivi personnalisé.
-              </p>
+              <p className="text-primary font-semibold tracking-widest uppercase text-sm mb-3">{kicker}</p>
+              <h2 className="font-display text-4xl sm:text-5xl text-gradient-blue mb-4">{title}</h2>
+              <p className="text-muted-foreground max-w-lg mx-auto">{desc}</p>
             </div>
 
             <Button
@@ -37,7 +41,7 @@ const QuestionnaireSection = () => {
               className="text-lg px-8 py-6"
               onClick={() => navigate("/questionnaire")}
             >
-              Remplir le questionnaire <ChevronRight size={18} className="ml-1" />
+              {btn} <ChevronRight size={18} className="ml-1" />
             </Button>
           </div>
         </motion.div>
