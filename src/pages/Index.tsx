@@ -10,6 +10,7 @@ import MarketingHighlights from "@/components/MarketingHighlights";
 import { useIsActiveSubscriber } from "@/hooks/useIsActiveSubscriber";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import WelcomePopup from "@/components/WelcomePopup";
+import InfoPopupsBanner from "@/components/InfoPopupsBanner";
 
 const PillarsRow = () => {
   const { data: s } = useSiteSettings();
@@ -60,6 +61,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-soft">
       <WelcomePopup />
+      <InfoPopupsBanner />
       <Navbar />
       <HeroSection />
       <div className="section-divider" />
