@@ -49,14 +49,9 @@ const FloatingCallButton = () => {
 
 const App = () => {
   useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (sessionStorage.getItem("session_only") === "true") {
-        supabase.auth.signOut();
-        sessionStorage.removeItem("session_only");
-      }
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    // Nettoie l'ancien marqueur "session_only" pour que la session persiste
+    // (l'utilisateur reste connecté entre les visites par défaut).
+    sessionStorage.removeItem("session_only");
   }, []);
 
   return (
