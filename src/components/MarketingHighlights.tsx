@@ -75,9 +75,9 @@ const MarketingHighlights = () => {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.08 }}
-                className="group bg-card/70 backdrop-blur-sm border border-border rounded-2xl p-6 text-center transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_15px_45px_-15px_hsl(var(--primary)/0.35)]"
+                className="card-hover group bg-card/70 backdrop-blur-sm border border-border rounded-2xl p-6 text-center"
               >
-                <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/20 flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-110">
+                <div className="icon-hover w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/20 flex items-center justify-center mb-3">
                   <Icon className="text-primary" size={24} />
                 </div>
                 <p className="font-display text-3xl sm:text-4xl text-gradient-blue mb-1">{stat.value}</p>
@@ -96,7 +96,7 @@ const MarketingHighlights = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
-              className="bg-card/70 backdrop-blur-sm border-l-4 border-primary rounded-r-xl p-5 shadow-sm hover:shadow-md transition-shadow"
+              className="bg-card/70 backdrop-blur-sm border-l-4 border-primary rounded-r-xl p-5 shadow-sm transition-all duration-300 hover:shadow-lg hover:translate-x-1 hover:border-l-[6px]"
             >
               <p className="text-foreground italic text-sm leading-relaxed">{r}</p>
             </motion.div>

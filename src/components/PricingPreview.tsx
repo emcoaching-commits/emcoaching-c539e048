@@ -52,7 +52,7 @@ const PricingPreview = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.08 }}
-              className={`relative bg-card border rounded-xl p-5 flex flex-col items-center text-center transition-all hover:scale-[1.02] ${
+              className={`card-hover group relative bg-card border rounded-xl p-5 flex flex-col items-center text-center ${
                 plan.is_popular ? "border-primary glow-blue" : "border-border"
               }`}
             >
