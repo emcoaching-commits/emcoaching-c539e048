@@ -19,38 +19,29 @@ const ReviewsSection = () => {
   const { data: reviews } = useQuery({
     queryKey: ["featured_reviews"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("reviews")
+      // Vue publique sécurisée : pas d'exposition des user_id
+      const { data, error } = await (supabase as any)
+        .from("public_reviews")
         .select("*")
         .eq("is_featured", true)
-        .eq("is_approved", true)
         .order("created_at", { ascending: false })
         .limit(6);
       if (error) throw error;
-      // Récupère noms + avatars en une fois
-      const userIds = [...new Set((data || []).map((r: any) => r.user_id))];
-      let profMap: Record<string, { full_name: string | null; avatar_url: string | null }> = {};
-      if (userIds.length > 0) {
-        const { data: profs } = await supabase
-          .from("profiles")
-          .select("user_id, full_name, avatar_url")
-          .in("user_id", userIds);
-        profMap = Object.fromEntries(
-          (profs || []).map((p: any) => [p.user_id, { full_name: p.full_name, avatar_url: p.avatar_url }]),
-        );
-      }
       // Avatars privés -> URL signée
       const enriched = await Promise.all(
         (data || []).map(async (r: any) => {
-          const prof = profMap[r.user_id];
           let signedAvatar: string | null = null;
-          if (prof?.avatar_url) {
+          if (r.author_avatar) {
             const { data: s } = await supabase.storage
               .from("avatars")
-              .createSignedUrl(prof.avatar_url, 3600);
+              .createSignedUrl(r.author_avatar, 3600);
             signedAvatar = s?.signedUrl || null;
           }
-          return { ...r, full_name: prof?.full_name || "Cliente", avatar_signed_url: signedAvatar };
+          return {
+            ...r,
+            full_name: r.author_name || "Cliente",
+            avatar_signed_url: signedAvatar,
+          };
         }),
       );
       return enriched;
