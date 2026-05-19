@@ -112,6 +112,10 @@ const HomeContentManager = () => {
       theme_accent: "200 100% 42%",
       theme_background: "40 30% 97%",
       theme_foreground: "220 40% 12%",
+      welcome_popup_enabled: "true",
+      welcome_popup_title: "Bienvenue sur EM' Coaching !",
+      welcome_popup_content: "Merci de visiter le site !",
+      welcome_popup_version: "1",
     };
     for (const s of settings || []) {
       init[s.key] = s.value || "";
