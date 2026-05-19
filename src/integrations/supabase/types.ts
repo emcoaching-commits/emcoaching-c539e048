@@ -569,10 +569,28 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_reviews: {
+        Row: {
+          author_avatar: string | null
+          author_name: string | null
+          comment: string | null
+          created_at: string | null
+          id: string | null
+          is_featured: boolean | null
+          rating: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_admin_id: { Args: never; Returns: string }
+      get_review_author: {
+        Args: { _user_id: string }
+        Returns: {
+          avatar_url: string
+          full_name: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
