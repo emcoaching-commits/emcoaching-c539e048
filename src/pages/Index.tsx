@@ -38,9 +38,9 @@ const PillarsRow = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="group relative flex flex-col items-center text-center gap-4 rounded-2xl border border-border bg-card/60 backdrop-blur-sm p-8 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_20px_60px_-20px_hsl(var(--primary)/0.35)]"
+                className="card-hover group relative flex flex-col items-center text-center gap-4 rounded-2xl border border-border bg-card/60 backdrop-blur-sm p-8"
               >
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 float-y" style={{ animationDelay: `${i * 0.8}s` }}>
+                <div className="icon-hover w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center float-y" style={{ animationDelay: `${i * 0.8}s` }}>
                   <Icon className="text-primary" size={28} />
                 </div>
                 <h3 className="font-display text-2xl text-foreground">{p.label}</h3>

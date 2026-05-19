@@ -150,3 +150,35 @@
     animation: none !important;
   }
 }
+
+@layer utilities {
+  /* Carte interactive cohérente sur tout le site */
+  .card-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+  .card-hover:hover {
+    transform: translateY(-4px);
+    border-color: hsl(var(--primary) / 0.5);
+    box-shadow: 0 20px 50px -20px hsl(var(--primary) / 0.4);
+  }
+
+  /* Icône qui réagit avec le parent .group */
+  .icon-hover {
+    @apply transition-transform duration-300 ease-out;
+  }
+  .group:hover .icon-hover {
+    transform: scale(1.15) rotate(-6deg);
+  }
+
+  /* Bouton : lift + glow subtil */
+  .btn-lift {
+    @apply transition-all duration-200 ease-out;
+  }
+  .btn-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px -10px hsl(var(--primary) / 0.5);
+  }
+  .btn-lift:active {
+    transform: translateY(0);
+  }
+}

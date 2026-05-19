@@ -111,10 +111,10 @@ const ReviewsSection = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="bg-card border border-border rounded-lg p-6 flex flex-col"
+                className="card-hover group bg-card border border-border rounded-lg p-6 flex flex-col"
               >
                 <div className="flex items-center gap-3 mb-4">
-                  <Avatar className="w-12 h-12">
+                  <Avatar className="w-12 h-12 transition-transform duration-300 group-hover:scale-110">
                     {review.avatar_signed_url && (
                       <AvatarImage src={review.avatar_signed_url} alt={review.full_name} />
                     )}
