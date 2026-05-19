@@ -15,6 +15,7 @@ import HomeContentManager from "@/components/admin/HomeContentManager";
 import PricingPlansManager from "@/components/admin/PricingPlansManager";
 import RecurringSlotsForm from "@/components/admin/RecurringSlotsForm";
 import CustomLinksManager from "@/components/admin/CustomLinksManager";
+import InfoPopupsManager from "@/components/admin/InfoPopupsManager";
 import { withAppBase } from "@/lib/app-paths";
 
 const Admin = () => {
