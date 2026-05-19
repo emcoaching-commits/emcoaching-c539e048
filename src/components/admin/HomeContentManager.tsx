@@ -48,6 +48,8 @@ const KEYS = [
   "contact_phone", "contact_phone_intl", "contact_email",
   // Thème (HSL "H S% L%")
   "theme_primary", "theme_accent", "theme_background", "theme_foreground",
+  // Popup de bienvenue
+  "welcome_popup_enabled", "welcome_popup_title", "welcome_popup_content", "welcome_popup_version",
 ];
 
 const HomeContentManager = () => {
@@ -110,6 +112,10 @@ const HomeContentManager = () => {
       theme_accent: "200 100% 42%",
       theme_background: "40 30% 97%",
       theme_foreground: "220 40% 12%",
+      welcome_popup_enabled: "true",
+      welcome_popup_title: "Bienvenue sur EM' Coaching !",
+      welcome_popup_content: "Merci de visiter le site !",
+      welcome_popup_version: "1",
     };
     for (const s of settings || []) {
       init[s.key] = s.value || "";
@@ -462,6 +468,61 @@ const HomeContentManager = () => {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Popup de bienvenue */}
+      <div className="border border-border rounded-lg p-4 bg-background/50 space-y-3">
+        <h4 className="font-display text-lg text-foreground">Message de bienvenue (popup)</h4>
+        <p className="text-xs text-muted-foreground">
+          S'affiche une seule fois par visiteur sur la page d'accueil. Augmente la "version" pour le ré-afficher à tout le monde après modification.
+        </p>
+        <div className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            id="welcome_popup_enabled"
+            checked={values.welcome_popup_enabled === "true"}
+            onChange={(e) =>
+              setValues({ ...values, welcome_popup_enabled: e.target.checked ? "true" : "false" })
+            }
+            className="w-4 h-4 accent-primary"
+          />
+          <Label htmlFor="welcome_popup_enabled" className="cursor-pointer">
+            Afficher le message de bienvenue
+          </Label>
+        </div>
+        <div className="space-y-2">
+          <Label>Titre du popup</Label>
+          <Input
+            value={values.welcome_popup_title || ""}
+            onChange={(e) => setValues({ ...values, welcome_popup_title: e.target.value })}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Contenu du message</Label>
+          <Textarea
+            rows={8}
+            value={values.welcome_popup_content || ""}
+            onChange={(e) => setValues({ ...values, welcome_popup_content: e.target.value })}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Version (incrémente pour ré-afficher à tous)</Label>
+          <Input
+            value={values.welcome_popup_version || "1"}
+            onChange={(e) => setValues({ ...values, welcome_popup_version: e.target.value })}
+            placeholder="1"
+          />
+        </div>
+        <Button size="sm" onClick={async () => {
+          await Promise.all([
+            handleSave("welcome_popup_enabled"),
+            handleSave("welcome_popup_title"),
+            handleSave("welcome_popup_content"),
+            handleSave("welcome_popup_version"),
+          ]);
+        }}>
+          <Save size={14} className="mr-1" /> Enregistrer le popup
+        </Button>
       </div>
 
       <Button onClick={handleSaveAll} size="lg" className="w-full">
