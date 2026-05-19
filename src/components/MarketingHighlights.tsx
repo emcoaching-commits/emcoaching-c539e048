@@ -47,7 +47,7 @@ const MarketingHighlights = () => {
 
   return (
     <section className="relative py-24 overflow-hidden">
-      <div className="blob bg-primary/10 w-[500px] h-[500px] top-10 -right-40" />
+      <div className="blob blob-float bg-primary/10 w-[500px] h-[500px] top-10 -right-40" />
       <div className="container relative z-10">
         {/* Accroche problème/solution */}
         <motion.div
