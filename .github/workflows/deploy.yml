@@ -36,6 +36,8 @@ jobs:
         run: bun install
 
       - name: Build
+        env:
+          DEPLOY_TARGET: gh-pages
         run: bun run build
 
       - name: Add SPA fallback (404.html)

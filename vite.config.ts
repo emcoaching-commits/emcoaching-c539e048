@@ -5,8 +5,10 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  // CETTE LIGNE CI-DESSOUS EST LA PLUS IMPORTANTE
-  base: '/emcoaching-c539e048/',
+  // Base "/" par défaut (Lovable preview + emcoaching.lovable.app).
+  // GitHub Pages : on définit DEPLOY_TARGET=gh-pages dans le workflow
+  // pour utiliser le sous-chemin du repo.
+  base: process.env.DEPLOY_TARGET === 'gh-pages' ? '/emcoaching-c539e048/' : '/',
   server: {
     host: "::",
     port: 8080,
