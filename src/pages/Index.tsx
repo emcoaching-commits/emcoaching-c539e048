@@ -9,6 +9,7 @@ import PricingPreview from "@/components/PricingPreview";
 import MarketingHighlights from "@/components/MarketingHighlights";
 import { useIsActiveSubscriber } from "@/hooks/useIsActiveSubscriber";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import WelcomePopup from "@/components/WelcomePopup";
 
 const PillarsRow = () => {
   const { data: s } = useSiteSettings();
@@ -58,6 +59,7 @@ const Index = () => {
   const { isActive } = useIsActiveSubscriber();
   return (
     <div className="min-h-screen bg-gradient-soft">
+      <WelcomePopup />
       <Navbar />
       <HeroSection />
       <div className="section-divider" />
