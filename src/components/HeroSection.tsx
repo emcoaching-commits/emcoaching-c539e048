@@ -29,9 +29,12 @@ const HeroSection = () => {
     <section id="accueil" className="relative min-h-screen flex items-center overflow-hidden bg-background">
       <div className="container relative z-10 pt-24">
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          initial="hidden"
+          animate="show"
+          variants={{
+            hidden: {},
+            show: { transition: { staggerChildren: 0.15, delayChildren: 0.1 } },
+          }}
           className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12"
         >
           {/* Logo à côté du texte */}
@@ -39,22 +42,41 @@ const HeroSection = () => {
             src={heroLogo}
             alt="Em' Coaching"
             className="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 rounded-3xl object-cover shadow-2xl"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            variants={{
+              hidden: { opacity: 0, scale: 0.85, rotate: -3 },
+              show: { opacity: 1, scale: 1, rotate: 0, transition: { duration: 0.9, ease: "easeOut" } },
+            }}
           />
 
-          <div className="text-center md:text-left max-w-xl">
-            <p className="text-primary font-semibold tracking-widest uppercase text-sm mb-4">{kicker}</p>
-            <h1 className="font-display text-5xl sm:text-7xl md:text-8xl leading-[0.9] mb-6">
+          <motion.div
+            className="text-center md:text-left max-w-xl"
+            variants={{
+              hidden: {},
+              show: { transition: { staggerChildren: 0.12 } },
+            }}
+          >
+            <motion.p
+              variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
+              className="text-primary font-semibold tracking-widest uppercase text-sm mb-4"
+            >{kicker}</motion.p>
+            <motion.h1
+              variants={{ hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } } }}
+              className="font-display text-5xl sm:text-7xl md:text-8xl leading-[0.9] mb-6"
+            >
               {line1}<br />
               <span className="text-gradient-blue">{line2}</span><br />
               {line3}
-            </h1>
-            <p className="text-muted-foreground text-lg max-w-md mx-auto md:mx-0 mb-8 font-light leading-relaxed">
+            </motion.h1>
+            <motion.p
+              variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
+              className="text-muted-foreground text-lg max-w-md mx-auto md:mx-0 mb-8 font-light leading-relaxed"
+            >
               {description}
-            </p>
+            </motion.p>
 
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 15 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
+            >
             {user ? (
               <div className="flex flex-wrap justify-center md:justify-start gap-4">
                 <Button variant="hero" size="lg" className="px-8 py-6 text-base" onClick={() => window.open("https://forms.gle/fjX1G24EuvHMu7W99", "_blank")}>
@@ -74,7 +96,8 @@ const HeroSection = () => {
                 </Button>
               </div>
             )}
-          </div>
+            </motion.div>
+          </motion.div>
         </motion.div>
       </div>
     </section>

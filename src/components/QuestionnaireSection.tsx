@@ -18,32 +18,47 @@ const QuestionnaireSection = () => {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
           className="relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-accent/10 p-8 sm:p-12 text-center"
         >
           <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-accent/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
-          <div className="relative z-10 space-y-6">
-            <div className="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto">
+          <motion.div
+            className="relative z-10 space-y-6"
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={{ hidden: {}, show: { transition: { staggerChildren: 0.15, delayChildren: 0.1 } } }}
+          >
+            <motion.div
+              variants={{ hidden: { opacity: 0, scale: 0.7 }, show: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: "backOut" } } }}
+              className="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center mx-auto"
+            >
               <ClipboardList size={32} className="text-primary" />
-            </div>
+            </motion.div>
 
-            <div>
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
+            >
               <p className="text-primary font-semibold tracking-widest uppercase text-sm mb-3">{kicker}</p>
               <h2 className="font-display text-4xl sm:text-5xl text-gradient-blue mb-4">{title}</h2>
               <p className="text-muted-foreground max-w-lg mx-auto">{desc}</p>
-            </div>
+            </motion.div>
 
-            <Button
-              variant="hero"
-              size="lg"
-              className="text-lg px-8 py-6"
-              onClick={() => navigate("/questionnaire")}
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 15 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
             >
-              {btn} <ChevronRight size={18} className="ml-1" />
-            </Button>
-          </div>
+              <Button
+                variant="hero"
+                size="lg"
+                className="text-lg px-8 py-6"
+                onClick={() => navigate("/questionnaire")}
+              >
+                {btn} <ChevronRight size={18} className="ml-1" />
+              </Button>
+            </motion.div>
+          </motion.div>
         </motion.div>
       </div>
     </section>
