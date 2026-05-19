@@ -1577,6 +1577,19 @@ const Admin = () => {
               <CustomLinksManager />
             </div>
           </TabsContent>
+
+          <TabsContent value="popups" className="space-y-6">
+            <div className="bg-card border border-border rounded-xl p-6">
+              <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                <BellRing size={20} /> Popups d'information
+              </h3>
+              <p className="text-muted-foreground text-sm mb-6">
+                Crée des annonces ponctuelles (nouveaux créneaux, nouvelle formule, promo…) affichées
+                en bas à droite du site. Chaque visiteur peut les fermer une fois.
+              </p>
+              <InfoPopupsManager />
+            </div>
+          </TabsContent>
             </Tabs>
           );
         })()}
