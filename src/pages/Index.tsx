@@ -21,8 +21,8 @@ const PillarsRow = () => {
   const title = s?.pillars_title || "UNE APPROCHE COMPLÈTE";
   return (
     <section className="relative py-20 overflow-hidden">
-      <div className="blob bg-primary/10 w-[420px] h-[420px] -top-32 -left-32" />
-      <div className="blob bg-accent/10 w-[380px] h-[380px] -bottom-32 -right-32" />
+      <div className="blob blob-float bg-primary/10 w-[420px] h-[420px] -top-32 -left-32" />
+      <div className="blob blob-float-slow bg-accent/10 w-[380px] h-[380px] -bottom-32 -right-32" />
       <div className="container relative z-10">
         <div className="text-center mb-12">
           <p className="text-primary font-semibold tracking-[0.2em] uppercase text-xs mb-3">{kicker}</p>
@@ -40,7 +40,7 @@ const PillarsRow = () => {
                 transition={{ duration: 0.4, delay: i * 0.1 }}
                 className="group relative flex flex-col items-center text-center gap-4 rounded-2xl border border-border bg-card/60 backdrop-blur-sm p-8 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_20px_60px_-20px_hsl(var(--primary)/0.35)]"
               >
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center transition-transform duration-300 group-hover:scale-110 float-y" style={{ animationDelay: `${i * 0.8}s` }}>
                   <Icon className="text-primary" size={28} />
                 </div>
                 <h3 className="font-display text-2xl text-foreground">{p.label}</h3>
