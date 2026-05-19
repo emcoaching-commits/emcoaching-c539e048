@@ -584,6 +584,7 @@ const Admin = () => {
                 { value: "home", label: "Accueil & Logo" },
                 { value: "about", label: "À propos" },
                 { value: "formules", label: "Formules" },
+                { value: "popups", label: "Popups info" },
               ],
             },
             {
