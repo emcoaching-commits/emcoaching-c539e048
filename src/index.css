@@ -151,6 +151,23 @@
   }
 }
 
+/* Mode "réduire les animations" activé par l'utilisateur */
+html.reduce-motion .blob-float,
+html.reduce-motion .blob-float-slow,
+html.reduce-motion .float-y,
+html.reduce-motion .pulse-glow,
+html.reduce-motion .section-divider {
+  animation: none !important;
+}
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
 @layer utilities {
   /* Carte interactive cohérente sur tout le site */
   .card-hover {

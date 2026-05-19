@@ -25,6 +25,7 @@ import NotFound from "./pages/NotFound.tsx";
 import { getAppBase } from "@/lib/app-paths";
 import FaviconLoader from "@/components/FaviconLoader";
 import ThemeLoader from "@/components/ThemeLoader";
+import ReduceMotionToggle from "@/components/ReduceMotionToggle";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const queryClient = new QueryClient();
@@ -87,6 +88,7 @@ const App = () => {
         </Routes>
       </BrowserRouter>
       <FloatingCallButton />
+      <ReduceMotionToggle />
     </TooltipProvider>
   </QueryClientProvider>
   );
