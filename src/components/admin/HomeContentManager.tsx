@@ -48,6 +48,8 @@ const KEYS = [
   "contact_phone", "contact_phone_intl", "contact_email",
   // Thème (HSL "H S% L%")
   "theme_primary", "theme_accent", "theme_background", "theme_foreground",
+  // Popup de bienvenue
+  "welcome_popup_enabled", "welcome_popup_title", "welcome_popup_content", "welcome_popup_version",
 ];
 
 const HomeContentManager = () => {
