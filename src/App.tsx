@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -49,14 +48,9 @@ const FloatingCallButton = () => {
 
 const App = () => {
   useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (sessionStorage.getItem("session_only") === "true") {
-        supabase.auth.signOut();
-        sessionStorage.removeItem("session_only");
-      }
-    };
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+    // Nettoie l'ancien marqueur "session_only" pour que la session persiste
+    // (l'utilisateur reste connecté entre les visites par défaut).
+    sessionStorage.removeItem("session_only");
   }, []);
 
   return (
