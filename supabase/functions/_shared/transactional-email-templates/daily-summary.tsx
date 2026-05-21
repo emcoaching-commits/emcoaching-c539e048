@@ -111,7 +111,7 @@ export const template = {
   subject: (data: Record<string, any>) =>
     `${data?.isTest ? '[TEST] ' : ''}Récap ${SITE_NAME} — ${data?.dateLabel ?? ''}`.trim(),
   displayName: 'Récap quotidien',
-  to: 'emcoaching@emcoachingfr.com',
+  to: "em'coaching@emcoachingfr.com",
   previewData: {
     dateLabel: 'jeudi 21 mai 2026',
     isTest: true,
