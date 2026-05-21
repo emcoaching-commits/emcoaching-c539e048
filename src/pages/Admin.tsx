@@ -536,13 +536,28 @@ const Admin = () => {
   if (isAdmin === null) return <div className="min-h-screen bg-background flex items-center justify-center text-foreground">Chargement...</div>;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container py-8">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Decorative background icons */}
+      <div className="pointer-events-none select-none absolute top-24 -right-16 opacity-[0.04] text-primary">
+        <CalendarClock size={420} strokeWidth={1} />
+      </div>
+      <div className="pointer-events-none select-none absolute bottom-10 left-[15%] opacity-[0.035] rotate-12 text-primary">
+        <Users size={320} strokeWidth={1} />
+      </div>
+      <div className="pointer-events-none select-none absolute top-1/2 left-[55%] opacity-[0.03] -rotate-6 text-primary">
+        <BellRing size={260} strokeWidth={1} />
+      </div>
+
+      <div className="container py-8 relative z-10">
         <div className="flex items-center gap-4 mb-8">
           <Button variant="heroOutline" size="sm" onClick={() => navigate("/")}>
             <ArrowLeft size={16} className="mr-1" /> Retour
           </Button>
-          <h1 className="font-display text-4xl text-gradient-blue">ADMIN</h1>
+          <h1 className="font-display text-4xl text-gradient-blue tracking-wider">ADMIN</h1>
+          <div className="hidden md:flex ml-auto items-center gap-2 px-3 py-1.5 rounded-full bg-card/70 backdrop-blur border border-border text-xs font-semibold text-muted-foreground">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="uppercase tracking-widest">Live</span>
+          </div>
         </div>
 
         {(() => {
@@ -605,7 +620,7 @@ const Admin = () => {
               <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6">
                 {/* Sidebar nav */}
                 <aside className="lg:sticky lg:top-4 lg:self-start">
-                  <nav className="bg-card border border-border rounded-xl p-2 space-y-1">
+                  <nav className="bg-card/70 backdrop-blur-md border border-border rounded-2xl p-3 space-y-1 shadow-sm">
                     {groups.map((g) => {
                       const GIcon = g.icon;
                       const isActiveGroup = g.id === activeGroup;
@@ -617,14 +632,15 @@ const Admin = () => {
                               setActiveGroup(g.id);
                               setActiveTab(g.tabs[0].value);
                             }}
-                            className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                            className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                               isActiveGroup
-                                ? "bg-primary/15 text-primary"
-                                : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                                ? "bg-primary/10 text-primary"
+                                : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
                             }`}
                           >
-                            <span className="inline-flex items-center gap-2">
-                              <GIcon size={16} /> {g.label}
+                            <span className="inline-flex items-center gap-2.5">
+                              <GIcon size={17} className={isActiveGroup ? "opacity-100" : "opacity-70"} />
+                              <span>{g.label}</span>
                             </span>
                             {groupBadge > 0 && (
                               <span className="bg-destructive text-destructive-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
@@ -633,7 +649,7 @@ const Admin = () => {
                             )}
                           </button>
                           {isActiveGroup && (
-                            <div className="ml-3 mt-1 mb-2 pl-3 border-l border-border space-y-0.5">
+                            <div className="ml-3 mt-1.5 mb-1 pl-3 border-l-2 border-primary/15 space-y-1">
                               {g.tabs.map((t) => {
                                 const TIcon = t.icon;
                                 const isActive = t.value === activeTab;
@@ -641,10 +657,10 @@ const Admin = () => {
                                   <button
                                     key={t.value}
                                     onClick={() => setActiveTab(t.value)}
-                                    className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                                    className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-sm transition-all ${
                                       isActive
-                                        ? "bg-primary text-primary-foreground font-semibold"
-                                        : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                                        ? "bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/25"
+                                        : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
                                     }`}
                                   >
                                     <span className="inline-flex items-center gap-2 truncate">
@@ -669,13 +685,23 @@ const Admin = () => {
 
                 {/* Content area */}
                 <section className="min-w-0">
-                  <div className="bg-card border border-border rounded-xl px-4 py-3 mb-4 flex items-center gap-2 text-sm text-muted-foreground">
-                    <CurrentGroupIcon size={14} />
-                    <span>{currentGroup.label}</span>
-                    <ChevronRight size={14} />
-                    <span className="text-foreground font-semibold inline-flex items-center gap-1.5">
-                      <CurrentTabIcon size={14} /> {currentTab.label}
-                    </span>
+                  <div className="bg-card/80 backdrop-blur-md border border-border rounded-2xl px-5 py-3.5 mb-5 flex items-center justify-between gap-2 text-sm shadow-sm">
+                    <div className="flex items-center gap-2 text-muted-foreground font-medium">
+                      <span className="inline-flex items-center gap-1.5">
+                        <CurrentGroupIcon size={14} />
+                        {currentGroup.label}
+                      </span>
+                      <ChevronRight size={14} className="opacity-50" />
+                      <span className="text-primary font-semibold inline-flex items-center gap-1.5">
+                        <CurrentTabIcon size={14} /> {currentTab.label}
+                      </span>
+                    </div>
+                    <div className="hidden sm:flex items-center gap-3">
+                      <div className="h-6 w-px bg-border" />
+                      <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
+                        <span className="font-display text-base text-primary leading-none mt-0.5">EF</span>
+                      </div>
+                    </div>
                   </div>
                   {/* Hidden TabsList to satisfy Tabs context */}
                   <TabsList className="sr-only">
@@ -698,27 +724,31 @@ const Admin = () => {
               <p className="text-muted-foreground text-center py-8">Aucune activité pour le moment</p>
             )}
             {notifications?.map((n: any) => {
-              const icon = n.type === "inscription" ? <UserPlus size={16} /> 
-                : n.type === "message" ? <MessageCircle size={16} />
-                : n.type === "profil_update" ? <RefreshCw size={16} />
-                : <AlertTriangle size={16} />;
-              const color = n.type === "inscription" ? "text-green-500"
-                : n.type === "message" ? "text-primary"
-                : n.type === "profil_update" ? "text-accent"
-                : "text-destructive";
+              const icon = n.type === "inscription" ? <UserPlus size={20} /> 
+                : n.type === "message" ? <MessageCircle size={20} />
+                : n.type === "profil_update" ? <RefreshCw size={20} />
+                : <AlertTriangle size={20} />;
+              const tone = n.type === "inscription"
+                ? { bar: "bg-emerald-500", bubble: "bg-emerald-500/10 text-emerald-600", border: "hover:border-emerald-500/30" }
+                : n.type === "message"
+                ? { bar: "bg-primary", bubble: "bg-primary/10 text-primary", border: "hover:border-primary/30" }
+                : n.type === "profil_update"
+                ? { bar: "bg-indigo-500", bubble: "bg-indigo-500/10 text-indigo-500", border: "hover:border-indigo-500/30" }
+                : { bar: "bg-destructive", bubble: "bg-destructive/10 text-destructive", border: "hover:border-destructive/30" };
               return (
-                <div key={n.id} className={`flex items-start gap-3 p-3 rounded-lg border ${n.is_read ? "bg-card border-border" : "bg-primary/5 border-primary/20"}`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${color} bg-muted`}>
+                <div key={n.id} className={`group relative bg-card border border-border rounded-2xl p-5 pl-6 flex items-center gap-5 shadow-sm transition-all hover:shadow-md ${tone.border}`}>
+                  <div className={`absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl ${tone.bar}`} />
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${tone.bubble}`}>
                     {icon}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-foreground text-sm">{n.content}</p>
-                    <p className="text-muted-foreground text-xs mt-0.5">
+                    <p className="text-foreground text-sm font-semibold leading-snug">{n.content}</p>
+                    <p className="text-muted-foreground text-xs mt-1 font-medium">
                       {format(new Date(n.created_at), "dd MMM yyyy · HH:mm", { locale: fr })}
                     </p>
                   </div>
                   {!n.is_read && (
-                    <div className="w-2.5 h-2.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-primary shrink-0 animate-pulse" />
                   )}
                 </div>
               );
