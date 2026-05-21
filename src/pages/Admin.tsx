@@ -16,6 +16,7 @@ import PricingPlansManager from "@/components/admin/PricingPlansManager";
 import RecurringSlotsForm from "@/components/admin/RecurringSlotsForm";
 import CustomLinksManager from "@/components/admin/CustomLinksManager";
 import InfoPopupsManager from "@/components/admin/InfoPopupsManager";
+import DailySummaryManager from "@/components/admin/DailySummaryManager";
 import { withAppBase } from "@/lib/app-paths";
 
 const Admin = () => {
@@ -608,6 +609,7 @@ const Admin = () => {
               icon: Link2,
               tabs: [
                 { value: "links", label: "Liens utiles", icon: Link2 },
+                { value: "summary", label: "Récap quotidien", icon: Send },
               ],
             },
           ];
@@ -1670,6 +1672,10 @@ const Admin = () => {
               </p>
               <InfoPopupsManager />
             </div>
+          </TabsContent>
+
+          <TabsContent value="summary" className="space-y-6">
+            <DailySummaryManager />
           </TabsContent>
                   </div>
                 </section>

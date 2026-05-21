@@ -21,6 +21,11 @@ function parisDateParts(d = new Date()) {
   return { iso, label }
 }
 
+function parisHour(d = new Date()): number {
+  const h = new Intl.DateTimeFormat('en-GB', { timeZone: TZ, hour: '2-digit', hour12: false }).format(d)
+  return parseInt(h, 10)
+}
+
 function fmtTime(t: string) {
   return (t ?? '').slice(0, 5)
 }
@@ -36,6 +41,30 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => ({}))
     const isTest = !!body?.test
+    const isScheduled = !!body?.scheduled
+
+    // Read settings
+    const { data: settings } = await supabase
+      .from('site_settings')
+      .select('key, value')
+      .in('key', ['daily_summary_enabled', 'daily_summary_hour_paris'])
+    const settingsMap = Object.fromEntries((settings ?? []).map((s: any) => [s.key, s.value]))
+    const enabled = (settingsMap.daily_summary_enabled ?? 'true') === 'true'
+    const targetHour = parseInt(settingsMap.daily_summary_hour_paris ?? '20', 10)
+
+    // For scheduled (cron) calls, skip if disabled or wrong hour
+    if (isScheduled && !isTest) {
+      if (!enabled) {
+        return new Response(JSON.stringify({ ok: true, skipped: 'disabled' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+      if (parisHour() !== targetHour) {
+        return new Response(JSON.stringify({ ok: true, skipped: 'wrong_hour' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        })
+      }
+    }
 
     const now = new Date()
     const { iso: today, label: dateLabel } = parisDateParts(now)
@@ -145,11 +174,21 @@ Deno.serve(async (req) => {
       label: qUsers?.find(u => u.user_id === q.user_id)?.full_name ?? q.full_name ?? 'Client',
     }))
 
-    // 8) Active users today (approximation via profile updated_at)
-    const activeCount = (updatedProfiles ?? []).length
-    const activeUsers = activeCount > 0
-      ? [{ label: `${activeCount} client${activeCount > 1 ? 's' : ''} actif${activeCount > 1 ? 's' : ''} aujourd'hui` }]
-      : []
+    // 8) Profile visitors today (distinct by user_id)
+    const { data: visits } = await supabase
+      .from('profile_visits')
+      .select('user_id, full_name, created_at')
+      .gte('created_at', startOfDay)
+      .lte('created_at', endOfDay)
+      .order('created_at', { ascending: false })
+    const seen = new Set<string>()
+    const activeUsers = (visits ?? [])
+      .filter((v: any) => {
+        if (seen.has(v.user_id)) return false
+        seen.add(v.user_id)
+        return true
+      })
+      .map((v: any) => ({ label: v.full_name ?? 'Client', detail: `dernière visite à ${new Intl.DateTimeFormat('fr-FR', { timeZone: TZ, hour: '2-digit', minute: '2-digit' }).format(new Date(v.created_at))}` }))
 
     const stats = [
       { label: 'rendez-vous pris', value: newBookings.length },
