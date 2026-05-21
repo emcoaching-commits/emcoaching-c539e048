@@ -11,6 +11,7 @@ import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Trash2, AlertTriangle } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 const MonProfil = () => {
   const navigate = useNavigate();
@@ -49,6 +50,7 @@ const MonProfil = () => {
   const [deleteStep, setDeleteStep] = useState<0 | 1 | 2>(0);
   const [deleteEmail, setDeleteEmail] = useState("");
   const [deletePassword, setDeletePassword] = useState("");
+  const [deleteReason, setDeleteReason] = useState("");
   const [deleting, setDeleting] = useState(false);
 
   const handleDeleteAccount = async () => {
@@ -56,10 +58,14 @@ const MonProfil = () => {
       toast.error("Email et mot de passe requis");
       return;
     }
+    if (deleteReason.trim().length < 3) {
+      toast.error("Merci d'indiquer une raison (min. 3 caractères)");
+      return;
+    }
     setDeleting(true);
     try {
       const { data, error } = await supabase.functions.invoke("delete-own-account", {
-        body: { email: deleteEmail.trim(), password: deletePassword },
+        body: { email: deleteEmail.trim(), password: deletePassword, reason: deleteReason.trim() },
       });
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
