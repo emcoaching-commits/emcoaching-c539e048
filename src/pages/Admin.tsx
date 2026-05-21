@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search, Users, Settings, CalendarClock, Tag, Clock, Image, Upload, Package, Edit2, Save, Calendar, Link2, BellRing } from "lucide-react";
+import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search, Users, Settings, CalendarClock, Tag, Clock, Image, Upload, Package, Edit2, Save, Calendar, Link2, BellRing, Home, Info, Megaphone, FileText, ChevronRight, Menu } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -546,14 +546,14 @@ const Admin = () => {
         </div>
 
         {(() => {
-          const groups: { id: string; label: string; icon: any; tabs: { value: string; label: string; badge?: number }[] }[] = [
+          const groups: { id: string; label: string; icon: any; tabs: { value: string; label: string; icon: any; badge?: number }[] }[] = [
             {
               id: "activite",
               label: "Activité",
               icon: Bell,
               tabs: [
-                { value: "notifications", label: "Notifications", badge: unreadCount },
-                { value: "messages", label: "Messages" },
+                { value: "notifications", label: "Notifications", icon: BellRing, badge: unreadCount },
+                { value: "messages", label: "Messages", icon: MessageCircle },
               ],
             },
             {
@@ -561,8 +561,8 @@ const Admin = () => {
               label: "Clients",
               icon: Users,
               tabs: [
-                { value: "clients", label: `Clients (${clients?.length || 0})` },
-                { value: "reviews", label: `Avis (${reviews?.length || 0})` },
+                { value: "clients", label: `Clients (${clients?.length || 0})`, icon: Users },
+                { value: "reviews", label: `Avis (${reviews?.length || 0})`, icon: Star },
               ],
             },
             {
@@ -570,10 +570,10 @@ const Admin = () => {
               label: "Planning",
               icon: CalendarClock,
               tabs: [
-                { value: "types", label: "Types RDV" },
-                { value: "slots", label: `Créneaux (${slots?.length || 0})` },
-                { value: "bookings", label: `Réservations (${bookings?.length || 0})` },
-                { value: "gcal", label: "Google Agenda" },
+                { value: "types", label: "Types RDV", icon: Tag },
+                { value: "slots", label: `Créneaux (${slots?.length || 0})`, icon: Clock },
+                { value: "bookings", label: `Réservations (${bookings?.length || 0})`, icon: Calendar },
+                { value: "gcal", label: "Google Agenda", icon: CalendarClock },
               ],
             },
             {
@@ -581,10 +581,10 @@ const Admin = () => {
               label: "Contenu",
               icon: Image,
               tabs: [
-                { value: "home", label: "Accueil & Logo" },
-                { value: "about", label: "À propos" },
-                { value: "formules", label: "Formules" },
-                { value: "popups", label: "Popups info" },
+                { value: "home", label: "Accueil & Logo", icon: Home },
+                { value: "about", label: "À propos", icon: Info },
+                { value: "formules", label: "Formules", icon: Package },
+                { value: "popups", label: "Popups info", icon: Megaphone },
               ],
             },
             {
@@ -592,47 +592,98 @@ const Admin = () => {
               label: "Management",
               icon: Link2,
               tabs: [
-                { value: "links", label: "Liens utiles" },
+                { value: "links", label: "Liens utiles", icon: Link2 },
               ],
             },
           ];
           const currentGroup = groups.find((g) => g.id === activeGroup) || groups[0];
+          const currentTab = currentGroup.tabs.find((t) => t.value === activeTab) || currentGroup.tabs[0];
+          const CurrentGroupIcon = currentGroup.icon;
+          const CurrentTabIcon = currentTab.icon;
           return (
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <div className="flex flex-wrap gap-2 mb-3">
-                {groups.map((g) => {
-                  const GIcon = g.icon;
-                  const isActive = g.id === activeGroup;
-                  return (
-                    <button
-                      key={g.id}
-                      onClick={() => {
-                        setActiveGroup(g.id);
-                        setActiveTab(g.tabs[0].value);
-                      }}
-                      className={`px-4 py-2 rounded-lg border text-sm font-semibold inline-flex items-center gap-2 transition-colors ${
-                        isActive
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : "bg-card text-muted-foreground border-border hover:text-foreground"
-                      }`}
-                    >
-                      <GIcon size={14} /> {g.label}
-                    </button>
-                  );
-                })}
-              </div>
-              <TabsList className="bg-card border border-border mb-6 flex-wrap">
-                {currentGroup.tabs.map((t) => (
-                  <TabsTrigger key={t.value} value={t.value} className="relative">
-                    {t.label}
-                    {t.badge && t.badge > 0 ? (
-                      <span className="ml-1 bg-destructive text-destructive-foreground text-[10px] px-1.5 py-0.5 rounded-full">
-                        {t.badge}
-                      </span>
-                    ) : null}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
+              <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6">
+                {/* Sidebar nav */}
+                <aside className="lg:sticky lg:top-4 lg:self-start">
+                  <nav className="bg-card border border-border rounded-xl p-2 space-y-1">
+                    {groups.map((g) => {
+                      const GIcon = g.icon;
+                      const isActiveGroup = g.id === activeGroup;
+                      const groupBadge = g.tabs.reduce((sum, t) => sum + (t.badge || 0), 0);
+                      return (
+                        <div key={g.id}>
+                          <button
+                            onClick={() => {
+                              setActiveGroup(g.id);
+                              setActiveTab(g.tabs[0].value);
+                            }}
+                            className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                              isActiveGroup
+                                ? "bg-primary/15 text-primary"
+                                : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                            }`}
+                          >
+                            <span className="inline-flex items-center gap-2">
+                              <GIcon size={16} /> {g.label}
+                            </span>
+                            {groupBadge > 0 && (
+                              <span className="bg-destructive text-destructive-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                                {groupBadge}
+                              </span>
+                            )}
+                          </button>
+                          {isActiveGroup && (
+                            <div className="ml-3 mt-1 mb-2 pl-3 border-l border-border space-y-0.5">
+                              {g.tabs.map((t) => {
+                                const TIcon = t.icon;
+                                const isActive = t.value === activeTab;
+                                return (
+                                  <button
+                                    key={t.value}
+                                    onClick={() => setActiveTab(t.value)}
+                                    className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                                      isActive
+                                        ? "bg-primary text-primary-foreground font-semibold"
+                                        : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                                    }`}
+                                  >
+                                    <span className="inline-flex items-center gap-2 truncate">
+                                      <TIcon size={14} className="shrink-0" />
+                                      <span className="truncate">{t.label}</span>
+                                    </span>
+                                    {t.badge && t.badge > 0 ? (
+                                      <span className="bg-destructive text-destructive-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                                        {t.badge}
+                                      </span>
+                                    ) : null}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </nav>
+                </aside>
+
+                {/* Content area */}
+                <section className="min-w-0">
+                  <div className="bg-card border border-border rounded-xl px-4 py-3 mb-4 flex items-center gap-2 text-sm text-muted-foreground">
+                    <CurrentGroupIcon size={14} />
+                    <span>{currentGroup.label}</span>
+                    <ChevronRight size={14} />
+                    <span className="text-foreground font-semibold inline-flex items-center gap-1.5">
+                      <CurrentTabIcon size={14} /> {currentTab.label}
+                    </span>
+                  </div>
+                  {/* Hidden TabsList to satisfy Tabs context */}
+                  <TabsList className="sr-only">
+                    {groups.flatMap((g) => g.tabs).map((t) => (
+                      <TabsTrigger key={t.value} value={t.value}>{t.label}</TabsTrigger>
+                    ))}
+                  </TabsList>
+                  <div>
 
           <TabsContent value="notifications" className="space-y-4">
             <div className="flex items-center justify-between mb-2">
@@ -1590,6 +1641,9 @@ const Admin = () => {
               <InfoPopupsManager />
             </div>
           </TabsContent>
+                  </div>
+                </section>
+              </div>
             </Tabs>
           );
         })()}
