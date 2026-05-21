@@ -910,29 +910,29 @@ const MonProfil = () => {
               </div>
 
               {editing ? (
-                <form onSubmit={handleSave} className="p-5 space-y-4">
+                <form onSubmit={handleSave} className="p-5 space-y-5">
                   <div>
-                    <label className="text-muted-foreground text-xs mb-1.5 block flex items-center gap-1.5"><User size={12} /> Nom complet</label>
-                    <Input placeholder="Ton nom complet" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} className="bg-background border-border" />
+                    <label className="text-muted-foreground text-xs mb-2 block flex items-center gap-1.5"><User size={12} /> Nom complet</label>
+                    <Input placeholder="Ton nom complet" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} className="bg-background border-muted-foreground/30 focus:border-primary focus:ring-1 focus:ring-primary/20" />
                   </div>
                   <div>
-                    <label className="text-muted-foreground text-xs mb-1.5 block flex items-center gap-1.5"><Phone size={12} /> Téléphone</label>
-                    <Input type="tel" placeholder="06 XX XX XX XX" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="bg-background border-border" />
+                    <label className="text-muted-foreground text-xs mb-2 block flex items-center gap-1.5"><Phone size={12} /> Téléphone</label>
+                    <Input type="tel" placeholder="06 XX XX XX XX" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="bg-background border-muted-foreground/30 focus:border-primary focus:ring-1 focus:ring-primary/20" />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-muted-foreground text-xs mb-1.5 block flex items-center gap-1.5"><Calendar size={12} /> Date de naissance</label>
+                      <label className="text-muted-foreground text-xs mb-2 block flex items-center gap-1.5"><Calendar size={12} /> Date de naissance</label>
                       <Input
                         type="date"
                         value={form.birth_date}
                         max={new Date().toISOString().split("T")[0]}
                         onChange={(e) => setForm({ ...form, birth_date: e.target.value })}
-                        className="bg-background border-border"
+                        className="bg-background border-muted-foreground/30 focus:border-primary focus:ring-1 focus:ring-primary/20"
                       />
                     </div>
                     <div>
-                      <label className="text-muted-foreground text-xs mb-1.5 block flex items-center gap-1.5"><MapPin size={12} /> Ville</label>
-                      <Input placeholder="Paris" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className="bg-background border-border" />
+                      <label className="text-muted-foreground text-xs mb-2 block flex items-center gap-1.5"><MapPin size={12} /> Ville</label>
+                      <Input placeholder="Paris" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} className="bg-background border-muted-foreground/30 focus:border-primary focus:ring-1 focus:ring-primary/20" />
                     </div>
                   </div>
                   <div>
@@ -946,7 +946,7 @@ const MonProfil = () => {
                           className={`flex-1 px-4 py-2.5 rounded-lg border text-sm font-medium transition-all ${
                             form.gender === g
                               ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/25"
-                              : "bg-background text-muted-foreground border-border hover:border-primary/40"
+                              : "bg-background text-muted-foreground border-muted-foreground/30 hover:border-primary/40"
                           }`}
                         >
                           {g}
