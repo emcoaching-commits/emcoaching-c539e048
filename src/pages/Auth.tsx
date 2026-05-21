@@ -5,7 +5,7 @@ import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Camera, X } from "lucide-react";
+import { Camera, Mail, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "react-router-dom";
 
@@ -21,6 +21,7 @@ const Auth = () => {
   const [signupClosed, setSignupClosed] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [pendingVerificationEmail, setPendingVerificationEmail] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
@@ -50,6 +51,29 @@ const Auth = () => {
     await supabase.storage.from("avatars").upload(path, avatarFile, { upsert: true });
     // Store path only (bucket is private, signed URLs used for display)
     await supabase.from("profiles").update({ avatar_url: path }).eq("user_id", userId);
+  };
+
+  const handleResendVerification = async () => {
+    if (!pendingVerificationEmail) {
+      toast.error("Ajoute d'abord ton email.");
+      return;
+    }
+
+    setLoading(true);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: pendingVerificationEmail,
+      options: {
+        emailRedirectTo: window.location.origin,
+      },
+    });
+
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success("Mail de vérification renvoyé ✉️");
+    }
+    setLoading(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -109,12 +133,14 @@ const Auth = () => {
         if (data.user) {
           await supabase.from("profiles").update({ birth_date: birthDate }).eq("user_id", data.user.id);
         }
-        // Auto-login après inscription (auto-confirm activé)
         if (!data.session) {
-          await supabase.auth.signInWithPassword({ email, password });
+          setPendingVerificationEmail(email);
+          toast.success("Compte créé ! Vérifie ta boîte mail pour confirmer ton adresse.");
+          setIsLogin(true);
+        } else {
+          toast.success("Inscription réussie ! Bienvenue 💪");
+          navigate("/mon-profil");
         }
-        toast.success("Inscription réussie ! Bienvenue 💪");
-        navigate("/mon-profil");
       }
     }
     setLoading(false);
@@ -222,6 +248,28 @@ const Auth = () => {
             <span className="text-muted-foreground text-xs uppercase">ou par email</span>
             <div className="flex-1 h-px bg-border" />
           </div>
+
+          {pendingVerificationEmail && (
+            <div className="mb-4 rounded-lg border border-primary/30 bg-primary/10 p-4">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 rounded-full bg-primary/15 p-2 text-primary">
+                  <Mail size={16} />
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Confirmation d'email en attente</p>
+                    <p className="text-sm text-muted-foreground">
+                      Un lien de vérification a été envoyé à <span className="text-foreground">{pendingVerificationEmail}</span>.
+                    </p>
+                  </div>
+                  <Button type="button" variant="heroOutline" size="sm" onClick={handleResendVerification} disabled={loading}>
+                    <Mail size={14} />
+                    Renvoyer le mail
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
