@@ -169,21 +169,27 @@ Deno.serve(async (req) => {
 
     const idempotencyKey = `daily-summary-${today}${isTest ? `-test-${Date.now()}` : ''}`
 
-    const { error } = await supabase.functions.invoke('send-transactional-email', {
-      body: {
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
+    const sendRes = await fetch(`${supabaseUrl}/functions/v1/send-transactional-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${serviceKey}`,
+        apikey: serviceKey,
+      },
+      body: JSON.stringify({
         templateName: 'daily-summary',
         recipientEmail: RECIPIENT,
         idempotencyKey,
         templateData,
-      },
-      headers: {
-        Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
-      },
+      }),
     })
 
-    if (error) {
-      console.error('[daily-summary] send error', error)
-      return new Response(JSON.stringify({ ok: false, error: String(error) }), {
+    if (!sendRes.ok) {
+      const errText = await sendRes.text()
+      console.error('[daily-summary] send error', sendRes.status, errText)
+      return new Response(JSON.stringify({ ok: false, status: sendRes.status, error: errText }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
