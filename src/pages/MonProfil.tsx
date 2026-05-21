@@ -1118,7 +1118,7 @@ const MonProfil = () => {
               <Button
                 variant="destructive"
                 className="mt-4"
-                onClick={() => { setDeleteStep(1); setDeleteEmail(""); setDeletePassword(""); }}
+                onClick={() => { setDeleteStep(1); setDeleteEmail(""); setDeletePassword(""); setDeleteReason(""); }}
               >
                 <Trash2 size={16} className="mr-2" /> Supprimer mon compte
               </Button>
@@ -1182,6 +1182,21 @@ const MonProfil = () => {
                 placeholder="••••••••"
               />
             </div>
+            <div>
+              <label className="text-sm text-muted-foreground">
+                Raison de la suppression <span className="text-destructive">*</span>
+              </label>
+              <Textarea
+                value={deleteReason}
+                onChange={(e) => setDeleteReason(e.target.value.slice(0, 2000))}
+                placeholder="Aide Emma à s'améliorer : pourquoi supprimes-tu ton compte ?"
+                rows={4}
+                maxLength={2000}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {deleteReason.trim().length}/2000 — minimum 3 caractères
+              </p>
+            </div>
           </div>
           <div className="flex flex-col-reverse sm:flex-row gap-2 pt-3">
             <Button variant="outline" className="flex-1" disabled={deleting} onClick={() => setDeleteStep(0)}>
@@ -1190,7 +1205,7 @@ const MonProfil = () => {
             <Button
               variant="destructive"
               className="flex-1"
-              disabled={deleting || !deleteEmail.trim() || !deletePassword}
+              disabled={deleting || !deleteEmail.trim() || !deletePassword || deleteReason.trim().length < 3}
               onClick={handleDeleteAccount}
             >
               {deleting ? "Suppression…" : "Supprimer définitivement"}
