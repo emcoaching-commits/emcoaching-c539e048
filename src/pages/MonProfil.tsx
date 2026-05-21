@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Trash2, AlertTriangle } from "lucide-react";
 
 const MonProfil = () => {
   const navigate = useNavigate();
@@ -43,6 +44,34 @@ const MonProfil = () => {
   const [bilanUrl, setBilanUrl] = useState<string | null>(null);
   const msgBottomRef = useRef<HTMLDivElement>(null);
   const messagerieRef = useRef<HTMLDivElement>(null);
+
+  // Suppression du compte (double confirmation)
+  const [deleteStep, setDeleteStep] = useState<0 | 1 | 2>(0);
+  const [deleteEmail, setDeleteEmail] = useState("");
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    if (!deleteEmail.trim() || !deletePassword) {
+      toast.error("Email et mot de passe requis");
+      return;
+    }
+    setDeleting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("delete-own-account", {
+        body: { email: deleteEmail.trim(), password: deletePassword },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      toast.success("Ton compte a été supprimé.");
+      await supabase.auth.signOut();
+      navigate("/");
+    } catch (e: any) {
+      toast.error(e?.message || "Suppression impossible");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   // Le rappel n'apparaît qu'à partir de 7 jours avant la date de prochain paiement
   // ET tant que l'admin n'a pas confirmé la réception du paiement (payment_reminder_active).
@@ -1067,6 +1096,102 @@ const MonProfil = () => {
           </motion.div>
         </div>
       </div>
+
+      {/* Zone dangereuse : suppression du compte */}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        <div className="mt-10 border border-destructive/40 rounded-2xl p-6 bg-destructive/5">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="text-destructive shrink-0 mt-1" size={22} />
+            <div className="flex-1">
+              <h3 className="font-display text-xl text-destructive">Supprimer mon compte</h3>
+              <p className="text-sm text-muted-foreground mt-1">
+                Cette action est <strong>définitive</strong>. Toutes tes informations
+                (profil, réservations, messages, questionnaire, formules, avis) seront
+                effacées et ne pourront pas être récupérées.
+              </p>
+              <Button
+                variant="destructive"
+                className="mt-4"
+                onClick={() => { setDeleteStep(1); setDeleteEmail(""); setDeletePassword(""); }}
+              >
+                <Trash2 size={16} className="mr-2" /> Supprimer mon compte
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Étape 1 : première confirmation */}
+      <Dialog open={deleteStep === 1} onOpenChange={(o) => { if (!o) setDeleteStep(0); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-destructive flex items-center gap-2">
+              <AlertTriangle size={20} /> Es-tu sûr·e ?
+            </DialogTitle>
+            <DialogDescription className="pt-2">
+              La suppression est <strong>irréversible</strong>. Tu vas perdre l'accès à tes formules,
+              tes réservations, ton historique de messages et toutes tes données personnelles.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col-reverse sm:flex-row gap-2 pt-2">
+            <Button variant="outline" className="flex-1" onClick={() => setDeleteStep(0)}>
+              Annuler
+            </Button>
+            <Button variant="destructive" className="flex-1" onClick={() => setDeleteStep(2)}>
+              Oui, continuer
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Étape 2 : confirmation finale email + mot de passe */}
+      <Dialog open={deleteStep === 2} onOpenChange={(o) => { if (!o && !deleting) setDeleteStep(0); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-destructive flex items-center gap-2">
+              <Trash2 size={20} /> Confirmation finale
+            </DialogTitle>
+            <DialogDescription>
+              Pour valider la suppression, saisis l'email et le mot de passe de ton compte.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 pt-2">
+            <div>
+              <label className="text-sm text-muted-foreground">Email du compte</label>
+              <Input
+                type="email"
+                autoComplete="email"
+                value={deleteEmail}
+                onChange={(e) => setDeleteEmail(e.target.value)}
+                placeholder={userEmail || "ton@email.com"}
+              />
+            </div>
+            <div>
+              <label className="text-sm text-muted-foreground">Mot de passe</label>
+              <Input
+                type="password"
+                autoComplete="current-password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                placeholder="••••••••"
+              />
+            </div>
+          </div>
+          <div className="flex flex-col-reverse sm:flex-row gap-2 pt-3">
+            <Button variant="outline" className="flex-1" disabled={deleting} onClick={() => setDeleteStep(0)}>
+              Annuler
+            </Button>
+            <Button
+              variant="destructive"
+              className="flex-1"
+              disabled={deleting || !deleteEmail.trim() || !deletePassword}
+              onClick={handleDeleteAccount}
+            >
+              {deleting ? "Suppression…" : "Supprimer définitivement"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Pop-up de bienvenue (7 jours après activation par Emma) */}
       <Dialog open={showWelcomePopup} onOpenChange={(open) => { if (!open) dismissWelcomePopup(); }}>
