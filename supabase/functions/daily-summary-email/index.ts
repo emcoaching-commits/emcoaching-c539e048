@@ -6,7 +6,7 @@ const corsHeaders = {
 }
 
 const TZ = 'Europe/Paris'
-const RECIPIENT = 'emcoaching@emcoachingfr.com'
+const RECIPIENT = "em'coaching@emcoachingfr.com"
 
 function parisDateParts(d = new Date()) {
   const f = new Intl.DateTimeFormat('fr-FR', {
