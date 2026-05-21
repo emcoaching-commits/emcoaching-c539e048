@@ -449,6 +449,27 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_visits: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null
