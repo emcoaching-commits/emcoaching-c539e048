@@ -1673,6 +1673,10 @@ const Admin = () => {
               <InfoPopupsManager />
             </div>
           </TabsContent>
+
+          <TabsContent value="summary" className="space-y-6">
+            <DailySummaryManager />
+          </TabsContent>
                   </div>
                 </section>
               </div>
