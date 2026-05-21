@@ -536,13 +536,28 @@ const Admin = () => {
   if (isAdmin === null) return <div className="min-h-screen bg-background flex items-center justify-center text-foreground">Chargement...</div>;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container py-8">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Decorative background icons */}
+      <div className="pointer-events-none select-none absolute top-24 -right-16 opacity-[0.04] text-primary">
+        <CalendarClock size={420} strokeWidth={1} />
+      </div>
+      <div className="pointer-events-none select-none absolute bottom-10 left-[15%] opacity-[0.035] rotate-12 text-primary">
+        <Users size={320} strokeWidth={1} />
+      </div>
+      <div className="pointer-events-none select-none absolute top-1/2 left-[55%] opacity-[0.03] -rotate-6 text-primary">
+        <BellRing size={260} strokeWidth={1} />
+      </div>
+
+      <div className="container py-8 relative z-10">
         <div className="flex items-center gap-4 mb-8">
           <Button variant="heroOutline" size="sm" onClick={() => navigate("/")}>
             <ArrowLeft size={16} className="mr-1" /> Retour
           </Button>
-          <h1 className="font-display text-4xl text-gradient-blue">ADMIN</h1>
+          <h1 className="font-display text-4xl text-gradient-blue tracking-wider">ADMIN</h1>
+          <div className="hidden md:flex ml-auto items-center gap-2 px-3 py-1.5 rounded-full bg-card/70 backdrop-blur border border-border text-xs font-semibold text-muted-foreground">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="uppercase tracking-widest">Live</span>
+          </div>
         </div>
 
         {(() => {
