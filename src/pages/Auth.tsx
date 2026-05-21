@@ -72,6 +72,7 @@ const Auth = () => {
     if (error) {
       toast.error(error.message);
     } else {
+      setVerificationResent(true);
       toast.success("Mail de vérification renvoyé ✉️");
     }
     setLoading(false);
