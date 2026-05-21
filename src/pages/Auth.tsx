@@ -256,21 +256,29 @@ const Auth = () => {
           </div>
 
           {pendingVerificationEmail && (
-            <div className="mb-4 rounded-lg border border-primary/30 bg-primary/10 p-4">
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 rounded-full bg-primary/15 p-2 text-primary">
-                  <Mail size={16} />
+            <div className="mb-4 rounded-xl border border-primary/30 bg-primary/10 p-5 shadow-sm">
+              <div className="flex items-start gap-4">
+                <div className="mt-0.5 rounded-full bg-primary/15 p-2.5 text-primary">
+                  <Mail size={18} />
                 </div>
-                <div className="space-y-3">
+                <div className="flex-1 space-y-3">
                   <div>
                     <p className="text-sm font-semibold text-foreground">Confirmation d'email en attente</p>
                     <p className="text-sm text-muted-foreground">
-                      Un lien de vérification a été envoyé à <span className="text-foreground">{pendingVerificationEmail}</span>.
+                      Un lien de vérification a été envoyé à <span className="text-foreground font-medium">{pendingVerificationEmail}</span>.
                     </p>
                   </div>
-                  <Button type="button" variant="heroOutline" size="sm" onClick={handleResendVerification} disabled={loading}>
+
+                  {verificationResent && (
+                    <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/20 p-3 flex items-center gap-2">
+                      <svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 1 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                      <p className="text-sm text-emerald-400 font-medium">Email de vérification renvoyé avec succès !</p>
+                    </div>
+                  )}
+
+                  <Button type="button" variant="heroOutline" size="sm" onClick={handleResendVerification} disabled={loading} className="w-full sm:w-auto">
                     <Mail size={14} />
-                    Renvoyer le mail
+                    Renvoyer le mail de vérification
                   </Button>
                 </div>
               </div>
