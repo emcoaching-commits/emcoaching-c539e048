@@ -45,6 +45,34 @@ const MonProfil = () => {
   const msgBottomRef = useRef<HTMLDivElement>(null);
   const messagerieRef = useRef<HTMLDivElement>(null);
 
+  // Suppression du compte (double confirmation)
+  const [deleteStep, setDeleteStep] = useState<0 | 1 | 2>(0);
+  const [deleteEmail, setDeleteEmail] = useState("");
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    if (!deleteEmail.trim() || !deletePassword) {
+      toast.error("Email et mot de passe requis");
+      return;
+    }
+    setDeleting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("delete-own-account", {
+        body: { email: deleteEmail.trim(), password: deletePassword },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      toast.success("Ton compte a été supprimé.");
+      await supabase.auth.signOut();
+      navigate("/");
+    } catch (e: any) {
+      toast.error(e?.message || "Suppression impossible");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   // Le rappel n'apparaît qu'à partir de 7 jours avant la date de prochain paiement
   // ET tant que l'admin n'a pas confirmé la réception du paiement (payment_reminder_active).
   const isReminderDue = (() => {
