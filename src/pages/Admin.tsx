@@ -598,7 +598,8 @@ const Admin = () => {
           ];
           const currentGroup = groups.find((g) => g.id === activeGroup) || groups[0];
           const currentTab = currentGroup.tabs.find((t) => t.value === activeTab) || currentGroup.tabs[0];
-          const totalUnread = unreadCount;
+          const CurrentGroupIcon = currentGroup.icon;
+          const CurrentTabIcon = currentTab.icon;
           return (
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6">
@@ -669,11 +670,11 @@ const Admin = () => {
                 {/* Content area */}
                 <section className="min-w-0">
                   <div className="bg-card border border-border rounded-xl px-4 py-3 mb-4 flex items-center gap-2 text-sm text-muted-foreground">
-                    <currentGroup.icon size={14} />
+                    <CurrentGroupIcon size={14} />
                     <span>{currentGroup.label}</span>
                     <ChevronRight size={14} />
                     <span className="text-foreground font-semibold inline-flex items-center gap-1.5">
-                      <currentTab.icon size={14} /> {currentTab.label}
+                      <CurrentTabIcon size={14} /> {currentTab.label}
                     </span>
                   </div>
                   {/* Hidden TabsList to satisfy Tabs context */}
