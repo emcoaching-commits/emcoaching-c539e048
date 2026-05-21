@@ -1640,6 +1640,9 @@ const Admin = () => {
               <InfoPopupsManager />
             </div>
           </TabsContent>
+                  </div>
+                </section>
+              </div>
             </Tabs>
           );
         })()}
