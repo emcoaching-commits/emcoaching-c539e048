@@ -34,8 +34,11 @@ Deno.serve(async (req) => {
 
     let body: any = {};
     try { body = await req.json(); } catch (_e) {}
-    const { email, password } = body ?? {};
+    const { email, password, reason } = body ?? {};
     if (!email || !password) return json({ error: "Email et mot de passe requis" }, 400);
+    const reasonStr = typeof reason === "string" ? reason.trim() : "";
+    if (reasonStr.length < 3) return json({ error: "Merci d'indiquer une raison (min. 3 caractères)" }, 400);
+    if (reasonStr.length > 2000) return json({ error: "Raison trop longue (max 2000 caractères)" }, 400);
 
     if (typeof user.email !== "string" || user.email.toLowerCase() !== String(email).toLowerCase()) {
       return json({ error: "L'email ne correspond pas à ton compte" }, 400);
@@ -54,6 +57,24 @@ Deno.serve(async (req) => {
     }
 
     const uid = user.id;
+
+    // Récupère le nom complet pour archive (avant suppression du profil)
+    const { data: profileRow } = await supabaseAdmin
+      .from("profiles").select("full_name").eq("user_id", uid).maybeSingle();
+
+    const { error: reasonErr } = await supabaseAdmin
+      .from("account_deletion_reasons")
+      .insert({
+        deleted_user_id: uid,
+        email: user.email ?? email,
+        full_name: profileRow?.full_name ?? null,
+        reason: reasonStr,
+      });
+    if (reasonErr) {
+      console.error("[delete-own-account] reason insert", reasonErr);
+      return json({ error: "Impossible d'enregistrer la raison, suppression annulée." }, 500);
+    }
+
     const safe = async (label: string, fn: () => Promise<{ error: any }>) => {
       const { error } = await fn();
       if (error) console.error(`[delete-own-account] ${label}`, error);
