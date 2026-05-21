@@ -11,6 +11,7 @@ import { fr } from "date-fns/locale";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Trash2, AlertTriangle } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 const MonProfil = () => {
   const navigate = useNavigate();
@@ -49,6 +50,7 @@ const MonProfil = () => {
   const [deleteStep, setDeleteStep] = useState<0 | 1 | 2>(0);
   const [deleteEmail, setDeleteEmail] = useState("");
   const [deletePassword, setDeletePassword] = useState("");
+  const [deleteReason, setDeleteReason] = useState("");
   const [deleting, setDeleting] = useState(false);
 
   const handleDeleteAccount = async () => {
@@ -56,10 +58,14 @@ const MonProfil = () => {
       toast.error("Email et mot de passe requis");
       return;
     }
+    if (deleteReason.trim().length < 3) {
+      toast.error("Merci d'indiquer une raison (min. 3 caractères)");
+      return;
+    }
     setDeleting(true);
     try {
       const { data, error } = await supabase.functions.invoke("delete-own-account", {
-        body: { email: deleteEmail.trim(), password: deletePassword },
+        body: { email: deleteEmail.trim(), password: deletePassword, reason: deleteReason.trim() },
       });
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
@@ -1112,7 +1118,7 @@ const MonProfil = () => {
               <Button
                 variant="destructive"
                 className="mt-4"
-                onClick={() => { setDeleteStep(1); setDeleteEmail(""); setDeletePassword(""); }}
+                onClick={() => { setDeleteStep(1); setDeleteEmail(""); setDeletePassword(""); setDeleteReason(""); }}
               >
                 <Trash2 size={16} className="mr-2" /> Supprimer mon compte
               </Button>
@@ -1176,6 +1182,21 @@ const MonProfil = () => {
                 placeholder="••••••••"
               />
             </div>
+            <div>
+              <label className="text-sm text-muted-foreground">
+                Raison de la suppression <span className="text-destructive">*</span>
+              </label>
+              <Textarea
+                value={deleteReason}
+                onChange={(e) => setDeleteReason(e.target.value.slice(0, 2000))}
+                placeholder="Aide Emma à s'améliorer : pourquoi supprimes-tu ton compte ?"
+                rows={4}
+                maxLength={2000}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {deleteReason.trim().length}/2000 — minimum 3 caractères
+              </p>
+            </div>
           </div>
           <div className="flex flex-col-reverse sm:flex-row gap-2 pt-3">
             <Button variant="outline" className="flex-1" disabled={deleting} onClick={() => setDeleteStep(0)}>
@@ -1184,7 +1205,7 @@ const MonProfil = () => {
             <Button
               variant="destructive"
               className="flex-1"
-              disabled={deleting || !deleteEmail.trim() || !deletePassword}
+              disabled={deleting || !deleteEmail.trim() || !deletePassword || deleteReason.trim().length < 3}
               onClick={handleDeleteAccount}
             >
               {deleting ? "Suppression…" : "Supprimer définitivement"}

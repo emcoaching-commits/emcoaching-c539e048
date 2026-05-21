@@ -38,6 +38,33 @@ export type Database = {
         }
         Relationships: []
       }
+      account_deletion_reasons: {
+        Row: {
+          created_at: string
+          deleted_user_id: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          reason: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_user_id?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          reason: string
+        }
+        Update: {
+          created_at?: string
+          deleted_user_id?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          reason?: string
+        }
+        Relationships: []
+      }
       appointment_types: {
         Row: {
           created_at: string
