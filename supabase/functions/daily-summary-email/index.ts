@@ -176,6 +176,9 @@ Deno.serve(async (req) => {
         idempotencyKey,
         templateData,
       },
+      headers: {
+        Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+      },
     })
 
     if (error) {
