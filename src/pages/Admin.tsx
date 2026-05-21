@@ -724,27 +724,31 @@ const Admin = () => {
               <p className="text-muted-foreground text-center py-8">Aucune activité pour le moment</p>
             )}
             {notifications?.map((n: any) => {
-              const icon = n.type === "inscription" ? <UserPlus size={16} /> 
-                : n.type === "message" ? <MessageCircle size={16} />
-                : n.type === "profil_update" ? <RefreshCw size={16} />
-                : <AlertTriangle size={16} />;
-              const color = n.type === "inscription" ? "text-green-500"
-                : n.type === "message" ? "text-primary"
-                : n.type === "profil_update" ? "text-accent"
-                : "text-destructive";
+              const icon = n.type === "inscription" ? <UserPlus size={20} /> 
+                : n.type === "message" ? <MessageCircle size={20} />
+                : n.type === "profil_update" ? <RefreshCw size={20} />
+                : <AlertTriangle size={20} />;
+              const tone = n.type === "inscription"
+                ? { bar: "bg-emerald-500", bubble: "bg-emerald-500/10 text-emerald-600", border: "hover:border-emerald-500/30" }
+                : n.type === "message"
+                ? { bar: "bg-primary", bubble: "bg-primary/10 text-primary", border: "hover:border-primary/30" }
+                : n.type === "profil_update"
+                ? { bar: "bg-indigo-500", bubble: "bg-indigo-500/10 text-indigo-500", border: "hover:border-indigo-500/30" }
+                : { bar: "bg-destructive", bubble: "bg-destructive/10 text-destructive", border: "hover:border-destructive/30" };
               return (
-                <div key={n.id} className={`flex items-start gap-3 p-3 rounded-lg border ${n.is_read ? "bg-card border-border" : "bg-primary/5 border-primary/20"}`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${color} bg-muted`}>
+                <div key={n.id} className={`group relative bg-card border border-border rounded-2xl p-5 pl-6 flex items-center gap-5 shadow-sm transition-all hover:shadow-md ${tone.border}`}>
+                  <div className={`absolute left-0 top-0 bottom-0 w-1 rounded-l-2xl ${tone.bar}`} />
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${tone.bubble}`}>
                     {icon}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-foreground text-sm">{n.content}</p>
-                    <p className="text-muted-foreground text-xs mt-0.5">
+                    <p className="text-foreground text-sm font-semibold leading-snug">{n.content}</p>
+                    <p className="text-muted-foreground text-xs mt-1 font-medium">
                       {format(new Date(n.created_at), "dd MMM yyyy · HH:mm", { locale: fr })}
                     </p>
                   </div>
                   {!n.is_read && (
-                    <div className="w-2.5 h-2.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-primary shrink-0 animate-pulse" />
                   )}
                 </div>
               );
