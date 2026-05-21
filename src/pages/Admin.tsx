@@ -620,7 +620,7 @@ const Admin = () => {
               <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-6">
                 {/* Sidebar nav */}
                 <aside className="lg:sticky lg:top-4 lg:self-start">
-                  <nav className="bg-card border border-border rounded-xl p-2 space-y-1">
+                  <nav className="bg-card/70 backdrop-blur-md border border-border rounded-2xl p-3 space-y-1 shadow-sm">
                     {groups.map((g) => {
                       const GIcon = g.icon;
                       const isActiveGroup = g.id === activeGroup;
@@ -632,14 +632,15 @@ const Admin = () => {
                               setActiveGroup(g.id);
                               setActiveTab(g.tabs[0].value);
                             }}
-                            className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                            className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                               isActiveGroup
-                                ? "bg-primary/15 text-primary"
-                                : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                                ? "bg-primary/10 text-primary"
+                                : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
                             }`}
                           >
-                            <span className="inline-flex items-center gap-2">
-                              <GIcon size={16} /> {g.label}
+                            <span className="inline-flex items-center gap-2.5">
+                              <GIcon size={17} className={isActiveGroup ? "opacity-100" : "opacity-70"} />
+                              <span>{g.label}</span>
                             </span>
                             {groupBadge > 0 && (
                               <span className="bg-destructive text-destructive-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
@@ -648,7 +649,7 @@ const Admin = () => {
                             )}
                           </button>
                           {isActiveGroup && (
-                            <div className="ml-3 mt-1 mb-2 pl-3 border-l border-border space-y-0.5">
+                            <div className="ml-3 mt-1.5 mb-1 pl-3 border-l-2 border-primary/15 space-y-1">
                               {g.tabs.map((t) => {
                                 const TIcon = t.icon;
                                 const isActive = t.value === activeTab;
@@ -656,10 +657,10 @@ const Admin = () => {
                                   <button
                                     key={t.value}
                                     onClick={() => setActiveTab(t.value)}
-                                    className={`w-full flex items-center justify-between gap-2 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                                    className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl text-sm transition-all ${
                                       isActive
-                                        ? "bg-primary text-primary-foreground font-semibold"
-                                        : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                                        ? "bg-primary text-primary-foreground font-semibold shadow-md shadow-primary/25"
+                                        : "text-muted-foreground hover:bg-primary/5 hover:text-primary"
                                     }`}
                                   >
                                     <span className="inline-flex items-center gap-2 truncate">
@@ -684,13 +685,23 @@ const Admin = () => {
 
                 {/* Content area */}
                 <section className="min-w-0">
-                  <div className="bg-card border border-border rounded-xl px-4 py-3 mb-4 flex items-center gap-2 text-sm text-muted-foreground">
-                    <CurrentGroupIcon size={14} />
-                    <span>{currentGroup.label}</span>
-                    <ChevronRight size={14} />
-                    <span className="text-foreground font-semibold inline-flex items-center gap-1.5">
-                      <CurrentTabIcon size={14} /> {currentTab.label}
-                    </span>
+                  <div className="bg-card/80 backdrop-blur-md border border-border rounded-2xl px-5 py-3.5 mb-5 flex items-center justify-between gap-2 text-sm shadow-sm">
+                    <div className="flex items-center gap-2 text-muted-foreground font-medium">
+                      <span className="inline-flex items-center gap-1.5">
+                        <CurrentGroupIcon size={14} />
+                        {currentGroup.label}
+                      </span>
+                      <ChevronRight size={14} className="opacity-50" />
+                      <span className="text-primary font-semibold inline-flex items-center gap-1.5">
+                        <CurrentTabIcon size={14} /> {currentTab.label}
+                      </span>
+                    </div>
+                    <div className="hidden sm:flex items-center gap-3">
+                      <div className="h-6 w-px bg-border" />
+                      <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
+                        <span className="font-display text-base text-primary leading-none mt-0.5">EF</span>
+                      </div>
+                    </div>
                   </div>
                   {/* Hidden TabsList to satisfy Tabs context */}
                   <TabsList className="sr-only">
