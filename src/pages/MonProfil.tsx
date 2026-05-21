@@ -103,6 +103,11 @@ const MonProfil = () => {
       const { data } = await supabase.from("profiles").select("*").eq("user_id", user.id).single();
       if (data) {
         setProfile(data);
+        // Log profile visit (best-effort)
+        supabase.from("profile_visits").insert({
+          user_id: user.id,
+          full_name: data.full_name ?? null,
+        }).then(() => {});
         setForm({
           full_name: data.full_name || "",
           phone: data.phone || "",
