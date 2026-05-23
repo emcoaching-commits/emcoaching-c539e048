@@ -58,7 +58,7 @@ interface IconBody {
   opacity: number;
 }
 
-const COUNT = 100;
+const COUNT = 60;
 const SPEED = 80; // px/sec
 
 const FloatingIcons = () => {
@@ -92,6 +92,23 @@ const FloatingIcons = () => {
   useEffect(() => {
     let raf = 0;
     let last = performance.now();
+    let obstacles: { x: number; y: number; w: number; h: number }[] = [];
+    let obstacleTick = 0;
+
+    const refreshObstacles = () => {
+      const el = containerRef.current;
+      if (!el) return;
+      const cRect = el.getBoundingClientRect();
+      const list: { x: number; y: number; w: number; h: number }[] = [];
+      document.querySelectorAll<HTMLElement>("img, [data-icon-obstacle]").forEach((node) => {
+        if (el.contains(node)) return; // skip our own (none, but safe)
+        const r = node.getBoundingClientRect();
+        if (r.width < 20 || r.height < 20) return;
+        // Convert to container-local coords
+        list.push({ x: r.left - cRect.left, y: r.top - cRect.top, w: r.width, h: r.height });
+      });
+      obstacles = list;
+    };
 
     const getBounds = () => {
       const el = containerRef.current;
@@ -107,12 +124,17 @@ const FloatingIcons = () => {
       b.y = Math.random() * Math.max(100, h - b.size);
     });
     setReady((n) => n + 1);
+    refreshObstacles();
 
     const tick = (now: number) => {
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       const { w, h } = getBounds();
       const bodies = bodiesRef.current;
+
+      // Refresh obstacles every ~150ms (scroll/layout changes)
+      obstacleTick += dt;
+      if (obstacleTick > 0.15) { obstacleTick = 0; refreshObstacles(); }
 
       // Move
       for (const b of bodies) {
@@ -124,6 +146,45 @@ const FloatingIcons = () => {
         if (b.y < 0) { b.y = 0; b.vy = Math.abs(b.vy); }
         if (b.x + b.size > w) { b.x = w - b.size; b.vx = -Math.abs(b.vx); }
         if (b.y + b.size > h) { b.y = h - b.size; b.vy = -Math.abs(b.vy); }
+
+        // Obstacle (image) bounce — treat icon as circle vs AABB
+        const r = b.size / 2;
+        const cx = b.x + r;
+        const cy = b.y + r;
+        for (const o of obstacles) {
+          const closestX = Math.max(o.x, Math.min(cx, o.x + o.w));
+          const closestY = Math.max(o.y, Math.min(cy, o.y + o.h));
+          const dx = cx - closestX;
+          const dy = cy - closestY;
+          const d2 = dx * dx + dy * dy;
+          if (d2 < r * r) {
+            let nx: number, ny: number;
+            if (d2 > 0.0001) {
+              const d = Math.sqrt(d2);
+              nx = dx / d;
+              ny = dy / d;
+              const push = r - d;
+              b.x += nx * push;
+              b.y += ny * push;
+            } else {
+              // Center inside rect — push along nearest edge
+              const leftD = cx - o.x;
+              const rightD = (o.x + o.w) - cx;
+              const topD = cy - o.y;
+              const botD = (o.y + o.h) - cy;
+              const m = Math.min(leftD, rightD, topD, botD);
+              if (m === leftD) { nx = -1; ny = 0; b.x = o.x - b.size; }
+              else if (m === rightD) { nx = 1; ny = 0; b.x = o.x + o.w; }
+              else if (m === topD) { nx = 0; ny = -1; b.y = o.y - b.size; }
+              else { nx = 0; ny = 1; b.y = o.y + o.h; }
+            }
+            const vn = b.vx * nx + b.vy * ny;
+            if (vn < 0) {
+              b.vx -= 2 * vn * nx;
+              b.vy -= 2 * vn * ny;
+            }
+          }
+        }
       }
 
       // Circle-circle collisions
