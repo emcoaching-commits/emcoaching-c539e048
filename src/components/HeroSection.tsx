@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, LogIn, UserPlus } from "lucide-react";
+import { Dumbbell, HeartPulse, Flame, Zap, Trophy, Apple, Droplets, Bike, Sparkles, Target, Activity, Timer } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
@@ -37,16 +38,42 @@ const HeroSection = () => {
           }}
           className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12"
         >
-          {/* Logo à côté du texte */}
-          <motion.img
-            src={heroLogo}
-            alt="Em' Coaching"
-            className="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 rounded-3xl object-cover shadow-2xl"
-            variants={{
-              hidden: { opacity: 0, scale: 0.85, rotate: -3 },
-              show: { opacity: 1, scale: 1, rotate: 0, transition: { duration: 0.9, ease: "easeOut" } },
-            }}
-          />
+          {/* Logo entouré d'icônes flottantes */}
+          <div className="relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 shrink-0">
+            {[
+              { Icon: Dumbbell, top: "-12%", left: "-14%", size: 32, dur: 4, delay: 0 },
+              { Icon: HeartPulse, top: "-8%", left: "50%", size: 28, dur: 5, delay: 0.3 },
+              { Icon: Flame, top: "-10%", left: "100%", size: 30, dur: 4.5, delay: 0.6 },
+              { Icon: Zap, top: "30%", left: "108%", size: 26, dur: 5.5, delay: 0.9 },
+              { Icon: Trophy, top: "70%", left: "108%", size: 30, dur: 4.2, delay: 1.2 },
+              { Icon: Apple, top: "100%", left: "100%", size: 28, dur: 5, delay: 1.5 },
+              { Icon: Droplets, top: "104%", left: "50%", size: 26, dur: 4.8, delay: 0.4 },
+              { Icon: Bike, top: "100%", left: "-12%", size: 32, dur: 4.4, delay: 0.7 },
+              { Icon: Sparkles, top: "70%", left: "-16%", size: 24, dur: 5.2, delay: 1 },
+              { Icon: Target, top: "30%", left: "-16%", size: 28, dur: 4.6, delay: 1.3 },
+              { Icon: Activity, top: "10%", left: "-22%", size: 22, dur: 5, delay: 1.6 },
+              { Icon: Timer, top: "90%", left: "115%", size: 22, dur: 4.7, delay: 0.2 },
+            ].map(({ Icon, top, left, size, dur, delay }, i) => (
+              <motion.div
+                key={i}
+                className="absolute text-primary pointer-events-none"
+                style={{ top, left, transform: "translate(-50%, -50%)" }}
+                animate={{ y: [0, -14, 0, 8, 0], x: [0, 6, -4, 3, 0], rotate: [0, 10, -8, 5, 0], opacity: [0.55, 0.9, 0.7, 0.95, 0.55] }}
+                transition={{ duration: dur, delay, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <Icon size={size} strokeWidth={1.8} />
+              </motion.div>
+            ))}
+            <motion.img
+              src={heroLogo}
+              alt="Em' Coaching"
+              className="relative w-full h-full rounded-3xl object-cover shadow-2xl"
+              variants={{
+                hidden: { opacity: 0, scale: 0.85, rotate: -3 },
+                show: { opacity: 1, scale: 1, rotate: 0, transition: { duration: 0.9, ease: "easeOut" } },
+              }}
+            />
+          </div>
 
           <motion.div
             className="text-center md:text-left max-w-xl"
