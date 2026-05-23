@@ -58,8 +58,8 @@ interface IconBody {
   opacity: number;
 }
 
-const COUNT = 28;
-const SPEED = 70; // px/sec
+const COUNT = 100;
+const SPEED = 80; // px/sec
 
 const FloatingIcons = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -196,7 +196,7 @@ const FloatingIcons = () => {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 pointer-events-none overflow-hidden"
+      className="fixed inset-0 pointer-events-none overflow-hidden"
       style={{ zIndex: 1 }}
     >
       {bodiesRef.current.map((b, i) => {
