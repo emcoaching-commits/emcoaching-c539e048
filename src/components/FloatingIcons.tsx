@@ -132,7 +132,7 @@ const icons = generateIcons();
 
 const FloatingIcons = () => {
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden z-1">
+    <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 1 }}>
       {icons.map((item, i) => {
         const { Icon, size, top, left, opacity, durationY, durationX, delay, rotate, blur } = item;
         return (
