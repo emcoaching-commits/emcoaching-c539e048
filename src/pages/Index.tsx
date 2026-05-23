@@ -60,9 +60,9 @@ const PillarsRow = () => {
 const Index = () => {
   const { isActive } = useIsActiveSubscriber();
   return (
-    <div className="min-h-screen bg-gradient-soft relative">
+    <>
       <FloatingIcons />
-      <div className="relative z-10">
+      <div className="min-h-screen bg-gradient-soft relative z-10">
         <WelcomePopup />
         <InfoPopupsBanner />
         <Navbar />
@@ -80,7 +80,7 @@ const Index = () => {
         <ReviewsSection />
         <Footer />
       </div>
-    </div>
+    </>
   );
 };
 
