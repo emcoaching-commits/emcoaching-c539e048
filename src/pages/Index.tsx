@@ -60,23 +60,26 @@ const PillarsRow = () => {
 const Index = () => {
   const { isActive } = useIsActiveSubscriber();
   return (
-    <div className="min-h-screen bg-gradient-soft">
-      <WelcomePopup />
-      <InfoPopupsBanner />
-      <Navbar />
-      <HeroSection />
-      <div className="section-divider" />
-      {/* Aperçu compact des formules — masqué si client déjà abonné */}
-      {!isActive && <PricingPreview />}
-      {!isActive && <div className="section-divider" />}
-      <PillarsRow />
-      <div className="section-divider" />
-      <MarketingHighlights />
-      <div className="section-divider" />
-      <QuestionnaireSection />
-      <div className="section-divider" />
-      <ReviewsSection />
-      <Footer />
+    <div className="min-h-screen bg-gradient-soft relative">
+      <FloatingIcons />
+      <div className="relative z-10">
+        <WelcomePopup />
+        <InfoPopupsBanner />
+        <Navbar />
+        <HeroSection />
+        <div className="section-divider" />
+        {/* Aperçu compact des formules — masqué si client déjà abonné */}
+        {!isActive && <PricingPreview />}
+        {!isActive && <div className="section-divider" />}
+        <PillarsRow />
+        <div className="section-divider" />
+        <MarketingHighlights />
+        <div className="section-divider" />
+        <QuestionnaireSection />
+        <div className="section-divider" />
+        <ReviewsSection />
+        <Footer />
+      </div>
     </div>
   );
 };
