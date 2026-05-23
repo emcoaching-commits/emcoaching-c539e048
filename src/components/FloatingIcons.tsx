@@ -12,6 +12,14 @@ import {
   Apple,
   Droplets,
   Bike,
+  Sparkles,
+  Star,
+  Target,
+  Award,
+  Sunrise,
+  Moon,
+  Leaf,
+  Sun,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -21,31 +29,112 @@ interface FloatingIconItem {
   top: string;
   left: string;
   opacity: number;
-  duration: number;
+  durationY: number;
+  durationX: number;
   delay: number;
   rotate: number;
+  blur?: number;
 }
 
-const icons: FloatingIconItem[] = [
-  { Icon: Dumbbell, size: 44, top: "8%", left: "5%", opacity: 0.32, duration: 7, delay: 1.2, rotate: -15 },
-  { Icon: HeartPulse, size: 40, top: "22%", left: "90%", opacity: 0.30, duration: 8, delay: 0.3, rotate: 10 },
-  { Icon: Footprints, size: 42, top: "45%", left: "3%", opacity: 0.32, duration: 6.5, delay: 2.1, rotate: 20 },
-  { Icon: Flame, size: 38, top: "70%", left: "88%", opacity: 0.32, duration: 7.5, delay: 0.8, rotate: -8 },
-  { Icon: Activity, size: 46, top: "15%", left: "70%", opacity: 0.28, duration: 9, delay: 1.5, rotate: 5 },
-  { Icon: Zap, size: 36, top: "38%", left: "15%", opacity: 0.34, duration: 5.5, delay: 1.0, rotate: -25 },
-  { Icon: Timer, size: 40, top: "60%", left: "78%", opacity: 0.30, duration: 8.5, delay: 2.8, rotate: 12 },
-  { Icon: TrendingUp, size: 42, top: "82%", left: "22%", opacity: 0.30, duration: 6, delay: 1.0, rotate: -5 },
-  { Icon: Trophy, size: 38, top: "5%", left: "42%", opacity: 0.30, duration: 7, delay: 3.2, rotate: 15 },
-  { Icon: Apple, size: 40, top: "50%", left: "68%", opacity: 0.28, duration: 9.5, delay: 0.5, rotate: -10 },
-  { Icon: Droplets, size: 36, top: "75%", left: "50%", opacity: 0.34, duration: 6, delay: 1.8, rotate: 8 },
-  { Icon: Bike, size: 44, top: "30%", left: "35%", opacity: 0.30, duration: 8, delay: 2.5, rotate: -12 },
+const allIcons: LucideIcon[] = [
+  Dumbbell,
+  HeartPulse,
+  Footprints,
+  Flame,
+  Activity,
+  Zap,
+  Timer,
+  TrendingUp,
+  Trophy,
+  Apple,
+  Droplets,
+  Bike,
+  Sparkles,
+  Star,
+  Target,
+  Award,
+  Sunrise,
+  Moon,
+  Leaf,
+  Sun,
 ];
+
+const generateIcons = (): FloatingIconItem[] => {
+  const items: FloatingIconItem[] = [];
+  const positions = [
+    { top: "2%", left: "8%" },
+    { top: "5%", left: "25%" },
+    { top: "3%", left: "48%" },
+    { top: "6%", left: "72%" },
+    { top: "4%", left: "92%" },
+    { top: "15%", left: "5%" },
+    { top: "18%", left: "35%" },
+    { top: "12%", left: "60%" },
+    { top: "16%", left: "85%" },
+    { top: "28%", left: "12%" },
+    { top: "25%", left: "45%" },
+    { top: "30%", left: "78%" },
+    { top: "22%", left: "95%" },
+    { top: "38%", left: "3%" },
+    { top: "35%", left: "28%" },
+    { top: "42%", left: "55%" },
+    { top: "40%", left: "88%" },
+    { top: "50%", left: "18%" },
+    { top: "48%", left: "42%" },
+    { top: "52%", left: "68%" },
+    { top: "55%", left: "92%" },
+    { top: "62%", left: "8%" },
+    { top: "65%", left: "32%" },
+    { top: "60%", left: "58%" },
+    { top: "68%", left: "82%" },
+    { top: "75%", left: "15%" },
+    { top: "72%", left: "48%" },
+    { top: "78%", left: "72%" },
+    { top: "82%", left: "5%" },
+    { top: "85%", left: "38%" },
+    { top: "88%", left: "62%" },
+    { top: "92%", left: "88%" },
+    { top: "95%", left: "22%" },
+    { top: "90%", left: "50%" },
+    { top: "8%", left: "18%" },
+    { top: "14%", left: "78%" },
+    { top: "32%", left: "65%" },
+    { top: "44%", left: "22%" },
+    { top: "58%", left: "48%" },
+    { top: "70%", left: "8%" },
+    { top: "80%", left: "55%" },
+  ];
+
+  positions.forEach((pos, i) => {
+    const Icon = allIcons[i % allIcons.length];
+    const sizeBase = 28 + Math.random() * 36; // 28 to 64
+    const size = Math.round(sizeBase);
+    const opacity = 0.15 + Math.random() * 1.35; // 0.15 to 0.50
+    const blur = Math.random() > 0.6 ? 0 : 1 + Math.random() * 2;
+    items.push({
+      Icon,
+      size,
+      top: pos.top,
+      left: pos.left,
+      opacity: parseFloat(opacity.toFixed(2)),
+      durationY: 4 + Math.random() * 5, // 4 to 9
+      durationX: 5 + Math.random() * 6, // 5 to 11
+      delay: Math.random() * 4,
+      rotate: Math.floor(Math.random() * 360) - 180,
+      blur,
+    });
+  });
+
+  return items;
+};
+
+const icons = generateIcons();
 
 const FloatingIcons = () => {
   return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+    <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 1 }}>
       {icons.map((item, i) => {
-        const { Icon, size, top, left, opacity, duration, delay, rotate } = item;
+        const { Icon, size, top, left, opacity, durationY, durationX, delay, rotate, blur } = item;
         return (
           <motion.div
             key={i}
@@ -55,21 +144,23 @@ const FloatingIcons = () => {
               left,
               opacity,
               rotate: `${rotate}deg`,
+              filter: blur ? `blur(${blur}px)` : undefined,
             }}
             animate={{
-              y: [0, -14, 0],
-              opacity: [opacity, opacity * 2.2, opacity],
-              rotate: [rotate, rotate + 4, rotate],
+              y: [0, -28, 0, 14, 1],
+              x: [0, 12, -8, 6, 0],
+              opacity: [opacity * 0.6, opacity * 1.6, opacity * 0.8, opacity * 1.4, opacity],
+              rotate: [rotate, rotate + 12, rotate - 8, rotate + 5, rotate],
             }}
             transition={{
-              duration,
+              duration: durationY,
               delay,
               repeat: Infinity,
-              repeatType: "reverse",
+              repeatType: "loop",
               ease: "easeInOut",
             }}
           >
-            <Icon size={size} strokeWidth={1.6} />
+            <Icon size={size} strokeWidth={1.5} />
           </motion.div>
         );
       })}
