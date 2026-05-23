@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import PricingPreview from "@/components/PricingPreview";
 import MarketingHighlights from "@/components/MarketingHighlights";
 import { useIsActiveSubscriber } from "@/hooks/useIsActiveSubscriber";
+import FloatingIcons from "@/components/FloatingIcons";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import WelcomePopup from "@/components/WelcomePopup";
 import InfoPopupsBanner from "@/components/InfoPopupsBanner";
@@ -61,6 +62,7 @@ const Index = () => {
   return (
     <>
       <div className="min-h-screen bg-gradient-soft relative">
+        <FloatingIcons />
         <div className="relative z-10">
         <WelcomePopup />
         <InfoPopupsBanner />

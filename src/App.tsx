@@ -26,7 +26,6 @@ import { getAppBase } from "@/lib/app-paths";
 import FaviconLoader from "@/components/FaviconLoader";
 import ThemeLoader from "@/components/ThemeLoader";
 import ReduceMotionToggle from "@/components/ReduceMotionToggle";
-import FloatingIcons from "@/components/FloatingIcons";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const queryClient = new QueryClient();
@@ -86,7 +85,6 @@ const App = () => {
       </BrowserRouter>
       <FloatingCallButton />
       <ReduceMotionToggle />
-      <FloatingIcons />
     </TooltipProvider>
   </QueryClientProvider>
   );
