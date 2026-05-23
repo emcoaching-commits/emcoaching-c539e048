@@ -61,8 +61,9 @@ const Index = () => {
   const { isActive } = useIsActiveSubscriber();
   return (
     <>
-      <FloatingIcons />
-      <div className="min-h-screen bg-gradient-soft relative z-10">
+      <div className="min-h-screen bg-gradient-soft relative overflow-hidden">
+        <FloatingIcons />
+        <div className="relative z-10">
         <WelcomePopup />
         <InfoPopupsBanner />
         <Navbar />
@@ -79,6 +80,7 @@ const Index = () => {
         <div className="section-divider" />
         <ReviewsSection />
         <Footer />
+        </div>
       </div>
     </>
   );
