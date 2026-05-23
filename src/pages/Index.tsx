@@ -11,7 +11,6 @@ import { useIsActiveSubscriber } from "@/hooks/useIsActiveSubscriber";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import WelcomePopup from "@/components/WelcomePopup";
 import InfoPopupsBanner from "@/components/InfoPopupsBanner";
-import FloatingIcons from "@/components/FloatingIcons";
 
 const PillarsRow = () => {
   const { data: s } = useSiteSettings();
@@ -61,8 +60,7 @@ const Index = () => {
   const { isActive } = useIsActiveSubscriber();
   return (
     <>
-      <div className="min-h-screen bg-gradient-soft relative overflow-hidden">
-        <FloatingIcons />
+      <div className="min-h-screen bg-gradient-soft relative">
         <div className="relative z-10">
         <WelcomePopup />
         <InfoPopupsBanner />
