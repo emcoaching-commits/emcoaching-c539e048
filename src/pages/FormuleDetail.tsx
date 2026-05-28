@@ -100,7 +100,7 @@ const FormuleDetail = () => {
 
             <p className="text-primary font-semibold tracking-widest uppercase text-sm mb-2">Formule</p>
             <h1 className="font-display text-5xl sm:text-6xl text-gradient-blue mb-4">{plan.name}</h1>
-            <p className="font-display text-4xl text-primary mb-6">{plan.price}€</p>
+            <p className="font-display text-4xl text-primary mb-6">{plan.price}€/mois</p>
 
             {plan.description && (
               <div className="bg-card border border-border rounded-xl p-8 mb-8">

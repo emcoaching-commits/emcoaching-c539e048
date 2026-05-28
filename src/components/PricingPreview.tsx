@@ -62,7 +62,7 @@ const PricingPreview = () => {
                 </span>
               )}
               <h3 className="font-display text-xl text-foreground mb-1">{plan.name}</h3>
-              <p className="font-display text-3xl text-gradient-blue mb-3">{plan.price}€</p>
+              <p className="font-display text-3xl text-gradient-blue mb-3">{plan.price}€/mois</p>
               <div className="flex flex-col gap-2 w-full mt-auto">
                 <Button
                   variant="heroOutline"
