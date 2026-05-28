@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { CheckCircle2, Play } from "lucide-react";
+import { CheckCircle2, Play, Heart, Target, Sparkles, Award, Users, Flame } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
@@ -8,6 +8,45 @@ const points = [
   "Spécialiste en transformation physique",
   "Approche bienveillante et motivante",
   "Suivi personnalisé et régulier",
+];
+
+const journey = [
+  {
+    icon: Flame,
+    title: "Ma passion devenue métier",
+    text:
+      "Le sport a changé ma vie. Après des années à m'entraîner et à expérimenter sur moi-même, j'ai décidé d'en faire mon métier pour transmettre cette énergie et accompagner d'autres femmes et hommes vers leur meilleure version.",
+  },
+  {
+    icon: Award,
+    title: "Formée et certifiée",
+    text:
+      "Coach sportive diplômée et formée en nutrition, je me forme en continu pour t'offrir un accompagnement à jour, basé sur la science du sport, du mouvement et de l'alimentation — sans régime restrictif ni méthode miracle.",
+  },
+  {
+    icon: Heart,
+    title: "Une approche bienveillante",
+    text:
+      "Je crois qu'on progresse mieux dans la bienveillance que dans la culpabilité. Mon rôle, c'est de te pousser sans te casser, de t'aider à aimer le processus autant que le résultat, et de construire avec toi des habitudes qui durent.",
+  },
+  {
+    icon: Target,
+    title: "Du sur-mesure, vraiment",
+    text:
+      "Chaque programme est construit pour toi : ton objectif, ton niveau, ton emploi du temps, ton matériel. Pas de copier-coller. Le programme évolue toutes les 6 semaines pour rester stimulant et efficace.",
+  },
+  {
+    icon: Users,
+    title: "Disponible et à l'écoute",
+    text:
+      "Tu n'es jamais seul·e. Je suis joignable pour répondre à tes questions, ajuster le programme, te remotiver quand c'est dur. On avance ensemble, à ton rythme, avec un cap clair.",
+  },
+  {
+    icon: Sparkles,
+    title: "Ma promesse",
+    text:
+      "Te faire (re)tomber amoureux·se du sport, te montrer que manger sainement peut être simple et bon, et te prouver que tu es capable de bien plus que ce que tu imagines.",
+  },
 ];
 
 const AboutSection = () => {
@@ -127,6 +166,46 @@ const AboutSection = () => {
               </>
             )}
           </motion.div>
+        </div>
+
+        {/* Mon histoire — détails */}
+        <div className="mt-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-12"
+          >
+            <p className="text-primary font-semibold tracking-widest uppercase text-xs mb-3">
+              Mon histoire & ma vision
+            </p>
+            <h3 className="font-display text-4xl sm:text-5xl text-gradient-blue">
+              POURQUOI ME CHOISIR
+            </h3>
+          </motion.div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {journey.map((j, i) => {
+              const Icon = j.icon;
+              return (
+                <motion.div
+                  key={j.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.08 }}
+                  className="card-hover relative rounded-2xl border border-border bg-card/60 backdrop-blur-sm p-6"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 border border-primary/30 flex items-center justify-center mb-4">
+                    <Icon className="text-primary" size={22} />
+                  </div>
+                  <h4 className="font-display text-xl text-foreground mb-2">{j.title}</h4>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{j.text}</p>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>
