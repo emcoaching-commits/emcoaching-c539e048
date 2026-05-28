@@ -81,10 +81,10 @@ const PricingSection = () => {
                 <h3 className="font-display text-3xl text-foreground mb-1 drop-shadow-sm">{plan.name}</h3>
                 <p className="text-muted-foreground text-sm mb-4">{plan.description}</p>
                 <p className="font-display text-5xl text-gradient-blue mb-0">
-                  {plan.price}€
+                  {plan.price}€/mois
                 </p>
                 <p className="text-muted-foreground text-xs mb-1">
-                  /mois • séances illimitées
+                  • séances illimitées
                 </p>
                 {detail && (
                   <p className="text-primary text-xs font-medium mb-6">{detail}</p>
