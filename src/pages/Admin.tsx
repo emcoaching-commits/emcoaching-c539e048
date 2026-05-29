@@ -1466,6 +1466,9 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="about" className="space-y-6">
+            {/* Édition complète "Qui suis-je" : kicker, titre, description, points, blocs, frise chronologique */}
+            <HomeContentManager />
+
             {/* Description editing */}
             <div className="bg-card border border-border rounded-lg p-4 space-y-3">
               <h3 className="text-foreground font-display text-lg">DESCRIPTION</h3>
