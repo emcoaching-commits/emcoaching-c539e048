@@ -644,6 +644,50 @@ const HomeContentManager = () => {
             ))}
           </div>
         </div>
+
+        <div className="pt-4 border-t border-border/50 space-y-3">
+          <h5 className="font-display text-foreground">Frise "Mon parcours" (histoire & expériences)</h5>
+          <p className="text-xs text-muted-foreground">
+            Une frise chronologique pour raconter ton histoire. Laisse un bloc vide pour le masquer.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label>Petit titre (kicker)</Label>
+              <Input value={values.about_timeline_kicker || ""} onChange={(e) => setValues({ ...values, about_timeline_kicker: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Titre</Label>
+              <Input value={values.about_timeline_title || ""} onChange={(e) => setValues({ ...values, about_timeline_title: e.target.value })} />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>Phrase d'introduction (optionnel)</Label>
+            <Textarea rows={2} value={values.about_timeline_intro || ""} onChange={(e) => setValues({ ...values, about_timeline_intro: e.target.value })} />
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <div key={n} className="border border-border/50 rounded p-3 space-y-2">
+                <Label className="text-xs">Étape #{n}</Label>
+                <Input
+                  placeholder="Année / période (ex: 2019)"
+                  value={values[`about_timeline${n}_year`] || ""}
+                  onChange={(e) => setValues({ ...values, [`about_timeline${n}_year`]: e.target.value })}
+                />
+                <Input
+                  placeholder="Titre de l'étape"
+                  value={values[`about_timeline${n}_title`] || ""}
+                  onChange={(e) => setValues({ ...values, [`about_timeline${n}_title`]: e.target.value })}
+                />
+                <Textarea
+                  rows={4}
+                  placeholder="Description de l'étape"
+                  value={values[`about_timeline${n}_text`] || ""}
+                  onChange={(e) => setValues({ ...values, [`about_timeline${n}_text`]: e.target.value })}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       <Button onClick={handleSaveAll} size="lg" className="w-full">
