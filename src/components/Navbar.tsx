@@ -11,7 +11,7 @@ import { useIsActiveSubscriber } from "@/hooks/useIsActiveSubscriber";
 const navLinks = [
   { label: "Accueil", to: "/" },
   { label: "Qui je suis", to: "/a-propos" },
-  { label: "Formules", to: "/services" },
+  { label: "Formules par mois", to: "/services" },
   { label: "Planning", to: "/planning" },
   { label: "Avis", to: "/avis" },
   { label: "Contact", to: "/contact" },
