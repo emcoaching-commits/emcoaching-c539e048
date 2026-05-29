@@ -60,6 +60,14 @@ const KEYS = [
   "about_block4_title", "about_block4_text",
   "about_block5_title", "about_block5_text",
   "about_block6_title", "about_block6_text",
+  // Section "Qui suis-je" – Frise chronologique (parcours)
+  "about_timeline_kicker", "about_timeline_title", "about_timeline_intro",
+  "about_timeline1_year", "about_timeline1_title", "about_timeline1_text",
+  "about_timeline2_year", "about_timeline2_title", "about_timeline2_text",
+  "about_timeline3_year", "about_timeline3_title", "about_timeline3_text",
+  "about_timeline4_year", "about_timeline4_title", "about_timeline4_text",
+  "about_timeline5_year", "about_timeline5_title", "about_timeline5_text",
+  "about_timeline6_year", "about_timeline6_title", "about_timeline6_text",
 ];
 
 const HomeContentManager = () => {
