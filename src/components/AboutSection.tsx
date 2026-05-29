@@ -3,66 +3,28 @@ import { CheckCircle2, Play, Heart, Target, Sparkles, Award, Users, Flame } from
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 
-const points = [
-  "Spécialiste en transformation physique",
-  "Approche bienveillante et motivante",
-  "Suivi personnalisé et régulier",
-];
-
-const journey = [
-  {
-    icon: Flame,
-    title: "Ma passion devenue métier",
-    text:
-      "Le sport a changé ma vie. Après des années à m'entraîner et à expérimenter sur moi-même, j'ai décidé d'en faire mon métier pour transmettre cette énergie et accompagner d'autres femmes et hommes vers leur meilleure version.",
-  },
-  {
-    icon: Award,
-    title: "Formée et certifiée",
-    text:
-      "Coach sportive diplômée et formée en nutrition, je me forme en continu pour t'offrir un accompagnement à jour, basé sur la science du sport, du mouvement et de l'alimentation — sans régime restrictif ni méthode miracle.",
-  },
-  {
-    icon: Heart,
-    title: "Une approche bienveillante",
-    text:
-      "Je crois qu'on progresse mieux dans la bienveillance que dans la culpabilité. Mon rôle, c'est de te pousser sans te casser, de t'aider à aimer le processus autant que le résultat, et de construire avec toi des habitudes qui durent.",
-  },
-  {
-    icon: Target,
-    title: "Du sur-mesure, vraiment",
-    text:
-      "Chaque programme est construit pour toi : ton objectif, ton niveau, ton emploi du temps, ton matériel. Pas de copier-coller. Le programme évolue toutes les 6 semaines pour rester stimulant et efficace.",
-  },
-  {
-    icon: Users,
-    title: "Disponible et à l'écoute",
-    text:
-      "Tu n'es jamais seul·e. Je suis joignable pour répondre à tes questions, ajuster le programme, te remotiver quand c'est dur. On avance ensemble, à ton rythme, avec un cap clair.",
-  },
-  {
-    icon: Sparkles,
-    title: "Ma promesse",
-    text:
-      "Te faire (re)tomber amoureux·se du sport, te montrer que manger sainement peut être simple et bon, et te prouver que tu es capable de bien plus que ce que tu imagines.",
-  },
-];
+const blockIcons = [Flame, Award, Heart, Target, Users, Sparkles];
 
 const AboutSection = () => {
   const [activeMedia, setActiveMedia] = useState<string | null>(null);
+  const { data: settings } = useSiteSettings();
+  const s = settings || {};
 
-  const { data: description } = useQuery({
-    queryKey: ["about_description"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("site_settings")
-        .select("value")
-        .eq("key", "about_description")
-        .single();
-      return data?.value || "";
-    },
-  });
+  const description = s.about_description || "";
+  const kicker = s.about_kicker || "À propos";
+  const title = s.about_title || "QUI SUIS-JE ?";
+  const points = [s.about_point1, s.about_point2, s.about_point3].filter(Boolean) as string[];
+  const journeyKicker = s.about_journey_kicker || "Mon histoire & ma vision";
+  const journeyTitle = s.about_journey_title || "POURQUOI ME CHOISIR";
+  const journey = [1, 2, 3, 4, 5, 6]
+    .map((n, i) => ({
+      icon: blockIcons[i],
+      title: s[`about_block${n}_title`] || "",
+      text: s[`about_block${n}_text`] || "",
+    }))
+    .filter((b) => b.title || b.text);
 
   const { data: media } = useQuery({
     queryKey: ["about_media"],
@@ -86,8 +48,8 @@ const AboutSection = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <p className="text-primary font-semibold tracking-widest uppercase text-sm mb-3">À propos</p>
-            <h2 className="font-display text-5xl sm:text-6xl mb-6 text-gradient-blue">QUI SUIS-JE ?</h2>
+            <p className="text-primary font-semibold tracking-widest uppercase text-sm mb-3">{kicker}</p>
+            <h2 className="font-display text-5xl sm:text-6xl mb-6 text-gradient-blue">{title}</h2>
             <p className="text-muted-foreground leading-relaxed mb-6 whitespace-pre-line">
               {description || ""}
             </p>
@@ -178,10 +140,10 @@ const AboutSection = () => {
             className="text-center mb-12"
           >
             <p className="text-primary font-semibold tracking-widest uppercase text-xs mb-3">
-              Mon histoire & ma vision
+              {journeyKicker}
             </p>
             <h3 className="font-display text-4xl sm:text-5xl text-gradient-blue">
-              POURQUOI ME CHOISIR
+              {journeyTitle}
             </h3>
           </motion.div>
 
