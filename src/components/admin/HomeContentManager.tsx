@@ -555,6 +555,68 @@ const HomeContentManager = () => {
         </Button>
       </div>
 
+      {/* Section Qui suis-je */}
+      <div className="border border-border rounded-lg p-4 bg-background/50 space-y-4">
+        <h4 className="font-display text-lg text-foreground">Section "Qui suis-je"</h4>
+        <div className="grid sm:grid-cols-2 gap-3">
+          <div className="space-y-2">
+            <Label>Petit titre (kicker)</Label>
+            <Input value={values.about_kicker || ""} onChange={(e) => setValues({ ...values, about_kicker: e.target.value })} />
+          </div>
+          <div className="space-y-2">
+            <Label>Titre principal</Label>
+            <Input value={values.about_title || ""} onChange={(e) => setValues({ ...values, about_title: e.target.value })} />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label>Description (paragraphe principal)</Label>
+          <Textarea rows={5} value={values.about_description || ""} onChange={(e) => setValues({ ...values, about_description: e.target.value })} />
+        </div>
+        <div className="grid sm:grid-cols-3 gap-3">
+          {[1, 2, 3].map((n) => (
+            <div key={n} className="space-y-2">
+              <Label className="text-xs">Point fort #{n}</Label>
+              <Input
+                value={values[`about_point${n}`] || ""}
+                onChange={(e) => setValues({ ...values, [`about_point${n}`]: e.target.value })}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="pt-4 border-t border-border/50 space-y-3">
+          <h5 className="font-display text-foreground">Sous-section "Pourquoi me choisir"</h5>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label>Petit titre</Label>
+              <Input value={values.about_journey_kicker || ""} onChange={(e) => setValues({ ...values, about_journey_kicker: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Titre</Label>
+              <Input value={values.about_journey_title || ""} onChange={(e) => setValues({ ...values, about_journey_title: e.target.value })} />
+            </div>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <div key={n} className="border border-border/50 rounded p-3 space-y-2">
+                <Label className="text-xs">Bloc #{n}</Label>
+                <Input
+                  placeholder="Titre du bloc"
+                  value={values[`about_block${n}_title`] || ""}
+                  onChange={(e) => setValues({ ...values, [`about_block${n}_title`]: e.target.value })}
+                />
+                <Textarea
+                  rows={4}
+                  placeholder="Texte du bloc"
+                  value={values[`about_block${n}_text`] || ""}
+                  onChange={(e) => setValues({ ...values, [`about_block${n}_text`]: e.target.value })}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <Button onClick={handleSaveAll} size="lg" className="w-full">
         <Save size={16} className="mr-2" /> Tout enregistrer
       </Button>
