@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
-import { CheckCircle2, Play, Heart, Target, Sparkles, Award, Users, Flame } from "lucide-react";
+import { CheckCircle2, Play, Heart, Target, Sparkles, Award, Users, Flame, GraduationCap, Trophy, Briefcase, Rocket, Star, Dumbbell } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const blockIcons = [Flame, Award, Heart, Target, Users, Sparkles];
+const timelineIcons = [GraduationCap, Dumbbell, Trophy, Briefcase, Rocket, Star];
 
 const AboutSection = () => {
   const [activeMedia, setActiveMedia] = useState<string | null>(null);
@@ -25,6 +26,18 @@ const AboutSection = () => {
       text: s[`about_block${n}_text`] || "",
     }))
     .filter((b) => b.title || b.text);
+
+  const timelineKicker = s.about_timeline_kicker || "Mon parcours";
+  const timelineTitle = s.about_timeline_title || "MON HISTOIRE & MES EXPÉRIENCES";
+  const timelineIntro = s.about_timeline_intro || "";
+  const timeline = [1, 2, 3, 4, 5, 6]
+    .map((n, i) => ({
+      icon: timelineIcons[i],
+      year: s[`about_timeline${n}_year`] || "",
+      title: s[`about_timeline${n}_title`] || "",
+      text: s[`about_timeline${n}_text`] || "",
+    }))
+    .filter((t) => t.year || t.title || t.text);
 
   const { data: media } = useQuery({
     queryKey: ["about_media"],
