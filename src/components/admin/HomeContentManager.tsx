@@ -60,6 +60,14 @@ const KEYS = [
   "about_block4_title", "about_block4_text",
   "about_block5_title", "about_block5_text",
   "about_block6_title", "about_block6_text",
+  // Section "Qui suis-je" – Frise chronologique (parcours)
+  "about_timeline_kicker", "about_timeline_title", "about_timeline_intro",
+  "about_timeline1_year", "about_timeline1_title", "about_timeline1_text",
+  "about_timeline2_year", "about_timeline2_title", "about_timeline2_text",
+  "about_timeline3_year", "about_timeline3_title", "about_timeline3_text",
+  "about_timeline4_year", "about_timeline4_title", "about_timeline4_text",
+  "about_timeline5_year", "about_timeline5_title", "about_timeline5_text",
+  "about_timeline6_year", "about_timeline6_title", "about_timeline6_text",
 ];
 
 const HomeContentManager = () => {
@@ -146,6 +154,27 @@ const HomeContentManager = () => {
       about_block5_text: "Tu n'es jamais seul·e. Je suis joignable pour répondre à tes questions, ajuster le programme, te remotiver quand c'est dur. On avance ensemble, à ton rythme, avec un cap clair.",
       about_block6_title: "Ma promesse",
       about_block6_text: "Te faire (re)tomber amoureux·se du sport, te montrer que manger sainement peut être simple et bon, et te prouver que tu es capable de bien plus que ce que tu imagines.",
+      about_timeline_kicker: "Mon parcours",
+      about_timeline_title: "MON HISTOIRE & MES EXPÉRIENCES",
+      about_timeline_intro: "Du déclic personnel à l'accompagnement de centaines de clientes, voici les étapes clés qui ont fait de moi la coach que je suis aujourd'hui.",
+      about_timeline1_year: "2015",
+      about_timeline1_title: "Le déclic",
+      about_timeline1_text: "Je découvre la musculation et la nutrition. Ce qui commence comme un défi personnel devient rapidement une vraie passion qui transforme mon corps, mon mental et ma vie quotidienne.",
+      about_timeline2_year: "2017",
+      about_timeline2_title: "Premiers résultats & transmission",
+      about_timeline2_text: "Après plusieurs années d'entraînement et d'expérimentation, mes proches me demandent conseil. J'accompagne mes premières amies bénévolement et je découvre que j'adore transmettre.",
+      about_timeline3_year: "2019",
+      about_timeline3_title: "Certification de coach sportive",
+      about_timeline3_text: "Je décide d'en faire mon métier et j'obtiens ma certification de coach sportive. En parallèle, je me forme à la nutrition pour proposer un accompagnement vraiment complet.",
+      about_timeline4_year: "2021",
+      about_timeline4_text: "Je lance officiellement EM' Coaching et accompagne mes premières clientes en présentiel et à distance, avec un suivi sur-mesure et bienveillant.",
+      about_timeline4_title: "Lancement d'EM' Coaching",
+      about_timeline5_year: "2023",
+      about_timeline5_title: "Spécialisation & méthode",
+      about_timeline5_text: "Forte de l'expérience accumulée, je structure ma méthode : programmes évolutifs toutes les 6 semaines, suivi Google Sheets, bilans hebdomadaires et coaching mental intégré.",
+      about_timeline6_year: "Aujourd'hui",
+      about_timeline6_title: "+150 clientes accompagnées",
+      about_timeline6_text: "Aujourd'hui, j'ai la chance d'accompagner des dizaines de femmes et d'hommes dans leur transformation, avec une approche humaine, durable et toujours personnalisée.",
     };
     for (const s of settings || []) {
       init[s.key] = s.value || "";
@@ -610,6 +639,50 @@ const HomeContentManager = () => {
                   placeholder="Texte du bloc"
                   value={values[`about_block${n}_text`] || ""}
                   onChange={(e) => setValues({ ...values, [`about_block${n}_text`]: e.target.value })}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="pt-4 border-t border-border/50 space-y-3">
+          <h5 className="font-display text-foreground">Frise "Mon parcours" (histoire & expériences)</h5>
+          <p className="text-xs text-muted-foreground">
+            Une frise chronologique pour raconter ton histoire. Laisse un bloc vide pour le masquer.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label>Petit titre (kicker)</Label>
+              <Input value={values.about_timeline_kicker || ""} onChange={(e) => setValues({ ...values, about_timeline_kicker: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Titre</Label>
+              <Input value={values.about_timeline_title || ""} onChange={(e) => setValues({ ...values, about_timeline_title: e.target.value })} />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>Phrase d'introduction (optionnel)</Label>
+            <Textarea rows={2} value={values.about_timeline_intro || ""} onChange={(e) => setValues({ ...values, about_timeline_intro: e.target.value })} />
+          </div>
+          <div className="grid sm:grid-cols-2 gap-3">
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <div key={n} className="border border-border/50 rounded p-3 space-y-2">
+                <Label className="text-xs">Étape #{n}</Label>
+                <Input
+                  placeholder="Année / période (ex: 2019)"
+                  value={values[`about_timeline${n}_year`] || ""}
+                  onChange={(e) => setValues({ ...values, [`about_timeline${n}_year`]: e.target.value })}
+                />
+                <Input
+                  placeholder="Titre de l'étape"
+                  value={values[`about_timeline${n}_title`] || ""}
+                  onChange={(e) => setValues({ ...values, [`about_timeline${n}_title`]: e.target.value })}
+                />
+                <Textarea
+                  rows={4}
+                  placeholder="Description de l'étape"
+                  value={values[`about_timeline${n}_text`] || ""}
+                  onChange={(e) => setValues({ ...values, [`about_timeline${n}_text`]: e.target.value })}
                 />
               </div>
             ))}

@@ -1,11 +1,12 @@
 import { motion } from "framer-motion";
-import { CheckCircle2, Play, Heart, Target, Sparkles, Award, Users, Flame } from "lucide-react";
+import { CheckCircle2, Play, Heart, Target, Sparkles, Award, Users, Flame, GraduationCap, Trophy, Briefcase, Rocket, Star, Dumbbell } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 
 const blockIcons = [Flame, Award, Heart, Target, Users, Sparkles];
+const timelineIcons = [GraduationCap, Dumbbell, Trophy, Briefcase, Rocket, Star];
 
 const AboutSection = () => {
   const [activeMedia, setActiveMedia] = useState<string | null>(null);
@@ -25,6 +26,18 @@ const AboutSection = () => {
       text: s[`about_block${n}_text`] || "",
     }))
     .filter((b) => b.title || b.text);
+
+  const timelineKicker = s.about_timeline_kicker || "Mon parcours";
+  const timelineTitle = s.about_timeline_title || "MON HISTOIRE & MES EXPÉRIENCES";
+  const timelineIntro = s.about_timeline_intro || "";
+  const timeline = [1, 2, 3, 4, 5, 6]
+    .map((n, i) => ({
+      icon: timelineIcons[i],
+      year: s[`about_timeline${n}_year`] || "",
+      title: s[`about_timeline${n}_title`] || "",
+      text: s[`about_timeline${n}_text`] || "",
+    }))
+    .filter((t) => t.year || t.title || t.text);
 
   const { data: media } = useQuery({
     queryKey: ["about_media"],
@@ -129,6 +142,89 @@ const AboutSection = () => {
             )}
           </motion.div>
         </div>
+
+        {/* Frise chronologique — Mon parcours */}
+        {timeline.length > 0 && (
+          <div className="mt-24">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="text-center mb-12"
+            >
+              <p className="text-primary font-semibold tracking-widest uppercase text-xs mb-3">
+                {timelineKicker}
+              </p>
+              <h3 className="font-display text-4xl sm:text-5xl text-gradient-blue mb-4">
+                {timelineTitle}
+              </h3>
+              {timelineIntro && (
+                <p className="text-muted-foreground max-w-2xl mx-auto whitespace-pre-line">
+                  {timelineIntro}
+                </p>
+              )}
+            </motion.div>
+
+            <div className="relative max-w-4xl mx-auto">
+              {/* Ligne verticale centrale (desktop) */}
+              <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-primary/40 via-primary/20 to-transparent -translate-x-1/2" />
+              {/* Ligne verticale gauche (mobile) */}
+              <div className="md:hidden absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-primary/40 via-primary/20 to-transparent" />
+
+              <div className="space-y-10">
+                {timeline.map((t, i) => {
+                  const Icon = t.icon;
+                  const isLeft = i % 2 === 0;
+                  return (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: i * 0.08 }}
+                      className="relative md:grid md:grid-cols-2 md:gap-12 items-center"
+                    >
+                      {/* Point central */}
+                      <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent border-4 border-background items-center justify-center shadow-lg shadow-primary/30 z-10">
+                        <Icon className="text-primary-foreground" size={18} />
+                      </div>
+                      {/* Point mobile */}
+                      <div className="md:hidden absolute left-0 w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent border-4 border-background flex items-center justify-center shadow-lg shadow-primary/30 z-10">
+                        <Icon className="text-primary-foreground" size={18} />
+                      </div>
+
+                      {/* Carte contenu */}
+                      <div
+                        className={`pl-20 md:pl-0 ${
+                          isLeft ? "md:pr-12 md:text-right" : "md:col-start-2 md:pl-12"
+                        }`}
+                      >
+                        <div className="card-hover rounded-2xl border border-border bg-card/60 backdrop-blur-sm p-6">
+                          {t.year && (
+                            <span className="inline-block text-xs font-semibold tracking-widest uppercase text-primary bg-primary/10 border border-primary/20 rounded-full px-3 py-1 mb-3">
+                              {t.year}
+                            </span>
+                          )}
+                          {t.title && (
+                            <h4 className="font-display text-2xl text-foreground mb-2">
+                              {t.title}
+                            </h4>
+                          )}
+                          {t.text && (
+                            <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-line">
+                              {t.text}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Mon histoire — détails */}
         <div className="mt-20">
