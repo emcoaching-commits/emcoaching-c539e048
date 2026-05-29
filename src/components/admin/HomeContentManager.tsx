@@ -50,6 +50,16 @@ const KEYS = [
   "theme_primary", "theme_accent", "theme_background", "theme_foreground",
   // Popup de bienvenue
   "welcome_popup_enabled", "welcome_popup_title", "welcome_popup_content", "welcome_popup_version",
+  // Section "Qui suis-je"
+  "about_kicker", "about_title", "about_description",
+  "about_point1", "about_point2", "about_point3",
+  "about_journey_kicker", "about_journey_title",
+  "about_block1_title", "about_block1_text",
+  "about_block2_title", "about_block2_text",
+  "about_block3_title", "about_block3_text",
+  "about_block4_title", "about_block4_text",
+  "about_block5_title", "about_block5_text",
+  "about_block6_title", "about_block6_text",
 ];
 
 const HomeContentManager = () => {
@@ -116,6 +126,26 @@ const HomeContentManager = () => {
       welcome_popup_title: "Bienvenue sur EM' Coaching !",
       welcome_popup_content: "Merci de visiter le site !",
       welcome_popup_version: "1",
+      about_kicker: "À propos",
+      about_title: "QUI SUIS-JE ?",
+      about_description: "",
+      about_point1: "Spécialiste en transformation physique",
+      about_point2: "Approche bienveillante et motivante",
+      about_point3: "Suivi personnalisé et régulier",
+      about_journey_kicker: "Mon histoire & ma vision",
+      about_journey_title: "POURQUOI ME CHOISIR",
+      about_block1_title: "Ma passion devenue métier",
+      about_block1_text: "Le sport a changé ma vie. Après des années à m'entraîner et à expérimenter sur moi-même, j'ai décidé d'en faire mon métier pour transmettre cette énergie et accompagner d'autres femmes et hommes vers leur meilleure version.",
+      about_block2_title: "Formée et certifiée",
+      about_block2_text: "Coach sportive diplômée et formée en nutrition, je me forme en continu pour t'offrir un accompagnement à jour, basé sur la science du sport, du mouvement et de l'alimentation — sans régime restrictif ni méthode miracle.",
+      about_block3_title: "Une approche bienveillante",
+      about_block3_text: "Je crois qu'on progresse mieux dans la bienveillance que dans la culpabilité. Mon rôle, c'est de te pousser sans te casser, de t'aider à aimer le processus autant que le résultat, et de construire avec toi des habitudes qui durent.",
+      about_block4_title: "Du sur-mesure, vraiment",
+      about_block4_text: "Chaque programme est construit pour toi : ton objectif, ton niveau, ton emploi du temps, ton matériel. Pas de copier-coller. Le programme évolue toutes les 6 semaines pour rester stimulant et efficace.",
+      about_block5_title: "Disponible et à l'écoute",
+      about_block5_text: "Tu n'es jamais seul·e. Je suis joignable pour répondre à tes questions, ajuster le programme, te remotiver quand c'est dur. On avance ensemble, à ton rythme, avec un cap clair.",
+      about_block6_title: "Ma promesse",
+      about_block6_text: "Te faire (re)tomber amoureux·se du sport, te montrer que manger sainement peut être simple et bon, et te prouver que tu es capable de bien plus que ce que tu imagines.",
     };
     for (const s of settings || []) {
       init[s.key] = s.value || "";
