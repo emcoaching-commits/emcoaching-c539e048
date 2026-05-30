@@ -710,6 +710,7 @@ const HomeContentManager = ({ section }: { section?: Section } = {}) => {
           </div>
         </div>
       </div>
+      )}
 
       <Button onClick={handleSaveAll} size="lg" className="w-full">
         <Save size={16} className="mr-2" /> Tout enregistrer
