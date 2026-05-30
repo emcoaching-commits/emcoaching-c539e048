@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search, Users, Settings, CalendarClock, Tag, Clock, Image, Upload, Package, Edit2, Save, Calendar, Link2, BellRing, Home, Info, Megaphone, FileText, ChevronRight, Menu } from "lucide-react";
+import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search, Users, Settings, CalendarClock, Tag, Clock, Image, Upload, Package, Edit2, Save, Calendar, Link2, BellRing, Home, Info, Megaphone, FileText, ChevronRight, Menu, Palette, Phone, PartyPopper, ImagePlus } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -597,9 +597,14 @@ const Admin = () => {
               label: "Contenu",
               icon: Image,
               tabs: [
-                { value: "home", label: "Accueil & Logo", icon: Home },
-                { value: "about", label: "À propos", icon: Info },
+                { value: "logos", label: "Logo & marque", icon: Image },
+                { value: "home", label: "Accueil", icon: Home },
+                { value: "about", label: "Qui suis-je", icon: Info },
+                { value: "media", label: "Photos & vidéos", icon: ImagePlus },
                 { value: "formules", label: "Formules", icon: Package },
+                { value: "footer", label: "Footer & contact", icon: Phone },
+                { value: "theme", label: "Thème (couleurs)", icon: Palette },
+                { value: "welcome", label: "Popup bienvenue", icon: PartyPopper },
                 { value: "popups", label: "Popups info", icon: Megaphone },
               ],
             },
