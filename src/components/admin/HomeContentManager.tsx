@@ -435,8 +435,10 @@ const HomeContentManager = ({ section }: { section?: Section } = {}) => {
           </div>
         </div>
       </div>
+      )}
 
       {/* Section 3 piliers */}
+      {(!section || section === "home") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-3">
         <h4 className="font-display text-lg text-foreground">Section "3 piliers"</h4>
         <div className="grid sm:grid-cols-2 gap-3">
@@ -459,8 +461,10 @@ const HomeContentManager = ({ section }: { section?: Section } = {}) => {
           ))}
         </div>
       </div>
+      )}
 
       {/* Section questionnaire */}
+      {(!section || section === "home") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-3">
         <h4 className="font-display text-lg text-foreground">Section Questionnaire</h4>
         <div className="grid sm:grid-cols-2 gap-3">
