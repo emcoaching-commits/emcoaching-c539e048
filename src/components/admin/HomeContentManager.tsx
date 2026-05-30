@@ -70,7 +70,9 @@ const KEYS = [
   "about_timeline6_year", "about_timeline6_title", "about_timeline6_text",
 ];
 
-const HomeContentManager = () => {
+type Section = "logos" | "home" | "about" | "footer" | "theme" | "welcome";
+
+const HomeContentManager = ({ section }: { section?: Section } = {}) => {
   const queryClient = useQueryClient();
   const [values, setValues] = useState<Record<string, string>>({});
   const [uploadingLogo, setUploadingLogo] = useState<"site" | "hero" | "favicon" | null>(null);
@@ -232,6 +234,7 @@ const HomeContentManager = () => {
   return (
     <div className="space-y-8">
       {/* Logos */}
+      {(!section || section === "logos") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-4">
         <h4 className="font-display text-lg text-foreground">Logos</h4>
 
@@ -300,8 +303,10 @@ const HomeContentManager = () => {
           />
         </div>
       </div>
+      )}
 
       {/* Marque */}
+      {(!section || section === "logos") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-3">
         <h4 className="font-display text-lg text-foreground">Nom de la marque (navbar)</h4>
         <Input
@@ -309,8 +314,10 @@ const HomeContentManager = () => {
           onChange={(e) => setValues({ ...values, site_brand_name: e.target.value })}
         />
       </div>
+      )}
 
       {/* Hero textes */}
+      {(!section || section === "home") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-4">
         <h4 className="font-display text-lg text-foreground">Textes de la page d'accueil</h4>
 
@@ -355,8 +362,10 @@ const HomeContentManager = () => {
           />
         </div>
       </div>
+      )}
 
       {/* Section marketing : accroche, chiffres, résultats, CTA */}
+      {(!section || section === "home") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-4">
         <h4 className="font-display text-lg text-foreground">Section marketing (chiffres & résultats)</h4>
 
