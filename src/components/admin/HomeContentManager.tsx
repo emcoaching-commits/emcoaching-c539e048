@@ -486,8 +486,10 @@ const HomeContentManager = ({ section }: { section?: Section } = {}) => {
           <Input value={values.quest_button || ""} onChange={(e) => setValues({ ...values, quest_button: e.target.value })} />
         </div>
       </div>
+      )}
 
       {/* Footer & Contact */}
+      {(!section || section === "footer") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-3">
         <h4 className="font-display text-lg text-foreground">Footer & coordonnées</h4>
         <div className="grid sm:grid-cols-2 gap-3">
@@ -519,8 +521,10 @@ const HomeContentManager = ({ section }: { section?: Section } = {}) => {
           </div>
         </div>
       </div>
+      )}
 
       {/* Couleurs du thème */}
+      {(!section || section === "theme") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-3">
         <h4 className="font-display text-lg text-foreground">Couleurs du thème</h4>
         <p className="text-xs text-muted-foreground">Format HSL : <code>"H S% L%"</code> — ex: <code>217 91% 50%</code>. Astuce : utilise un convertisseur HEX→HSL.</p>
@@ -541,8 +545,10 @@ const HomeContentManager = ({ section }: { section?: Section } = {}) => {
           ))}
         </div>
       </div>
+      )}
 
       {/* Popup de bienvenue */}
+      {(!section || section === "welcome") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-3">
         <h4 className="font-display text-lg text-foreground">Message de bienvenue (popup)</h4>
         <p className="text-xs text-muted-foreground">
@@ -596,8 +602,10 @@ const HomeContentManager = ({ section }: { section?: Section } = {}) => {
           <Save size={14} className="mr-1" /> Enregistrer le popup
         </Button>
       </div>
+      )}
 
       {/* Section Qui suis-je */}
+      {(!section || section === "about") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-4">
         <h4 className="font-display text-lg text-foreground">Section "Qui suis-je"</h4>
         <div className="grid sm:grid-cols-2 gap-3">
