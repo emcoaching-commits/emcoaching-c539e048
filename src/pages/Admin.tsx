@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search, Users, Settings, CalendarClock, Tag, Clock, Image, Upload, Package, Edit2, Save, Calendar, Link2, BellRing, Home, Info, Megaphone, FileText, ChevronRight, Menu } from "lucide-react";
+import { Star, ArrowLeft, Trash2, Check, X, Plus, Send, MessageCircle, Bell, UserPlus, RefreshCw, AlertTriangle, Search, Users, Settings, CalendarClock, Tag, Clock, Image, Upload, Package, Edit2, Save, Calendar, Link2, BellRing, Home, Info, Megaphone, FileText, ChevronRight, Menu, Palette, Phone, PartyPopper, ImagePlus } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -597,9 +597,14 @@ const Admin = () => {
               label: "Contenu",
               icon: Image,
               tabs: [
-                { value: "home", label: "Accueil & Logo", icon: Home },
-                { value: "about", label: "À propos", icon: Info },
+                { value: "logos", label: "Logo & marque", icon: Image },
+                { value: "home", label: "Accueil", icon: Home },
+                { value: "about", label: "Qui suis-je", icon: Info },
+                { value: "media", label: "Photos & vidéos", icon: ImagePlus },
                 { value: "formules", label: "Formules", icon: Package },
+                { value: "footer", label: "Footer & contact", icon: Phone },
+                { value: "theme", label: "Thème (couleurs)", icon: Palette },
+                { value: "welcome", label: "Popup bienvenue", icon: PartyPopper },
                 { value: "popups", label: "Popups info", icon: Megaphone },
               ],
             },
@@ -1466,37 +1471,22 @@ const Admin = () => {
           </TabsContent>
 
           <TabsContent value="about" className="space-y-6">
-            {/* Édition complète "Qui suis-je" : kicker, titre, description, points, blocs, frise chronologique */}
-            <HomeContentManager />
-
-            {/* Description editing */}
-            <div className="bg-card border border-border rounded-lg p-4 space-y-3">
-              <h3 className="text-foreground font-display text-lg">DESCRIPTION</h3>
-              <Textarea
-                value={aboutDesc}
-                onChange={(e) => setAboutDesc(e.target.value)}
-                rows={6}
-                className="bg-background border-border text-foreground"
-                placeholder="Décris-toi ici..."
-              />
-              <Button
-                variant="hero"
-                size="sm"
-                onClick={async () => {
-                  const { error } = await supabase
-                    .from("site_settings")
-                    .upsert({ key: "about_description", value: aboutDesc });
-                  if (error) toast.error("Erreur");
-                  else toast.success("Description mise à jour !");
-                }}
-              >
-                <Check size={14} className="mr-1" /> Sauvegarder
-              </Button>
+            <div className="bg-card border border-border rounded-xl p-6">
+              <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                <Info size={20} /> Page "Qui suis-je"
+              </h3>
+              <p className="text-muted-foreground text-sm mb-6">
+                Kicker, titre, description, points forts, "Pourquoi me choisir" et frise chronologique de ton parcours.
+              </p>
+              <HomeContentManager section="about" />
             </div>
+          </TabsContent>
 
+          <TabsContent value="media" className="space-y-6">
             {/* Media upload */}
             <div className="bg-card border border-border rounded-lg p-4 space-y-3">
               <h3 className="text-foreground font-display text-lg">PHOTOS & VIDÉOS</h3>
+              <p className="text-muted-foreground text-sm">Galerie affichée dans la section "Qui suis-je".</p>
               <div className="flex gap-3 items-center">
                 <label className="cursor-pointer">
                   <input
@@ -1641,12 +1631,60 @@ const Admin = () => {
           <TabsContent value="home" className="space-y-6">
             <div className="bg-card border border-border rounded-xl p-6">
               <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
-                <Image size={20} /> Page d'accueil & Logo
+                <Home size={20} /> Page d'accueil
               </h3>
               <p className="text-muted-foreground text-sm mb-6">
-                Modifie les textes de la page d'accueil, le nom de la marque et les logos.
+                Hero, accroche marketing, chiffres, 3 piliers et bloc questionnaire.
               </p>
-              <HomeContentManager />
+              <HomeContentManager section="home" />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="logos" className="space-y-6">
+            <div className="bg-card border border-border rounded-xl p-6">
+              <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                <Image size={20} /> Logo, favicon & nom de marque
+              </h3>
+              <p className="text-muted-foreground text-sm mb-6">
+                Logos navbar et hero, favicon de l'onglet et nom affiché de la marque.
+              </p>
+              <HomeContentManager section="logos" />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="footer" className="space-y-6">
+            <div className="bg-card border border-border rounded-xl p-6">
+              <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                <Phone size={20} /> Footer & coordonnées
+              </h3>
+              <p className="text-muted-foreground text-sm mb-6">
+                Textes du footer, téléphone et email de contact.
+              </p>
+              <HomeContentManager section="footer" />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="theme" className="space-y-6">
+            <div className="bg-card border border-border rounded-xl p-6">
+              <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                <Palette size={20} /> Thème (couleurs)
+              </h3>
+              <p className="text-muted-foreground text-sm mb-6">
+                Couleurs principales du site au format HSL.
+              </p>
+              <HomeContentManager section="theme" />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="welcome" className="space-y-6">
+            <div className="bg-card border border-border rounded-xl p-6">
+              <h3 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2">
+                <PartyPopper size={20} /> Popup de bienvenue
+              </h3>
+              <p className="text-muted-foreground text-sm mb-6">
+                Message affiché une fois par visiteur sur la page d'accueil.
+              </p>
+              <HomeContentManager section="welcome" />
             </div>
           </TabsContent>
 

@@ -70,7 +70,9 @@ const KEYS = [
   "about_timeline6_year", "about_timeline6_title", "about_timeline6_text",
 ];
 
-const HomeContentManager = () => {
+type Section = "logos" | "home" | "about" | "footer" | "theme" | "welcome";
+
+const HomeContentManager = ({ section }: { section?: Section } = {}) => {
   const queryClient = useQueryClient();
   const [values, setValues] = useState<Record<string, string>>({});
   const [uploadingLogo, setUploadingLogo] = useState<"site" | "hero" | "favicon" | null>(null);
@@ -232,6 +234,7 @@ const HomeContentManager = () => {
   return (
     <div className="space-y-8">
       {/* Logos */}
+      {(!section || section === "logos") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-4">
         <h4 className="font-display text-lg text-foreground">Logos</h4>
 
@@ -300,8 +303,10 @@ const HomeContentManager = () => {
           />
         </div>
       </div>
+      )}
 
       {/* Marque */}
+      {(!section || section === "logos") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-3">
         <h4 className="font-display text-lg text-foreground">Nom de la marque (navbar)</h4>
         <Input
@@ -309,8 +314,10 @@ const HomeContentManager = () => {
           onChange={(e) => setValues({ ...values, site_brand_name: e.target.value })}
         />
       </div>
+      )}
 
       {/* Hero textes */}
+      {(!section || section === "home") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-4">
         <h4 className="font-display text-lg text-foreground">Textes de la page d'accueil</h4>
 
@@ -355,8 +362,10 @@ const HomeContentManager = () => {
           />
         </div>
       </div>
+      )}
 
       {/* Section marketing : accroche, chiffres, résultats, CTA */}
+      {(!section || section === "home") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-4">
         <h4 className="font-display text-lg text-foreground">Section marketing (chiffres & résultats)</h4>
 
@@ -426,8 +435,10 @@ const HomeContentManager = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* Section 3 piliers */}
+      {(!section || section === "home") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-3">
         <h4 className="font-display text-lg text-foreground">Section "3 piliers"</h4>
         <div className="grid sm:grid-cols-2 gap-3">
@@ -450,8 +461,10 @@ const HomeContentManager = () => {
           ))}
         </div>
       </div>
+      )}
 
       {/* Section questionnaire */}
+      {(!section || section === "home") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-3">
         <h4 className="font-display text-lg text-foreground">Section Questionnaire</h4>
         <div className="grid sm:grid-cols-2 gap-3">
@@ -473,8 +486,10 @@ const HomeContentManager = () => {
           <Input value={values.quest_button || ""} onChange={(e) => setValues({ ...values, quest_button: e.target.value })} />
         </div>
       </div>
+      )}
 
       {/* Footer & Contact */}
+      {(!section || section === "footer") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-3">
         <h4 className="font-display text-lg text-foreground">Footer & coordonnées</h4>
         <div className="grid sm:grid-cols-2 gap-3">
@@ -506,8 +521,10 @@ const HomeContentManager = () => {
           </div>
         </div>
       </div>
+      )}
 
       {/* Couleurs du thème */}
+      {(!section || section === "theme") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-3">
         <h4 className="font-display text-lg text-foreground">Couleurs du thème</h4>
         <p className="text-xs text-muted-foreground">Format HSL : <code>"H S% L%"</code> — ex: <code>217 91% 50%</code>. Astuce : utilise un convertisseur HEX→HSL.</p>
@@ -528,8 +545,10 @@ const HomeContentManager = () => {
           ))}
         </div>
       </div>
+      )}
 
       {/* Popup de bienvenue */}
+      {(!section || section === "welcome") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-3">
         <h4 className="font-display text-lg text-foreground">Message de bienvenue (popup)</h4>
         <p className="text-xs text-muted-foreground">
@@ -583,8 +602,10 @@ const HomeContentManager = () => {
           <Save size={14} className="mr-1" /> Enregistrer le popup
         </Button>
       </div>
+      )}
 
       {/* Section Qui suis-je */}
+      {(!section || section === "about") && (
       <div className="border border-border rounded-lg p-4 bg-background/50 space-y-4">
         <h4 className="font-display text-lg text-foreground">Section "Qui suis-je"</h4>
         <div className="grid sm:grid-cols-2 gap-3">
@@ -689,6 +710,7 @@ const HomeContentManager = () => {
           </div>
         </div>
       </div>
+      )}
 
       <Button onClick={handleSaveAll} size="lg" className="w-full">
         <Save size={16} className="mr-2" /> Tout enregistrer
